@@ -16,15 +16,18 @@
 
 package com.android.gradle.replicator.collectors
 
+import com.android.build.api.dsl.ApplicationBuildFeatures
+import com.android.build.api.dsl.DynamicFeatureBuildFeatures
+import com.android.build.api.dsl.LibraryBuildFeatures
+import com.android.build.api.dsl.TestBuildFeatures
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.plugins.BasePlugin
 import com.android.gradle.replicator.model.internal.DefaultAndroidInfo
+import com.android.gradle.replicator.model.internal.DefaultBuildFeaturesInfo
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.*
 import javax.inject.Inject
 
 /**
@@ -40,18 +43,23 @@ interface AndroidCollector {
  * Basic implementation of collector to start with.
  */
 class DefaultAndroidCollector : AndroidCollector {
+    private lateinit var project: Project
     override fun collectInfo(project: Project): AndroidInfoInputs? {
         // load the BasePlugin by reflection in case it does not exist so that we dont fail with ClassNotFoundException
         return project.plugins.withType(BasePlugin::class.java).firstOrNull()?.let {
-            // if we are here there is indeed an Android plugin applied
+            this.project = project
 
+            // if we are here there is indeed an Android plugin applied
             val baseExtension = project.extensions.getByName("android") as BaseExtension
+
+            val buildFeatures = getBuildFeatures(baseExtension)
 
             val inputs = project.objects.newInstance(
                 AndroidInfoInputs::class.java,
                 baseExtension.compileSdkVersion ?: "",
                 baseExtension.defaultConfig.minSdkVersion?.apiLevel ?: 0, //FIXME
-                baseExtension.defaultConfig.targetSdkVersion?.apiLevel ?: 0 //FIXME
+                baseExtension.defaultConfig.targetSdkVersion?.apiLevel ?: 0, //FIXME
+                buildFeatures
             )
 
             // FIXME when we get to provide flavor/build type info, then we can augment this.
@@ -63,6 +71,59 @@ class DefaultAndroidCollector : AndroidCollector {
             inputs
         }
     }
+
+    @Suppress("UnstableApiUsage")
+    private fun getBuildFeatures(extension: BaseExtension): BuildFeaturesInput {
+        val buildFeatures = extension.buildFeatures
+
+        val aidl: Boolean? = buildFeatures.aidl
+        val buildConfig: Boolean? = buildFeatures.buildConfig
+        val compose: Boolean? = buildFeatures.compose
+        val prefab: Boolean? = buildFeatures.prefab
+        val renderScript: Boolean? = buildFeatures.renderScript
+        val resValues: Boolean? = buildFeatures.resValues
+        val shaders: Boolean? = buildFeatures.shaders
+        val viewBinding: Boolean? = buildFeatures.viewBinding
+
+        var androidResources: Boolean? = null
+        var dataBinding: Boolean? = null
+        var mlModelBinding: Boolean? = null
+        var prefabPublishing: Boolean? = null
+
+        when (buildFeatures) {
+            is ApplicationBuildFeatures -> {
+                dataBinding = buildFeatures.dataBinding
+                mlModelBinding = buildFeatures.mlModelBinding
+            }
+            is LibraryBuildFeatures -> {
+                androidResources = buildFeatures.androidResources
+                dataBinding = buildFeatures.dataBinding
+                mlModelBinding = buildFeatures.mlModelBinding
+                prefabPublishing = buildFeatures.prefabPublishing
+
+            }
+            is DynamicFeatureBuildFeatures -> {
+                dataBinding = buildFeatures.dataBinding
+                mlModelBinding = buildFeatures.mlModelBinding
+            }
+            is TestBuildFeatures -> {}
+        }
+
+        return project.objects.newInstance(BuildFeaturesInput::class.java).also {
+            it.aidl.set(aidl)
+            it.androidResources.set(androidResources)
+            it.buildConfig.set(buildConfig)
+            it.compose.set(compose)
+            it.dataBinding.set(dataBinding)
+            it.mlModelBinding.set(mlModelBinding)
+            it.prefab.set(prefab)
+            it.prefabPublishing.set(prefabPublishing)
+            it.renderScript.set(renderScript)
+            it.resValues.set(resValues)
+            it.shaders.set(shaders)
+            it.viewBinding.set(viewBinding)
+        }
+    }
 }
 
 abstract class AndroidInfoInputs @Inject constructor(
@@ -71,7 +132,9 @@ abstract class AndroidInfoInputs @Inject constructor(
     @get:Input
     val minSdkVersion: Int,
     @get:Input
-    val targetSdkVersion: Int
+    val targetSdkVersion: Int,
+    @get:Nested
+    val buildFeatures: BuildFeaturesInput
 ) {
 
     @get:InputFiles
@@ -79,6 +142,63 @@ abstract class AndroidInfoInputs @Inject constructor(
     abstract val javaFolders: ConfigurableFileCollection
 
     fun toInfo(): DefaultAndroidInfo {
-        return DefaultAndroidInfo(compileSdkVersion, minSdkVersion, targetSdkVersion)
+        return DefaultAndroidInfo(compileSdkVersion, minSdkVersion, targetSdkVersion, buildFeatures.toInfo())
     }
 }
+
+abstract class BuildFeaturesInput {
+
+    @get:Input
+    @get:Optional
+    abstract val aidl: Property<Boolean>
+    @get:Input
+    @get:Optional
+    abstract val androidResources: Property<Boolean>
+    @get:Input
+    @get:Optional
+    abstract val buildConfig: Property<Boolean>
+    @get:Input
+    @get:Optional
+    abstract val compose: Property<Boolean>
+    @get:Input
+    @get:Optional
+    abstract val dataBinding: Property<Boolean>
+    @get:Input
+    @get:Optional
+    abstract val mlModelBinding: Property<Boolean>
+    @get:Input
+    @get:Optional
+    abstract val prefab: Property<Boolean>
+    @get:Input
+    @get:Optional
+    abstract val prefabPublishing: Property<Boolean>
+    @get:Input
+    @get:Optional
+    abstract val renderScript: Property<Boolean>
+    @get:Input
+    @get:Optional
+    abstract val resValues: Property<Boolean>
+    @get:Input
+    @get:Optional
+    abstract val shaders: Property<Boolean>
+    @get:Input
+    @get:Optional
+    abstract val viewBinding: Property<Boolean>
+
+    fun toInfo(): DefaultBuildFeaturesInfo =
+            DefaultBuildFeaturesInfo(
+                aidl.orNull,
+                androidResources.orNull,
+                buildConfig.orNull,
+                compose.orNull,
+                dataBinding.orNull,
+                mlModelBinding.orNull,
+                prefab.orNull,
+                prefabPublishing.orNull,
+                renderScript.orNull,
+                resValues.orNull,
+                shaders.orNull,
+                viewBinding.orNull
+            )
+}
+

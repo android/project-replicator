@@ -60,6 +60,32 @@ inline fun <reified T> String.fromJson(adapter: TypeAdapter<T>): T {
 }
 
 /**
+ * Writes a json object
+ */
+internal inline fun <T> T.toJsonObject(
+    writer: JsonWriter,
+    name: String? = null,
+    action: JsonWriter.(T) -> Unit
+) {
+    name?.let { writer.name(it) }
+    writer.beginObject()
+    action(writer, this)
+    writer.endObject()
+}
+
+internal fun JsonWriter.writeJsonString(value: String?, name: String) {
+    value?.let {
+        name(name).value(it)
+    }
+}
+
+internal fun JsonWriter.writeJsonBoolean(value: Boolean?, name: String) {
+    value?.let {
+        name(name).value(it)
+    }
+}
+
+/**
  * Writes a json array
  *
  * @param name the name of the array

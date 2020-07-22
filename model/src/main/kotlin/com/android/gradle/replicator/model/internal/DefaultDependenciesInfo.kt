@@ -30,11 +30,10 @@ data class DefaultDependenciesInfo(
 
 class DependenciesAdapter: TypeAdapter<DependenciesInfo>() {
     override fun write(output: JsonWriter, value: DependenciesInfo) {
-        output
-            .beginObject()
-            .name(value.type.jsonValue).value(value.dependency)
-            .name("method").value(value.scope)
-            .endObject()
+        value.toJsonObject(output) {
+            name(it.type.jsonValue).value(it.dependency)
+            name("method").value(it.scope)
+        }
     }
 
     override fun read(input: JsonReader): DependenciesInfo {

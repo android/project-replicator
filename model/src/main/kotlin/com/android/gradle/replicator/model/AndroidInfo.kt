@@ -23,14 +23,30 @@ interface AndroidInfo {
     val compileSdkVersion: String
     val minSdkVersion: Int
     val targetSdkVersion: Int
+    val buildFeatures: BuildFeaturesInfo
 
-    // TODO add support for build types, flavors, buildFeatures, dynamic-features
+    // TODO add support for build types, flavors, dynamic-features
 
     // TODO implement the items below if useful
     //    val activityCount: Int
     //    val hasLaunchActivity: Boolean
     //    val resources: ResourceInfo
 
+}
+
+interface BuildFeaturesInfo {
+    val aidl: Boolean?
+    val buildConfig: Boolean?
+    val androidResources: Boolean?
+    val compose: Boolean?
+    val dataBinding: Boolean?
+    val mlModelBinding: Boolean?
+    val prefab: Boolean?
+    val prefabPublishing: Boolean?
+    val renderScript: Boolean?
+    val resValues: Boolean?
+    val shaders: Boolean?
+    val viewBinding: Boolean?
 }
 
 /**

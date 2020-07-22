@@ -19,7 +19,6 @@ package com.android.gradle.replicator
 
 import org.gradle.testkit.runner.GradleRunner
 import java.io.File
-import java.lang.RuntimeException
 
 const val GRADLE_VERSION = "6.6-milestone-2"
 const val KOTLIN_VERSION = "1.3.72"
@@ -37,6 +36,7 @@ enum class BuildFileType {
 }
 
 fun BuildFileType.settingsFile(): String {
+    @Suppress("REDUNDANT_ELSE_IN_WHEN")
     return when (this) {
         BuildFileType.KTS -> "settings.gradle.kts"
         BuildFileType.GROOVY -> "settings.gradle"
@@ -45,6 +45,7 @@ fun BuildFileType.settingsFile(): String {
 }
 
 fun BuildFileType.buidFile(): String {
+    @Suppress("REDUNDANT_ELSE_IN_WHEN")
     return when (this) {
         BuildFileType.KTS -> "build.gradle.kts"
         BuildFileType.GROOVY -> "build.gradle"
@@ -90,7 +91,7 @@ fun setupProject(type: BuildFileType, plugins: List<PluginInfo>): ProjectSetup {
  *
  * @param buildscript a provider for the content of the `buildscript` block
  */
-fun setupProject(type: BuildFileType, plugins: List<PluginInfo>, buildscript: (() -> String)? = null): ProjectSetup {
+fun setupProject(type: BuildFileType, plugins: List<PluginInfo>, buildscript: () -> String): ProjectSetup {
     // pass one since we are adding one method to the trace
     return setupProject(type = type, traceOffset = 1, plugins = plugins, buildscript = buildscript)
 }
@@ -102,9 +103,21 @@ fun setupProject(type: BuildFileType, plugins: List<PluginInfo>, buildscript: ((
  *
  * @param buildscript a provider for the content of the `buildscript` block
  */
-fun setupProject(type: BuildFileType, buildscript: (() -> String)? = null): ProjectSetup {
+fun setupProject(type: BuildFileType, buildscript: () -> String): ProjectSetup {
     // pass one since we are adding one method to the trace
     return setupProject(type = type, traceOffset = 1, plugins = listOf(), buildscript = buildscript)
+}
+
+/**
+ * Sets up the project.
+ *
+ * DO NOT USE DEFAULT PARAM VALUES AS THIS BREAKS TRACE INSPECTION
+ *
+ * @param buildscript a provider for the content of the `buildscript` block
+ */
+fun setupProject(type: BuildFileType, traceOffset: Int, buildscript: () -> String): ProjectSetup {
+    // pass one since we are adding one method to the trace
+    return setupProject(type = type, traceOffset = traceOffset, plugins = listOf(), buildscript = buildscript)
 }
 
 /**
@@ -116,6 +129,7 @@ fun setupProject(type: BuildFileType, buildscript: (() -> String)? = null): Proj
  *                    [setupProject]. 1 indicates the parent of the caller, and so on.
  * @param buildscript a provider for the content of the `buildscript` block
  */
+@Suppress("UnstableApiUsage")
 fun setupProject(
     type: BuildFileType,
     traceOffset: Int,
@@ -179,6 +193,13 @@ $customPlugins
         val oldCP = runner.pluginClasspath
         runner.withPluginClasspath(newCP + oldCP)
     }
+
+    val env = runner.environment
+    val newEnv = mutableMapOf<String, String>().also {
+        it["ANDROID_SDK_ROOT"] = System.getenv("ANDROID_SDK_ROOT")
+    }
+    env?.let { newEnv.putAll(it) }
+    runner.withEnvironment(newEnv)
 
     runner.withProjectDir(projectDir)
 

@@ -102,6 +102,10 @@ class ProjectAdapterTest {
                 compileSdkVersion = "android-30"
                 minSdkVersion = 24
                 targetSdkVersion = 30
+                buildFeatures {
+                    androidResources = true
+                    compose = true
+                }
             }
         }
     }
@@ -157,7 +161,11 @@ private val FULL_PROJECT = """
         "android": {
           "compileSdkVersion": "android-30",
           "minSdkVersion": 24,
-          "targetSdkVersion": 30
+          "targetSdkVersion": 30,
+          "buildFeatures": {
+            "androidResources": true,
+            "compose": true
+          }
         }
       },
       "modules": []

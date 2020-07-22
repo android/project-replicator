@@ -17,6 +17,7 @@
 package com.android.gradle.replicator.model.internal
 
 import com.android.gradle.replicator.model.AndroidInfo
+import com.android.gradle.replicator.model.BuildFeaturesInfo
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
@@ -24,29 +25,34 @@ import com.google.gson.stream.JsonWriter
 data class DefaultAndroidInfo(
     override val compileSdkVersion: String,
     override val minSdkVersion: Int,
-    override val targetSdkVersion: Int
+    override val targetSdkVersion: Int,
+    override val buildFeatures: BuildFeaturesInfo
 ) : AndroidInfo
 
 class AndroidAdapter: TypeAdapter<AndroidInfo>() {
     override fun write(output: JsonWriter, value: AndroidInfo) {
-        output
-            .beginObject()
-            .name("compileSdkVersion").value(value.compileSdkVersion)
-            .name("minSdkVersion").value(value.minSdkVersion)
-            .name("targetSdkVersion").value(value.targetSdkVersion)
-            .endObject()
+        value.toJsonObject(output) {
+            name("compileSdkVersion").value(it.compileSdkVersion)
+            name("minSdkVersion").value(it.minSdkVersion)
+            name("targetSdkVersion").value(it.targetSdkVersion)
+
+            name("buildFeatures")
+            BuildFeaturesInfoAdapter().write(this, it.buildFeatures)
+        }
     }
 
     override fun read(input: JsonReader): AndroidInfo {
         var compileSdkVersion: String? = null
         var minSdkVersion: Int? = null
         var targetSdkVersion: Int? = null
+        var buildFeaturesInfo: BuildFeaturesInfo? = null
 
         input.readObjectProperties {
             when (it) {
                 "compileSdkVersion" -> compileSdkVersion = nextString()
                 "minSdkVersion" -> minSdkVersion = nextInt()
                 "targetSdkVersion" -> targetSdkVersion = nextInt()
+                "buildFeatures" -> buildFeaturesInfo = BuildFeaturesInfoAdapter().read(input)
                 else -> skipValue()
             }
         }
@@ -54,6 +60,8 @@ class AndroidAdapter: TypeAdapter<AndroidInfo>() {
         return DefaultAndroidInfo(
             compileSdkVersion ?: "",
             minSdkVersion ?: 0,
-            targetSdkVersion ?: 0)
+            targetSdkVersion ?: 0,
+            buildFeaturesInfo ?: DefaultBuildFeaturesInfo()
+        )
     }
 }

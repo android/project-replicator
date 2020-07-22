@@ -87,6 +87,7 @@ val agpTask by tasks.registering(AgpClasspathTask::class) {
 
 functionalTest.configure {
     systemProperty("agp.classpath", outputFileLocation.forUseAtConfigurationTime().get().asFile.absolutePath)
+    environment("ANDROID_SDK_ROOT", System.getenv("ANDROID_SDK_ROOT"))
     dependsOn(agpTask)
 }
 

@@ -165,7 +165,7 @@ private val relevantConfigurations = setOf(
 private fun gatherDependencies(config: Configuration): List<DependenciesInfoInputs> {
     val builder = mutableListOf<DependenciesInfoInputs>()
 
-    for (dependency in config.allDependencies) {
+    for (dependency in config.dependencies) {
         val dep = when (dependency) {
             is ProjectDependency -> DependenciesInfoInputs(
                 type = DependencyType.MODULE,

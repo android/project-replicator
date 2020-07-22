@@ -23,6 +23,11 @@ class AndroidBuilder {
     var compileSdkVersion: String = ""
     var minSdkVersion: Int = 0
     var targetSdkVersion: Int = 0
+    var buildFeatures: BuildFeaturesBuilder = BuildFeaturesBuilder()
 
-    fun toInfo(): AndroidInfo = DefaultAndroidInfo(compileSdkVersion, minSdkVersion, targetSdkVersion)
+    fun buildFeatures(action: BuildFeaturesBuilder.() -> Unit) {
+        action(buildFeatures)
+    }
+
+    fun toInfo(): AndroidInfo = DefaultAndroidInfo(compileSdkVersion, minSdkVersion, targetSdkVersion, buildFeatures.toInfo())
 }
