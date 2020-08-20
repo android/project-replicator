@@ -15,6 +15,12 @@ See [USAGE.md](docs/USAGE.md)
 
 See [TODO.md](TODO.md)
 
+## Versions ##
+
+*0.2* Add support for `android.BuildFeatures`.
+
+*0.1* Initial version.
+
 ## Disclaimer ##
 
 This is not an officially supported Google product.

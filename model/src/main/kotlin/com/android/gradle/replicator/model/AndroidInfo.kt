@@ -47,6 +47,21 @@ interface BuildFeaturesInfo {
     val resValues: Boolean?
     val shaders: Boolean?
     val viewBinding: Boolean?
+
+    fun hasFeatures(): Boolean {
+        return aidl != null
+                || buildConfig != null
+                || androidResources != null
+                || compose != null
+                || dataBinding != null
+                || mlModelBinding != null
+                || prefab != null
+                || prefabPublishing != null
+                || renderScript != null
+                || resValues != null
+                || shaders != null
+                || viewBinding != null
+    }
 }
 
 /**

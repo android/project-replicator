@@ -73,58 +73,52 @@ class DefaultAndroidCollector : AndroidCollector {
     }
 
     @Suppress("UnstableApiUsage")
-    private fun getBuildFeatures(extension: BaseExtension): BuildFeaturesInput {
-        val buildFeatures = extension.buildFeatures
+    private fun getBuildFeatures(extension: BaseExtension): BuildFeaturesInput =
+            project.objects.newInstance(BuildFeaturesInput::class.java).also { buildFeaturesInput ->
+                try {
+                    val buildFeatures = extension.buildFeatures
 
-        val aidl: Boolean? = buildFeatures.aidl
-        val buildConfig: Boolean? = buildFeatures.buildConfig
-        val compose: Boolean? = buildFeatures.compose
-        val prefab: Boolean? = buildFeatures.prefab
-        val renderScript: Boolean? = buildFeatures.renderScript
-        val resValues: Boolean? = buildFeatures.resValues
-        val shaders: Boolean? = buildFeatures.shaders
-        val viewBinding: Boolean? = buildFeatures.viewBinding
+                    buildFeaturesInput.aidl.lenientSet { buildFeatures.aidl }
+                    buildFeaturesInput.buildConfig.lenientSet { buildFeatures.buildConfig }
+                    buildFeaturesInput.compose.lenientSet { buildFeatures.compose }
 
-        var androidResources: Boolean? = null
-        var dataBinding: Boolean? = null
-        var mlModelBinding: Boolean? = null
-        var prefabPublishing: Boolean? = null
+                    buildFeaturesInput.prefab.lenientSet { buildFeatures.prefab }
+                    buildFeaturesInput.renderScript.lenientSet { buildFeatures.renderScript }
+                    buildFeaturesInput.resValues.lenientSet { buildFeatures.resValues }
+                    buildFeaturesInput.shaders.lenientSet { buildFeatures.shaders }
+                    buildFeaturesInput.viewBinding.lenientSet { buildFeatures.viewBinding }
 
-        when (buildFeatures) {
-            is ApplicationBuildFeatures -> {
-                dataBinding = buildFeatures.dataBinding
-                mlModelBinding = buildFeatures.mlModelBinding
+                    when (buildFeatures) {
+                        is ApplicationBuildFeatures -> {
+                            buildFeaturesInput.dataBinding.lenientSet { buildFeatures.dataBinding }
+                            buildFeaturesInput.mlModelBinding.lenientSet { buildFeatures.mlModelBinding }
+                        }
+                        is LibraryBuildFeatures -> {
+                            buildFeaturesInput.androidResources.lenientSet { buildFeatures.androidResources }
+                            buildFeaturesInput.dataBinding.lenientSet { buildFeatures.dataBinding }
+                            buildFeaturesInput.mlModelBinding.lenientSet { buildFeatures.mlModelBinding }
+                            buildFeaturesInput.prefabPublishing.lenientSet { buildFeatures.prefabPublishing }
+                        }
+                        is DynamicFeatureBuildFeatures -> {
+                            buildFeaturesInput.dataBinding.lenientSet { buildFeatures.dataBinding }
+                            buildFeaturesInput.mlModelBinding.lenientSet { buildFeatures.mlModelBinding }
+                        }
+                        is TestBuildFeatures -> {
+                        }
+                    }
+
+                } catch (e: Throwable) {
+                    // older AGP don't have buildFeatures
+                }
             }
-            is LibraryBuildFeatures -> {
-                androidResources = buildFeatures.androidResources
-                dataBinding = buildFeatures.dataBinding
-                mlModelBinding = buildFeatures.mlModelBinding
-                prefabPublishing = buildFeatures.prefabPublishing
-
-            }
-            is DynamicFeatureBuildFeatures -> {
-                dataBinding = buildFeatures.dataBinding
-                mlModelBinding = buildFeatures.mlModelBinding
-            }
-            is TestBuildFeatures -> {}
-        }
-
-        return project.objects.newInstance(BuildFeaturesInput::class.java).also {
-            it.aidl.set(aidl)
-            it.androidResources.set(androidResources)
-            it.buildConfig.set(buildConfig)
-            it.compose.set(compose)
-            it.dataBinding.set(dataBinding)
-            it.mlModelBinding.set(mlModelBinding)
-            it.prefab.set(prefab)
-            it.prefabPublishing.set(prefabPublishing)
-            it.renderScript.set(renderScript)
-            it.resValues.set(resValues)
-            it.shaders.set(shaders)
-            it.viewBinding.set(viewBinding)
-        }
-    }
 }
+
+private fun <T> Property<T>.lenientSet(access: () -> T?) = try {
+    set(access())
+} catch (e: Throwable) {
+    // do nothing
+}
+
 
 abstract class AndroidInfoInputs @Inject constructor(
     @get:Input

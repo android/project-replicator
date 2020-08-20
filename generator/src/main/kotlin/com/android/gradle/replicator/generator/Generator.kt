@@ -21,7 +21,6 @@ import com.android.gradle.replicator.model.*
 import com.android.gradle.replicator.model.internal.DefaultDependenciesInfo
 import java.io.File
 
-
 class Generator(private val params: Params) {
     interface Params {
         val jsonFile: File
@@ -262,57 +261,6 @@ allprojects {
         buildFile.appendText("}\n")
     }
 
-    private fun AndroidInfo.generate(
-        folder: File,
-        buildFile: File,
-        gradlePath: String,
-        hasKotlin: Boolean) {
-        // generate the android block
-
-        // For Kotlin projects
-        val kotlinString = if (hasKotlin) {
-            """
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-            """.trimIndent()
-        } else ""
-
-        buildFile.appendText("""
-            android {
-                compileSdkVersion = "$compileSdkVersion"
-                defaultConfig {
-                    minSdkVersion $minSdkVersion
-                    targetSdkVersion $targetSdkVersion
-                }
-                compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_1_8
-                    targetCompatibility JavaVersion.VERSION_1_8
-                }
-                $kotlinString
-            }
-        """.trimIndent())
-
-
-
-        // generate a main manifest.
-        val manifestFile = folder.join("src", "main", "AndroidManifest.xml")
-        val parentFolder = manifestFile.parentFile
-        parentFolder.createDirWithParents()
-
-        // compute package name based on gradle path
-        val packageName = gradlePath.split(":").filter { it.isNotBlank() }.joinToString(".")
-
-        // add "pkg.android." prefix to package in order to guarantee at least 2 segments to the package since it's
-        // by aapt
-        manifestFile.writeText(""" 
-            <?xml version="1.0" encoding="utf-8"?>
-            <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-                package="pkg.android.$packageName">
-            </manifest>
-        """.trimIndent())
-    }
-
     private fun generateSettingsFile(project: ProjectInfo) {
         println("Generate settings.gradle")
         val settingsGradle = File(params.destination, "settings.gradle")
@@ -333,46 +281,3 @@ allprojects {
         }
     }
 }
-
-private fun File.createDirWithParents() {
-    // attempt to create first.
-    // if failure only throw if folder does not exist.
-    // This makes this method able to create the same folder(s) from different thread
-    if (!mkdirs() && !isDirectory) {
-        throw RuntimeException("Cannot create directory $this")
-    }
-}
-
-/**
- * Joins a list of path segments to a given File object.
- *
- * @param paths the segments.
- * @return a new File object.
- */
-private fun File.join(vararg paths: String): File {
-    val p = paths.filter { it.isNotBlank() }
-    return if (p.isEmpty()) {
-        this
-    } else {
-        File(this, p.joinToString(separator = File.separator))
-    }
-}
-
-/**
- * Joins a list of path segments to a given File object.
- *
- * @param paths the segments.
- * @return a new File object.
- */
-private fun File.join(paths: List<String>): File {
-    val p = paths.filter { it.isNotBlank() }
-    return if (p.isEmpty()) {
-        this
-    } else {
-        File(this, p.joinToString(separator = File.separator))
-    }
-}
-
-private fun Iterable<PluginType>.containsAndroid() = any { it.isAndroid }
-private fun Iterable<PluginType>.containsKotlin() = any { it.isKotlin }
-private fun Iterable<PluginType>.containsJava() = any { it.isJava }

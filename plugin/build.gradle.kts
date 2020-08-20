@@ -117,7 +117,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.android.gradle.replicator"
             artifactId = "project-replicator"
-            version = "0.1"
+            version = "0.2"
 
             from(components["java"])
             pom {
