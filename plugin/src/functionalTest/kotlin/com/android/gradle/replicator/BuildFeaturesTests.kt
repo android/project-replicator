@@ -373,7 +373,7 @@ class BuildFeaturesTests {
             },
             "dependencies": [
               {
-                "library": "com.android.databinding:viewbinding:4.1.0-beta02",
+                "library": "com.android.databinding:viewbinding:$AGP_VERSION",
                 "method": "api"
               }
             ],
@@ -424,19 +424,19 @@ class BuildFeaturesTests {
             },
             "dependencies": [
               {
-                "library": "androidx.databinding:databinding-compiler:4.1.0-beta02",
+                "library": "androidx.databinding:databinding-compiler:$AGP_VERSION",
                 "method": "annotationProcessor"
               },
               {
-                "library": "com.android.databinding:adapters:4.1.0-beta02",
+                "library": "com.android.databinding:adapters:$AGP_VERSION",
                 "method": "api"
               },
               {
-                "library": "com.android.databinding:baseLibrary:4.1.0-beta02",
+                "library": "com.android.databinding:baseLibrary:$AGP_VERSION",
                 "method": "api"
               },
               {
-                "library": "com.android.databinding:library:4.1.0-beta02",
+                "library": "com.android.databinding:library:$AGP_VERSION",
                 "method": "api"
               }
             ],

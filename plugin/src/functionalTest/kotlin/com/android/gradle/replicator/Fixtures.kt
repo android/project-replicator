@@ -20,10 +20,9 @@ package com.android.gradle.replicator
 import org.gradle.testkit.runner.GradleRunner
 import java.io.File
 
-const val GRADLE_VERSION = "6.6-milestone-2"
-const val KOTLIN_VERSION = "1.3.72"
-const val AGP_VERSION = "4.1.0-beta02"
-
+val GRADLE_VERSION = System.getenv("GRADLE_VERSION") ?: "failed to find Gradle version"
+val KOTLIN_VERSION = System.getenv("KOTLIN_VERSION") ?: "failed to find Kotlin version"
+val AGP_VERSION = System.getenv("AGP_VERSION") ?: "failed to find AGP version"
 
 class ProjectSetup(
     val projectDir: File,

@@ -32,7 +32,7 @@ class BasicTest {
         // Verify the result
         Truth.assertThat(setup.projectDir.resolve("build/project-structure.json").readText()).isEqualTo("""
 {
-  "gradle": "6.6-milestone-2",
+  "gradle": "$GRADLE_VERSION",
   "agp": "n/a",
   "kotlin": "n/a",
   "properties": [],

@@ -55,7 +55,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "com.android.gradle.structure"
             artifactId = "structure-model"
-            version = "1.0"
+            version = "0.2"
 
             from(components["java"])
             pom {

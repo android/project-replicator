@@ -28,6 +28,10 @@ repositories {
     jcenter()
 }
 
+val gradleVersion = "6.6"
+val agpVersion = "4.2.0-alpha07"
+val kotlinVersion: String by rootProject.extra
+
 // Add a source set for the functional test suite
 val functionalTestSourceSet = sourceSets.create("functionalTest") {
 }
@@ -52,8 +56,8 @@ dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    compileOnly("com.android.tools.build:gradle:4.1.0-beta02")
-    testImplementation("com.android.tools.build:gradle:4.1.0-beta02")
+    compileOnly("com.android.tools.build:gradle:$agpVersion")
+    testImplementation("com.android.tools.build:gradle:$agpVersion")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
@@ -88,11 +92,14 @@ val agpTask by tasks.registering(AgpClasspathTask::class) {
 functionalTest.configure {
     systemProperty("agp.classpath", outputFileLocation.forUseAtConfigurationTime().get().asFile.absolutePath)
     environment("ANDROID_SDK_ROOT", System.getenv("ANDROID_SDK_ROOT"))
+    environment("AGP_VERSION", agpVersion)
+    environment("KOTLIN_VERSION", kotlinVersion)
+    environment("GRADLE_VERSION", gradleVersion)
     dependsOn(agpTask)
 }
 
-dependencies.add(agpClasspath.name, "com.android.tools.build:gradle:4.1.0-beta02")
-dependencies.add(agpClasspath.name, "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
+dependencies.add(agpClasspath.name, "com.android.tools.build:gradle:$agpVersion")
+dependencies.add(agpClasspath.name, "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
 
 gradlePlugin {
     val extractor by plugins.creating {

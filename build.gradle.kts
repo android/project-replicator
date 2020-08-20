@@ -18,3 +18,5 @@ plugins {
     // set the version of the kotlin plugin
     id("org.jetbrains.kotlin.jvm") version "1.3.72" apply false
 }
+
+val kotlinVersion: String by extra("1.3.72")
