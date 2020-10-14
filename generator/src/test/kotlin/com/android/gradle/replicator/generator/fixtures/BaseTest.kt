@@ -27,7 +27,6 @@ abstract class BaseTest {
     @get:Rule
     val testFolder = TemporaryFolder()
 
-
     protected fun generateWithStructure(structure: String): File {
         val jsonFile = testFolder.newFile("structure.json")
         jsonFile.writeText(structure)

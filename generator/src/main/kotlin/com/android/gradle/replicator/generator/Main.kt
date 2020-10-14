@@ -24,16 +24,21 @@ class Main {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            if (args.isEmpty()) {
-                printUsage()
-                exitProcess(0)
+            val params = parseArgs(args) ?: exitProcess(0)
+
+            if (!params.isValid()) {
+                throw RuntimeException("Not all parameters have been provided")
             }
 
-            val params = parseArgs(args)
             Generator(params).generate()
         }
 
-        private fun parseArgs(args: Array<String>): ExecutionParams {
+        internal fun parseArgs(args: Array<String>): ExecutionParams? {
+            if (args.isEmpty()) {
+                println(USAGE)
+                return null
+            }
+
             // let's be basic here for now
             val params = ExecutionParams()
 
@@ -41,35 +46,19 @@ class Main {
             while (index < args.size) {
                 when (val option = args[index]) {
                     "--destination", "-d" -> {
-                        params.destination = File(args[index+1]).also {
-                            if (it.exists().not()) {
-                                throw RuntimeException("Location for option %option does not exist: $it")
-                            }
-                        }
+                        params.destination = checkFolderParam(args, index)
                         index++
                     }
                     "--structure", "-s" -> {
-                        params.jsonFile = File(args[index+1]).also {
-                            if (it.exists().not()) {
-                                throw RuntimeException("Location for option %option does not exist: $it")
-                            }
-                        }
+                        params.jsonFile = checkFileParam(args, index)
                         index++
                     }
                     "--filter-libraries", "-f" -> {
-                        params.libraryFilter = File(args[index+1]).also {
-                            if (it.exists().not()) {
-                                throw RuntimeException("Location for option %option does not exist: $it")
-                            }
-                        }
+                        params.libraryFilter = checkFileParam(args, index)
                         index++
                     }
                     "--add-libraries", "-a" -> {
-                        params.libraryAdditions = File(args[index+1]).also {
-                            if (it.exists().not()) {
-                                throw RuntimeException("Location for option %option does not exist: $it")
-                            }
-                        }
+                        params.libraryAdditions = checkFileParam(args, index)
                         index++
                     }
                     else -> throw RuntimeException("Unknown option: $option")
@@ -77,15 +66,34 @@ class Main {
                 index++
             }
 
-            if (params.isValid()) {
-                return params
-            }
-
-            throw RuntimeException("Not all parameters have been provided")
+            return params
         }
 
-        private fun printUsage() {
-            println("""
+        private fun checkFolderParam(args: Array<String>, index: Int): File {
+            return File(args[index + 1]).also {
+                if (it.isDirectory.not()) {
+                    if (it.exists()) {
+                        throw RuntimeException("Location for option ${args[index]} is not a folder: $it")
+                    } else {
+                        throw RuntimeException("Location for option ${args[index]} does not exist: $it")
+                    }
+                }
+            }
+        }
+
+        private fun checkFileParam(args: Array<String>, index: Int): File {
+            return File(args[index + 1]).also {
+                if (it.isFile.not()) {
+                    if (it.exists()) {
+                        throw RuntimeException("Location for option ${args[index]} is not a file: $it")
+                    } else {
+                        throw RuntimeException("Location for option ${args[index]} does not exist: $it")
+                    }
+                }
+            }
+        }
+
+        internal val USAGE = """
                 Gradle Project Generator. Usage:
 
                 gradlew[.bat] generator:run --structure <file> --destination <folder>
@@ -97,10 +105,7 @@ class Main {
                                         To replace a library, add " -> <coordinate to replace with>"
                 -d, --add-libraries: a file containing libraries to add to specific sub-projects. Line format is:
                                      <modulepath><space><configuration name><space><dependency string>
-                
-            """.trimIndent()
-            )
-        }
+""".trimIndent()
     }
 }
 
