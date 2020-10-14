@@ -57,8 +57,7 @@ class BuildFeaturesTests {
               "minSdkVersion": 24,
               "targetSdkVersion": 30,
               "buildFeatures": {
-                "aidl": false,
-                "mlModelBinding": false
+                "aidl": false
               }
             }
           },
@@ -102,8 +101,7 @@ class BuildFeaturesTests {
               "minSdkVersion": 24,
               "targetSdkVersion": 30,
               "buildFeatures": {
-                "buildConfig": false,
-                "mlModelBinding": false
+                "buildConfig": false
               }
             }
           },
@@ -147,8 +145,7 @@ class BuildFeaturesTests {
               "minSdkVersion": 24,
               "targetSdkVersion": 30,
               "buildFeatures": {
-                "compose": true,
-                "mlModelBinding": false
+                "compose": true
               }
             }
           },
@@ -193,7 +190,6 @@ class BuildFeaturesTests {
               "minSdkVersion": 24,
               "targetSdkVersion": 30,
               "buildFeatures": {
-                "mlModelBinding": false,
                 "prefab": true
               }
             }
@@ -239,7 +235,6 @@ class BuildFeaturesTests {
               "minSdkVersion": 24,
               "targetSdkVersion": 30,
               "buildFeatures": {
-                "mlModelBinding": false,
                 "renderScript": false
               }
             }
@@ -285,7 +280,6 @@ class BuildFeaturesTests {
               "minSdkVersion": 24,
               "targetSdkVersion": 30,
               "buildFeatures": {
-                "mlModelBinding": false,
                 "resValues": false
               }
             }
@@ -331,7 +325,6 @@ class BuildFeaturesTests {
               "minSdkVersion": 24,
               "targetSdkVersion": 30,
               "buildFeatures": {
-                "mlModelBinding": false,
                 "shaders": true
               }
             }
@@ -382,7 +375,6 @@ class BuildFeaturesTests {
               "minSdkVersion": 24,
               "targetSdkVersion": 30,
               "buildFeatures": {
-                "mlModelBinding": false,
                 "viewBinding": true
               }
             }
@@ -445,8 +437,7 @@ class BuildFeaturesTests {
               "minSdkVersion": 24,
               "targetSdkVersion": 30,
               "buildFeatures": {
-                "dataBinding": true,
-                "mlModelBinding": false
+                "dataBinding": true
               }
             }
           },

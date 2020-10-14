@@ -70,9 +70,7 @@ class AndroidPluginTests {
                   "compileSdkVersion": "android-30",
                   "minSdkVersion": 24,
                   "targetSdkVersion": 30,
-                  "buildFeatures": {
-                    "mlModelBinding": false
-                  }
+                  "buildFeatures": {}
                 }
               },
               "modules": []
@@ -134,9 +132,7 @@ class AndroidPluginTests {
                   "compileSdkVersion": "android-30",
                   "minSdkVersion": 24,
                   "targetSdkVersion": 30,
-                  "buildFeatures": {
-                    "mlModelBinding": false
-                  }
+                  "buildFeatures": {}
                 }
               },
               "modules": []

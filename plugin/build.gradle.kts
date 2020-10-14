@@ -28,8 +28,8 @@ repositories {
     jcenter()
 }
 
-val gradleVersion = "6.6"
-val agpVersion = "4.2.0-alpha07"
+val gradleVersion = gradle.gradleVersion
+val agpVersion = "4.2.0-alpha13"
 val kotlinVersion: String by rootProject.extra
 val pluginVersion = "0.2"
 val pluginArtifactId = "project-replicator"
