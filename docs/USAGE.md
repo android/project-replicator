@@ -24,7 +24,7 @@ The plugin must be applied to the projects.
 
 There is a single task to call. It is registered in the root project:
 
-`./gradlew getStructure`
+`./gradlew :getStructure`
 
 This creates a file in the build folder of the root project: `build/project-structure.json`.
 A mapping file is also created next to the structure plugin should you need to analyze the structure. This file

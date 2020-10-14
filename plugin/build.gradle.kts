@@ -31,6 +31,8 @@ repositories {
 val gradleVersion = "6.6"
 val agpVersion = "4.2.0-alpha07"
 val kotlinVersion: String by rootProject.extra
+val pluginVersion = "0.2"
+val pluginArtifactId = "project-replicator"
 
 // Add a source set for the functional test suite
 val functionalTestSourceSet = sourceSets.create("functionalTest") {
@@ -38,6 +40,14 @@ val functionalTestSourceSet = sourceSets.create("functionalTest") {
 
 gradlePlugin.testSourceSets(functionalTestSourceSet)
 configurations.getByName("functionalTestImplementation").extendsFrom(configurations.getByName("testImplementation"))
+
+val initScriptLinter by tasks.registering(DefaultTask::class) {
+    doLast {
+        require(project.rootProject.file("initscript/init.gradle").readText().contains("$pluginArtifactId:$pluginVersion")) {
+            throw AssertionError("init script does not reference $pluginArtifactId:$pluginVersion")
+        }
+    }
+}
 
 // Add a task to run the functional tests
 val functionalTest by tasks.registering(Test::class) {
@@ -48,6 +58,7 @@ val functionalTest by tasks.registering(Test::class) {
 val check by tasks.getting(Task::class) {
     // Run the functional tests as part of `check`
     dependsOn(functionalTest)
+    dependsOn(initScriptLinter)
 }
 
 dependencies {
@@ -123,8 +134,8 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             groupId = "com.android.gradle.replicator"
-            artifactId = "project-replicator"
-            version = "0.2"
+            artifactId = pluginArtifactId
+            version = pluginVersion
 
             from(components["java"])
             pom {

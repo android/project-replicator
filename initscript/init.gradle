@@ -21,7 +21,7 @@ buildscript {
       jcenter()
     }
     dependencies {
-      classpath "com.android.gradle.replicator:project-replicator:0.1"
+      classpath "com.android.gradle.replicator:project-replicator:0.2"
     }
   }
 }
