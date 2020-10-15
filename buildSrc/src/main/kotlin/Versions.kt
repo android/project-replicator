@@ -12,10 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
-plugins {
-    // set the version of the kotlin plugin
-    id("org.jetbrains.kotlin.jvm") version "1.3.72" apply false
+class Versions {
+    companion object {
+        val gradleVersion = "6.7" // FIXME gradle.gradleVersion
+        const val agpVersion = "4.2.0-alpha13"
+        const val kotlinVersion = "1.3.72"
+        const val pluginVersion = "0.2"
+        const val pluginArtifactId = "project-replicator"
+    }
 }
-
