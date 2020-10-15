@@ -17,7 +17,7 @@
 
 package com.android.gradle.replicator.generator.fixtures
 
-import com.android.gradle.replicator.generator.Generator
+import com.android.gradle.replicator.generator.BuildGenerator
 import java.io.File
 
 data class TestParams(
@@ -25,5 +25,5 @@ data class TestParams(
     override val destination: File,
     override val libraryFilter: File? = null,
     override val libraryAdditions: File? = null
-) : Generator.Params {
+) : BuildGenerator.Params {
 }

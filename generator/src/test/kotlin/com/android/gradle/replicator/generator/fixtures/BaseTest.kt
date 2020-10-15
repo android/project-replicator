@@ -17,7 +17,7 @@
 
 package com.android.gradle.replicator.generator.fixtures
 
-import com.android.gradle.replicator.generator.Generator
+import com.android.gradle.replicator.generator.BuildGenerator
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import java.io.File
@@ -33,7 +33,7 @@ abstract class BaseTest {
         val output = testFolder.newFolder("output")
 
         val params = TestParams(jsonFile, output)
-        Generator(params).generate()
+        BuildGenerator(params).generate()
 
         return output
     }

@@ -30,7 +30,7 @@ class Main {
                 throw RuntimeException("Not all parameters have been provided")
             }
 
-            Generator(params).generate()
+            BuildGenerator(params).generate()
         }
 
         internal fun parseArgs(args: Array<String>): ExecutionParams? {
@@ -109,7 +109,7 @@ class Main {
     }
 }
 
-class ExecutionParams: Generator.Params {
+class ExecutionParams: BuildGenerator.Params {
     override lateinit var jsonFile: File
     override lateinit var destination: File
     override var libraryFilter: File? = null
