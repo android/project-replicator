@@ -17,6 +17,7 @@
 
 package com.android.gradle.replicator.generator
 
+import com.android.gradle.replicator.generator.writer.DslWriter
 import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.ModuleInfo
 import com.android.gradle.replicator.model.PluginType
@@ -26,14 +27,14 @@ import java.io.File
 class ProjectGenerator(
     private val destinationFolder: File,
     private val libraryFilter: Map<String, String>,
-    private val libraryAdditions: Map<String, List<DependenciesInfo>>
+    private val libraryAdditions: Map<String, List<DependenciesInfo>>,
+    private val dslWriter: DslWriter
 ) {
 
     internal fun generateRootModule(project: ProjectInfo) {
-        val buildFile = File(destinationFolder, "build.gradle")
+        dslWriter.newBuildFile(destinationFolder)
 
         val rootPlugins = project.rootModule.plugins
-
         // gather all the plugins from all the modules.
         val allPlugins = mutableSetOf<PluginType>()
         allPlugins.addAll(rootPlugins)
@@ -41,77 +42,73 @@ class ProjectGenerator(
             allPlugins.addAll(module.plugins)
         }
 
-        // Because AGP does not support the new DSL, we need a mix and match of both of DSL.
-        // First figure out the full list of plugins knowing whether it's applied to the root module or not.
-        // build a list of plugins to put in the root module.
-        val rootPluginInfos = allPlugins.map { RootPluginInfo(it, rootPlugins.contains(it)) }
-
-        // now prepare the new DSL for all the plugins that support it.
-        val pluginIds = rootPluginInfos.asSequence()
-            .filter { it.plugin.useNewDsl }
-            .map {
-                val applyStr = if (it.applied) {
-                    ""
-                } else {
-                    " apply false"
-                }
-
-                when (it.plugin) {
-                    PluginType.JAVA, PluginType.JAVA_LIBRARY, PluginType.APPLICATION -> {
-                        if (it.applied) {
-                            """    id("${it.plugin.id}")"""
-                        } else {
-                            ""
+        dslWriter.block("buildscript") {
+            block("repositories") {
+                google()
+                jcenter()
+            }
+            block("dependencies") {
+                // now prepare the classpaths for plugins *not* using the new DSL
+                val classpaths = allPlugins.asSequence()
+                    .filter { !it.useNewDsl }
+                    .mapNotNull {
+                        when (it) {
+                            PluginType.ANDROID_APP, PluginType.ANDROID_LIB, PluginType.ANDROID_TEST, PluginType.ANDROID_DYNAMIC_FEATURE -> {
+                                "com.android.tools.build:gradle:${project.agpVersion}"
+                            }
+                            PluginType.KOTLIN_ANDROID, PluginType.KOTLIN_JVM, PluginType.KAPT -> {
+                                "org.jetbrains.kotlin:kotlin-gradle-plugin:${project.kotlinVersion}"
+                            }
+                            else -> null
                         }
-                    }
-                    PluginType.KOTLIN_ANDROID, PluginType.KOTLIN_JVM, PluginType.KAPT -> {
-                        """    id("${it.plugin.id}") version "${project.kotlinVersion}" $applyStr """
-                    }
-                    else -> throw RuntimeException("Unexpected plugin in root plugin infos.")
+                    }.toSet()
+
+                for (cp in classpaths) {
+                    call("classpath", "'$cp'")
                 }
-            }.joinToString(separator = "\n")
+            }
+        }
 
-        // now prepare the classpaths for plugins *not* using the new DSL
-        val classpaths = allPlugins.asSequence()
-            .filter { !it.useNewDsl }
-            .mapNotNull {
-                when (it) {
-                    PluginType.ANDROID_APP, PluginType.ANDROID_LIB, PluginType.ANDROID_TEST, PluginType.ANDROID_DYNAMIC_FEATURE -> {
-                        "com.android.tools.build:gradle:${project.agpVersion}"
+        dslWriter.block("plugins") {
+            // Because AGP does not support the new DSL, we need a mix and match of both of DSL.
+            // First figure out the full list of plugins knowing whether it's applied to the root module or not.
+            // build a list of plugins to put in the root module.
+            val rootPluginInfos = allPlugins.map { RootPluginInfo(it, rootPlugins.contains(it)) }
+
+            // now prepare the new DSL for all the plugins that support it.
+            rootPluginInfos.asSequence()
+                .filter { it.plugin.useNewDsl }
+                .forEach { pluginInfo ->
+                    val p: Pair<String, String?>? = when (pluginInfo.plugin) {
+                        PluginType.JAVA, PluginType.JAVA_LIBRARY, PluginType.APPLICATION -> {
+                            if (pluginInfo.applied) {
+                                pluginInfo.plugin.id to null
+                            } else {
+                                null
+                            }
+                        }
+                        PluginType.KOTLIN_ANDROID, PluginType.KOTLIN_JVM, PluginType.KAPT -> {
+                            pluginInfo.plugin.id to project.kotlinVersion
+                        }
+                        else -> throw RuntimeException("Unexpected plugin in root plugin infos.")
                     }
-                    PluginType.KOTLIN_ANDROID, PluginType.KOTLIN_JVM, PluginType.KAPT -> {
-                        "org.jetbrains.kotlin:kotlin-gradle-plugin:${project.kotlinVersion}"
+
+                    p?.let {
+                        pluginInNewBlock(p.first, p.second , pluginInfo.applied)
                     }
-                    else -> null
+
                 }
-            }.map { "        classpath(\"$it\")" }
-            .toSet()
-            .joinToString(separator = "\n")
+        }
 
-        // buildScript stuff.
-        buildFile.appendText("""
-buildscript {
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-$classpaths    
-    }
-}
-
-plugins {
-$pluginIds
-}
-
-allprojects {
-    repositories {
-        google()
-        jcenter()
-        maven { url 'https://jitpack.io' }
-    }
-}
-""")
+        dslWriter.block("allprojects") {
+            block("repositories") {
+                google()
+                jcenter()
+                block("maven") {
+                    call("url", asString("https://jitpack.io"))
+                }
+            }
+        }
 
         // now the generic module info stuff
         generateModuleInfo(destinationFolder, project.rootModule)
@@ -121,81 +118,84 @@ allprojects {
         folder: File,
         module: ModuleInfo
     ) {
-        val buildFile = File(folder, "build.gradle")
+        dslWriter.newBuildFile(folder)
 
         val newDslPlugin = module.plugins.filter { it.useNewDsl }
         if (newDslPlugin.isNotEmpty()) {
-            buildFile.appendText("plugins {\n")
-            for (plugin in newDslPlugin) {
-                buildFile.appendText("    id(\"${plugin.id}\")\n")
+            dslWriter.block("plugins") {
+                for (plugin in newDslPlugin) {
+                    dslWriter.pluginInNewBlock(plugin.id)
+                }
             }
-            buildFile.appendText("}\n")
         }
 
         val oldDslPlugin = module.plugins.filter { !it.useNewDsl }.sortedBy { it.last }
         for (plugin in oldDslPlugin) {
-            buildFile.appendText("apply plugin: \"${plugin.id}\"\n")
+            dslWriter.applyPluginOldWay(plugin.id)
         }
 
         generateModuleInfo(folder, module)
+    }
+
+    internal fun generateSettingsFile(project: ProjectInfo) {
+        println("Generate settings.gradle")
+        dslWriter.newSettingsFile(destinationFolder)
+
+        project.subModules.map { it.path }.sorted().forEach {
+            dslWriter.call("include", dslWriter.asString(it))
+        }
     }
 
     private fun generateModuleInfo(
         folder: File,
         module: ModuleInfo
     ) {
-        val buildFile = File(folder, "build.gradle")
-
         module.android?.generate(
             folder = folder,
-            buildFile = buildFile,
+            dslWriter = dslWriter,
             gradlePath = module.path,
             hasKotlin = module.plugins.containsKotlin()
         )
 
-        module.generateDependencies(buildFile)
+        module.generateDependencies()
     }
 
 
-    private fun ModuleInfo.generateDependencies(
-        buildFile: File
-    ) {
-        buildFile.appendText("\ndependencies {\n")
+    private fun ModuleInfo.generateDependencies() {
+        val moduleInfo = this
+        dslWriter.block("dependencies") {
+            var dependencyList = dependencies
 
-        var dependencyList = dependencies
-
-        // check if we need to add dependencies to this module
-        libraryAdditions[this.path]?.let { list ->
-            println("\tAdding dependencies to $path")
-            list.forEach {
-                println("\t\t- ${it.dependency}(${it.scope})")
-            }
-            dependencyList = dependencyList + list
-        }
-
-        // first gather the scope in order to sort by them
-        val scopes = dependencyList.asSequence().map { it.scope }.toSortedSet()
-
-        // this is not very efficient, but good enough here.
-        for (scope in scopes) {
-            for (dep in dependencyList.filter { it.scope == scope}) {
-                // search for replacement. If none, use the original value
-                val replacement = libraryFilter[dep.dependency] ?: dep.dependency
-                // empty string means ignored dependency
-                if (replacement.isEmpty()) {
-                    println("\tIgnoring ${dep.dependency}")
-                    continue
+            // check if we need to add dependencies to this module
+            libraryAdditions[moduleInfo.path]?.let { list ->
+                println("\tAdding dependencies to $path")
+                list.forEach {
+                    println("\t\t- ${it.dependency}(${it.scope})")
                 }
+                dependencyList = dependencyList + list
+            }
 
-                buildFile.appendText("    ${dep.scope}(${dep.type.getString(replacement)})\n")
+            // first gather the scope in order to sort by them
+            val scopes = dependencyList.asSequence().map { it.scope }.toSortedSet()
+
+            // this is not very efficient, but good enough here.
+            for (scope in scopes) {
+                for (dep in dependencyList.filter { it.scope == scope}) {
+                    // search for replacement. If none, use the original value
+                    val replacement = libraryFilter[dep.dependency] ?: dep.dependency
+                    // empty string means ignored dependency
+                    if (replacement.isEmpty()) {
+                        println("\tIgnoring ${dep.dependency}")
+                        continue
+                    }
+
+                    call(dep.scope, dep.type.getString(replacement, dslWriter::asString))
+                }
             }
         }
-        buildFile.appendText("}\n")
     }
-
 
     private data class RootPluginInfo(
         val plugin: PluginType,
         val applied: Boolean)
-
 }

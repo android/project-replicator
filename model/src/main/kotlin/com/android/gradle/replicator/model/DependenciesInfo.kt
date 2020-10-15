@@ -24,11 +24,11 @@ interface DependenciesInfo {
 
 enum class DependencyType(val jsonValue: String) {
     MODULE("moduleName") {
-        override fun getString(value: String) = "project(\"$value\")"
+        override fun getString(value: String, asString: (String) -> String) = "project(${asString(value)})"
     },
     EXTERNAL_LIBRARY("library") {
-        override fun getString(value: String) = "\"$value\""
+        override fun getString(value: String, asString: (String) -> String) = asString(value)
     };
 
-    abstract fun getString(value: String): String
+    abstract fun getString(value: String, asString: (String) -> String): String
 }
