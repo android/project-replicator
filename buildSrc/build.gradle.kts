@@ -8,9 +8,18 @@ repositories {
     jcenter()
 }
 
+dependencies {
+  compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
+}
+
 gradlePlugin {
-    val extractor by plugins.creating {
+    val agpFunctionalTest by plugins.creating {
         id = "agp-function-tests"
         implementationClass = "AgpFunctionalTestPlugin"
+    }
+
+    val defaultConfig by plugins.creating {
+        id = "default-config"
+        implementationClass = "DefaultConfigPlugin"
     }
 }

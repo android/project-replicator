@@ -21,11 +21,8 @@ plugins {
 
     // Apply the Kotlin JVM plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm")
-}
 
-repositories {
-    google()
-    jcenter()
+    id("default-config")
 }
 
 dependencies {
@@ -44,10 +41,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
         jvmTarget = "1.8"
         freeCompilerArgs = listOf("-Xjvm-default=enable")
     }
-}
-
-tasks.withType<Test>().configureEach {
-    maxParallelForks = 10 //Runtime.runtime.availableProcessors()
 }
 
 publishing {
