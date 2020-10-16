@@ -20,21 +20,46 @@ package com.android.gradle.replicator.generator.fixtures
 import com.android.gradle.replicator.generator.BuildGenerator
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import org.junit.runners.Parameterized
 import java.io.File
 
 abstract class BaseTest {
+
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "kts_{0}")
+        fun kts(): List<Boolean> {
+            return listOf(true, false)
+        }
+    }
+
+    @Parameterized.Parameter(0)
+    @JvmField
+    var ktsMode: Boolean = false
 
     @get:Rule
     val testFolder = TemporaryFolder()
 
     protected fun generateWithStructure(structure: String): File {
-        val jsonFile = testFolder.newFile("structure.json")
+        val jsonFile = testFolder.newFile()
         jsonFile.writeText(structure)
-        val output = testFolder.newFolder("output")
+        val output = testFolder.newFolder()
 
-        val params = TestParams(jsonFile, output)
+        val params = TestParams(
+            jsonFile = jsonFile,
+            destination = output,
+            kts = ktsMode
+        )
         BuildGenerator(params).generate()
 
         return output
     }
+
+    val buildFileName: String
+        get() = if (ktsMode) "build.gradle.kts" else "build.gradle"
+
+    val settingsFileName: String
+        get() = if (ktsMode) "settings.gradle.kts" else "settings.gradle"
+
+    fun select(kts: String, groovy: String): String = if (ktsMode) kts else groovy
 }

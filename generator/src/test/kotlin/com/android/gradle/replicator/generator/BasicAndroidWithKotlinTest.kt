@@ -18,76 +18,18 @@
 package com.android.gradle.replicator.generator
 
 import com.android.gradle.replicator.generator.fixtures.BaseTest
-import com.android.gradle.replicator.generator.fixtures.TestParams
+import com.android.gradle.replicator.generator.fixtures.GradleRunner
 import com.google.common.truth.Truth
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 import java.io.File
 
+@RunWith(Parameterized::class)
 class BasicAndroidWithKotlinTest: BaseTest() {
 
-    @Test
-    fun test() {
-        val output = generateWithStructure(projectStructure)
-
-        val rootBuildFile = File(output, "build.gradle")
-        Truth.assertWithMessage(rootBuildFile.absolutePath).that(rootBuildFile.readText()).isEqualTo("""
-            |buildscript {
-            |  repositories {
-            |    google()
-            |    jcenter()
-            |  }
-            |  dependencies {
-            |    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72'
-            |    classpath 'com.android.tools.build:gradle:4.0.1'
-            |  }
-            |}
-            |plugins {
-            |}
-            |allprojects {
-            |  repositories {
-            |    google()
-            |    jcenter()
-            |    maven {
-            |      url 'https://jitpack.io'
-            |    }
-            |  }
-            |}
-            |dependencies {
-            |}
-            |
-        """.trimMargin())
-
-        val settingsFile = File(output, "settings.gradle")
-        Truth.assertWithMessage(settingsFile.absolutePath).that(settingsFile.readText()).isEqualTo("""
-            |include ':module1'
-            |
-        """.trimMargin())
-
-        val moduleBuildFile = File(File(output, "module1"), "build.gradle")
-
-        Truth.assertWithMessage(moduleBuildFile.absolutePath).that(moduleBuildFile.readText()).isEqualTo("""
-            |apply plugin: 'com.android.application'
-            |apply plugin: 'kotlin-android'
-            |android {
-            |  compileSdkVersion = 'android-30'
-            |  defaultConfig {
-            |    minSdkVersion = 21
-            |    targetSdkVersion = 30
-            |  }
-            |  compileOptions {
-            |    sourceCompatibility = JavaVersion.VERSION_1_8
-            |    targetCompatibility = JavaVersion.VERSION_1_8
-            |  }
-            |  kotlinOptions {
-            |    jvmTarget = '1.8'
-            |  }
-            |}
-            |dependencies {
-            |}
-            |""".trimMargin())
-    }
-
-    private val projectStructure: String = """
+    companion object {
+        private const val TEST_STRUCTURE: String = """
 {
   "gradle": "6.1.1",
   "agp": "4.0.1",
@@ -119,4 +61,141 @@ class BasicAndroidWithKotlinTest: BaseTest() {
   ]
 }
 """
+
+    }
+
+    @Test
+    fun testOutput() {
+        val output = generateWithStructure(TEST_STRUCTURE)
+
+        val rootBuildFile = File(output, buildFileName)
+        Truth.assertWithMessage(rootBuildFile.absolutePath).that(rootBuildFile.readText()).isEqualTo(
+            select(
+                kts = """
+                    |buildscript {
+                    |  repositories {
+                    |    google()
+                    |    jcenter()
+                    |  }
+                    |  dependencies {
+                    |    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
+                    |    classpath("com.android.tools.build:gradle:4.0.1")
+                    |  }
+                    |}
+                    |plugins {
+                    |}
+                    |allprojects {
+                    |  repositories {
+                    |    google()
+                    |    jcenter()
+                    |    maven {
+                    |      url = uri("https://jitpack.io")
+                    |    }
+                    |  }
+                    |}
+                    |dependencies {
+                    |}
+                    |
+                """.trimMargin(),
+                groovy = """
+                    |buildscript {
+                    |  repositories {
+                    |    google()
+                    |    jcenter()
+                    |  }
+                    |  dependencies {
+                    |    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72'
+                    |    classpath 'com.android.tools.build:gradle:4.0.1'
+                    |  }
+                    |}
+                    |plugins {
+                    |}
+                    |allprojects {
+                    |  repositories {
+                    |    google()
+                    |    jcenter()
+                    |    maven {
+                    |      url 'https://jitpack.io'
+                    |    }
+                    |  }
+                    |}
+                    |dependencies {
+                    |}
+                    |
+                """.trimMargin()
+            )
+        )
+
+        val settingsFile = File(output, settingsFileName)
+        Truth.assertWithMessage(settingsFile.absolutePath).that(settingsFile.readText()).isEqualTo(
+            select(
+                kts = """
+                    |include(":module1")
+                    |
+                """.trimMargin(),
+                groovy = """
+                    |include ':module1'
+                    |
+                """.trimMargin()
+            )
+        )
+
+        val moduleBuildFile = File(File(output, "module1"), buildFileName)
+
+        Truth.assertWithMessage(moduleBuildFile.absolutePath).that(moduleBuildFile.readText()).isEqualTo(
+            select(
+                kts = """
+                    |plugins {
+                    |  id("com.android.application")
+                    |  id("kotlin-android")
+                    |}
+                    |android {
+                    |  compileSdkVersion = "android-30"
+                    |  defaultConfig {
+                    |    minSdkVersion(21)
+                    |    targetSdkVersion(30)
+                    |  }
+                    |  compileOptions {
+                    |    sourceCompatibility = JavaVersion.VERSION_1_8
+                    |    targetCompatibility = JavaVersion.VERSION_1_8
+                    |  }
+                    |  kotlinOptions {
+                    |    jvmTarget = "1.8"
+                    |  }
+                    |}
+                    |dependencies {
+                    |}
+                    |
+                """.trimMargin(),
+                groovy = """
+                    |plugins {
+                    |  id 'com.android.application'
+                    |  id 'kotlin-android'
+                    |}
+                    |android {
+                    |  compileSdkVersion = 'android-30'
+                    |  defaultConfig {
+                    |    minSdkVersion 21
+                    |    targetSdkVersion 30
+                    |  }
+                    |  compileOptions {
+                    |    sourceCompatibility = JavaVersion.VERSION_1_8
+                    |    targetCompatibility = JavaVersion.VERSION_1_8
+                    |  }
+                    |  kotlinOptions {
+                    |    jvmTarget = '1.8'
+                    |  }
+                    |}
+                    |dependencies {
+                    |}
+                    |
+                """.trimMargin()
+            )
+        )
+    }
+
+    @Test
+    fun runOutput() {
+        GradleRunner(generateWithStructure(TEST_STRUCTURE)).runTasks("projects")
+    }
 }

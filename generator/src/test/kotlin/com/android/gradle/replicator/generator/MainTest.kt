@@ -56,6 +56,17 @@ class MainTest {
     }
 
     @Test
+    fun `test KTS flag`() {
+        val params = Main.parseArgs(
+            arrayOf(
+                "--kts"
+            )
+        ) ?: fail("params is null")
+
+        Truth.assertWithMessage("KTS flag").that(params.kts).isEqualTo(true)
+    }
+
+    @Test
     fun `test basic params, long form`() {
         val destination = testFolder.newFolder()
         val structureFile = testFolder.newFile()
@@ -69,6 +80,7 @@ class MainTest {
 
         Truth.assertWithMessage("Destination param").that(params.destination).isEqualTo(destination)
         Truth.assertWithMessage("Structure param").that(params.jsonFile).isEqualTo(structureFile)
+        Truth.assertWithMessage("KTS flag").that(params.kts).isEqualTo(false)
     }
 
     @Test

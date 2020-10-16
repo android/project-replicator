@@ -24,7 +24,7 @@ class GroovyDslWriter(
     override val extension: String
         get() = "gradle"
 
-    override fun pluginInNewBlock(pluginId: String, version: String?, apply: Boolean) {
+    override fun pluginInBlock(pluginId: String, version: String?, apply: Boolean) {
         writeIndent()
         buffer.append("id '$pluginId'")
         version?.let {
@@ -34,11 +34,6 @@ class GroovyDslWriter(
             buffer.append(" apply false")
         }
         buffer.append("\n")
-    }
-
-    override fun applyPluginOldWay(pluginId: String) {
-        writeIndent()
-        buffer.append("apply plugin: '$pluginId'\n")
     }
 
     override fun asString(value: String): String = """'$value'"""
@@ -51,7 +46,12 @@ class GroovyDslWriter(
         assign("compileSdkVersion", """"$level"""")
     }
 
-    override fun doMethodCall(methodName: String, withBlock: Boolean, vararg values: String) {
+    override fun url(uri: String) {
+        writeIndent()
+        buffer.append("url '$uri'\n")
+    }
+
+    override fun doMethodCall(methodName: String, withBlock: Boolean, vararg values: Any) {
         if (withBlock) {
             buffer.append("$methodName(")
             values.joinTo(buffer)

@@ -24,21 +24,16 @@ class KtsWriter(
     override val extension: String
         get() = "gradle.kts"
 
-    override fun pluginInNewBlock(pluginId: String, version: String?, apply: Boolean) {
+    override fun pluginInBlock(pluginId: String, version: String?, apply: Boolean) {
         writeIndent()
         buffer.append("""id("$pluginId")""")
         version?.let {
             buffer.append(" version '$version'")
         }
-        if (apply == false) {
+        if (!apply) {
             buffer.append(" apply false")
         }
         buffer.append("\n")
-    }
-
-    override fun applyPluginOldWay(pluginId: String) {
-        writeIndent()
-        buffer.append("apply plugin: \"$pluginId\"\n")
     }
 
     override fun asString(value: String): String = """"$value""""
@@ -51,7 +46,12 @@ class KtsWriter(
         assign("compileSdkPreview", """"$level"""")
     }
 
-    override fun doMethodCall(methodName: String, withBlock: Boolean, vararg values: String) {
+    override fun url(uri: String) {
+        writeIndent()
+        buffer.append("url = uri(\"$uri\")\n")
+    }
+
+    override fun doMethodCall(methodName: String, withBlock: Boolean, vararg values: Any) {
         buffer.append("$methodName(")
         values.joinTo(buffer)
         buffer.append(")")

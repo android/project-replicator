@@ -18,15 +18,20 @@
 package com.android.gradle.replicator.generator
 
 import com.android.gradle.replicator.generator.fixtures.BaseTest
+import com.android.gradle.replicator.generator.fixtures.GradleRunner
 import com.google.common.truth.Truth
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 import java.io.File
 
+@RunWith(Parameterized::class)
 class BuildFeaturesTest: BaseTest() {
 
     @Test
     fun testAidl() {
         runTest(
+            pluginId = "com.android.application",
             structureSnippet = """
                 "aidl": false
             """.trimIndent(),
@@ -41,6 +46,7 @@ class BuildFeaturesTest: BaseTest() {
     @Test
     fun testBuildConfig() {
         runTest(
+            pluginId = "com.android.application",
             structureSnippet = """
                 "buildConfig": false
             """.trimIndent(),
@@ -55,6 +61,7 @@ class BuildFeaturesTest: BaseTest() {
     @Test
     fun testAndroidResources() {
         runTest(
+            pluginId = "com.android.library",
             structureSnippet = """
                 "androidResources": false
             """.trimIndent(),
@@ -69,6 +76,7 @@ class BuildFeaturesTest: BaseTest() {
     @Test
     fun testCompose() {
         runTest(
+            pluginId = "com.android.application",
             structureSnippet = """
                 "compose": true
             """.trimIndent(),
@@ -83,6 +91,7 @@ class BuildFeaturesTest: BaseTest() {
     @Test
     fun testDataBinding() {
         runTest(
+            pluginId = "com.android.application",
             structureSnippet = """
                 "dataBinding": false
             """.trimIndent(),
@@ -97,6 +106,7 @@ class BuildFeaturesTest: BaseTest() {
     @Test
     fun testML() {
         runTest(
+            pluginId = "com.android.application",
             structureSnippet = """
                 "mlModelBinding": false
             """.trimIndent(),
@@ -111,6 +121,7 @@ class BuildFeaturesTest: BaseTest() {
     @Test
     fun testPrefab() {
         runTest(
+            pluginId = "com.android.application",
             structureSnippet = """
                 "prefab": false
             """.trimIndent(),
@@ -125,6 +136,7 @@ class BuildFeaturesTest: BaseTest() {
     @Test
     fun testPrefabPublishing() {
         runTest(
+            pluginId = "com.android.library",
             structureSnippet = """
                 "prefabPublishing": false
             """.trimIndent(),
@@ -139,6 +151,7 @@ class BuildFeaturesTest: BaseTest() {
     @Test
     fun testRenderScript() {
         runTest(
+            pluginId = "com.android.application",
             structureSnippet = """
                 "renderScript": false
             """.trimIndent(),
@@ -153,6 +166,7 @@ class BuildFeaturesTest: BaseTest() {
     @Test
     fun testResValues() {
         runTest(
+            pluginId = "com.android.application",
             structureSnippet = """
                 "resValues": false
             """.trimIndent(),
@@ -167,6 +181,7 @@ class BuildFeaturesTest: BaseTest() {
     @Test
     fun testShaders() {
         runTest(
+            pluginId = "com.android.application",
             structureSnippet = """
                 "shaders": false
             """.trimIndent(),
@@ -181,6 +196,7 @@ class BuildFeaturesTest: BaseTest() {
     @Test
     fun testViewBinding() {
         runTest(
+            pluginId = "com.android.application",
             structureSnippet = """
                 "viewBinding": false
             """.trimIndent(),
@@ -195,23 +211,30 @@ class BuildFeaturesTest: BaseTest() {
     // -------------
 
     private fun runTest(
+        pluginId: String,
         structureSnippet: String,
         expectedSnippet: String
     ) {
-        val output = generateWithStructure(getStructure(structureSnippet))
+        val output = generateWithStructure(getStructure(pluginId, structureSnippet))
 
-        val moduleBuildFile = File(File(output, "module1"), "build.gradle")
+        val moduleBuildFile = File(File(output, "module1"), buildFileName)
         Truth.assertWithMessage(moduleBuildFile.absolutePath).that(moduleBuildFile.readText()).isEqualTo(
             getExpected(
+                pluginId,
                 expectedSnippet
             )
         )
+
+        GradleRunner(output).runTasks("projects")
     }
 
-    private fun getStructure(features: String): String = """
+    private fun getStructure(
+        pluginId: String,
+        features: String
+    ): String = """
 {
 "gradle": "6.1.1",
-"agp": "4.0.1",
+"agp": "4.1.0",
 "kotlin": "n/a",
 "properties": [],
 "rootModule": {
@@ -223,7 +246,7 @@ class BuildFeaturesTest: BaseTest() {
 {
   "path": ":module1",
   "plugins": [
-    "com.android.application"
+    "$pluginId"
   ],
   "javaSources": {
     "fileCount": 1
@@ -242,21 +265,48 @@ class BuildFeaturesTest: BaseTest() {
 }            
 """
 
-    private fun getExpected(features: String): String = """
-        |apply plugin: 'com.android.application'
-        |android {
-        |  compileSdkVersion = 'android-30'
-        |  defaultConfig {
-        |    minSdkVersion = 21
-        |    targetSdkVersion = 30
-        |  }
-        |  compileOptions {
-        |    sourceCompatibility = JavaVersion.VERSION_1_8
-        |    targetCompatibility = JavaVersion.VERSION_1_8
-        |  }
-        $features
-        |}
-        |dependencies {
-        |}
-        |""".trimMargin()
+    private fun getExpected(
+        pluginId: String,
+        features: String
+    ): String = select(
+        kts = """
+            |plugins {
+            |  id("$pluginId")
+            |}
+            |android {
+            |  compileSdkVersion = "android-30"
+            |  defaultConfig {
+            |    minSdkVersion(21)
+            |    targetSdkVersion(30)
+            |  }
+            |  compileOptions {
+            |    sourceCompatibility = JavaVersion.VERSION_1_8
+            |    targetCompatibility = JavaVersion.VERSION_1_8
+            |  }
+            $features
+            |}
+            |dependencies {
+            |}
+            |
+        """.trimMargin(),
+        groovy = """
+            |plugins {
+            |  id '$pluginId'
+            |}
+            |android {
+            |  compileSdkVersion = 'android-30'
+            |  defaultConfig {
+            |    minSdkVersion 21
+            |    targetSdkVersion 30
+            |  }
+            |  compileOptions {
+            |    sourceCompatibility = JavaVersion.VERSION_1_8
+            |    targetCompatibility = JavaVersion.VERSION_1_8
+            |  }
+            $features
+            |}
+            |dependencies {
+            |}
+            |
+        """.trimMargin())
 }

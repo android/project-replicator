@@ -24,6 +24,7 @@ data class TestParams(
     override val jsonFile: File,
     override val destination: File,
     override val libraryFilter: File? = null,
-    override val libraryAdditions: File? = null
+    override val libraryAdditions: File? = null,
+    override val kts: Boolean = false
 ) : BuildGenerator.Params {
 }

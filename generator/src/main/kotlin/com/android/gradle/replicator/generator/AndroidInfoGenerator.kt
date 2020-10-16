@@ -34,8 +34,8 @@ internal fun AndroidInfo.generate(
         assign("compileSdkVersion", asString(compileSdkVersion))
 
         block("defaultConfig") {
-            assign("minSdkVersion", minSdkVersion)
-            assign("targetSdkVersion", targetSdkVersion)
+            call("minSdkVersion", minSdkVersion)
+            call("targetSdkVersion", targetSdkVersion)
         }
 
         block("compileOptions") {

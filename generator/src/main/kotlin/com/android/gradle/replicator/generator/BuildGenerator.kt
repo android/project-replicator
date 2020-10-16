@@ -19,6 +19,7 @@ package com.android.gradle.replicator.generator
 
 import com.android.gradle.replicator.generator.writer.DslWriter
 import com.android.gradle.replicator.generator.writer.GroovyDslWriter
+import com.android.gradle.replicator.generator.writer.KtsWriter
 import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.DependencyType
 import com.android.gradle.replicator.model.Serializer
@@ -34,6 +35,7 @@ internal class BuildGenerator(private val params: Params) {
         val destination: File
         val libraryFilter: File?
         val libraryAdditions: File?
+        val kts: Boolean
     }
 
     private val libraryFilter = generateLibraryFilter()
@@ -42,7 +44,7 @@ internal class BuildGenerator(private val params: Params) {
     fun generate() {
         val project = Serializer.instance().deserializeProject(params.jsonFile)
 
-        val dslWriter: DslWriter = GroovyDslWriter(true)
+        val dslWriter: DslWriter = if (params.kts) KtsWriter(true) else GroovyDslWriter(true)
 
         val projectGenerator = ProjectGenerator(
             params.destination,
