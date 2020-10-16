@@ -31,9 +31,9 @@ class BuildFeaturesTest: BaseTest() {
                 "aidl": false
             """.trimIndent(),
             expectedSnippet = """
-            |    buildFeatures {
-            |        aidl = false
-            |    }
+            |  buildFeatures {
+            |    aidl = false
+            |  }
             """.trimIndent()
         )
     }
@@ -45,9 +45,9 @@ class BuildFeaturesTest: BaseTest() {
                 "buildConfig": false
             """.trimIndent(),
             expectedSnippet = """
-            |    buildFeatures {
-            |        buildConfig = false
-            |    }
+            |  buildFeatures {
+            |    buildConfig = false
+            |  }
             """.trimIndent()
         )
     }
@@ -59,9 +59,9 @@ class BuildFeaturesTest: BaseTest() {
                 "androidResources": false
             """.trimIndent(),
             expectedSnippet = """
-            |    buildFeatures {
-            |        androidResources = false
-            |    }
+            |  buildFeatures {
+            |    androidResources = false
+            |  }
             """.trimIndent()
         )
     }
@@ -73,9 +73,9 @@ class BuildFeaturesTest: BaseTest() {
                 "compose": true
             """.trimIndent(),
             expectedSnippet = """
-            |    buildFeatures {
-            |        compose = true
-            |    }
+            |  buildFeatures {
+            |    compose = true
+            |  }
             """.trimIndent()
         )
     }
@@ -87,9 +87,9 @@ class BuildFeaturesTest: BaseTest() {
                 "dataBinding": false
             """.trimIndent(),
             expectedSnippet = """
-            |    buildFeatures {
-            |        dataBinding = false
-            |    }
+            |  buildFeatures {
+            |    dataBinding = false
+            |  }
             """.trimIndent()
         )
     }
@@ -101,9 +101,9 @@ class BuildFeaturesTest: BaseTest() {
                 "mlModelBinding": false
             """.trimIndent(),
             expectedSnippet = """
-            |    buildFeatures {
-            |        mlModelBinding = false
-            |    }
+            |  buildFeatures {
+            |    mlModelBinding = false
+            |  }
             """.trimIndent()
         )
     }
@@ -115,9 +115,9 @@ class BuildFeaturesTest: BaseTest() {
                 "prefab": false
             """.trimIndent(),
             expectedSnippet = """
-            |    buildFeatures {
-            |        prefab = false
-            |    }
+            |  buildFeatures {
+            |    prefab = false
+            |  }
             """.trimIndent()
         )
     }
@@ -129,9 +129,9 @@ class BuildFeaturesTest: BaseTest() {
                 "prefabPublishing": false
             """.trimIndent(),
             expectedSnippet = """
-            |    buildFeatures {
-            |        prefabPublishing = false
-            |    }
+            |  buildFeatures {
+            |    prefabPublishing = false
+            |  }
             """.trimIndent()
         )
     }
@@ -143,9 +143,9 @@ class BuildFeaturesTest: BaseTest() {
                 "renderScript": false
             """.trimIndent(),
             expectedSnippet = """
-            |    buildFeatures {
-            |        renderScript = false
-            |    }
+            |  buildFeatures {
+            |    renderScript = false
+            |  }
             """.trimIndent()
         )
     }
@@ -157,9 +157,9 @@ class BuildFeaturesTest: BaseTest() {
                 "resValues": false
             """.trimIndent(),
             expectedSnippet = """
-            |    buildFeatures {
-            |        resValues = false
-            |    }
+            |  buildFeatures {
+            |    resValues = false
+            |  }
             """.trimIndent()
         )
     }
@@ -171,9 +171,9 @@ class BuildFeaturesTest: BaseTest() {
                 "shaders": false
             """.trimIndent(),
             expectedSnippet = """
-            |    buildFeatures {
-            |        shaders = false
-            |    }
+            |  buildFeatures {
+            |    shaders = false
+            |  }
             """.trimIndent()
         )
     }
@@ -185,9 +185,9 @@ class BuildFeaturesTest: BaseTest() {
                 "viewBinding": false
             """.trimIndent(),
             expectedSnippet = """
-            |    buildFeatures {
-            |        viewBinding = false
-            |    }
+            |  buildFeatures {
+            |    viewBinding = false
+            |  }
             """.trimIndent()
         )
     }
@@ -243,22 +243,19 @@ class BuildFeaturesTest: BaseTest() {
 """
 
     private fun getExpected(features: String): String = """
-        |apply plugin: "com.android.application"
-        |
+        |apply plugin: 'com.android.application'
         |android {
-        |    compileSdkVersion = "android-30"
-        |    defaultConfig {
-        |        minSdkVersion 21
-        |        targetSdkVersion 30
-        |    }
-        |    compileOptions {
-        |        sourceCompatibility JavaVersion.VERSION_1_8
-        |        targetCompatibility JavaVersion.VERSION_1_8
-        |    }
+        |  compileSdkVersion = 'android-30'
+        |  defaultConfig {
+        |    minSdkVersion = 21
+        |    targetSdkVersion = 30
+        |  }
+        |  compileOptions {
+        |    sourceCompatibility = JavaVersion.VERSION_1_8
+        |    targetCompatibility = JavaVersion.VERSION_1_8
+        |  }
         $features
-        |
         |}
-        |
         |dependencies {
         |}
         |""".trimMargin()

@@ -17,9 +17,10 @@
 
 package com.android.gradle.replicator.generator
 
+import com.android.gradle.replicator.generator.writer.DslWriter
+import com.android.gradle.replicator.generator.writer.GroovyDslWriter
 import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.DependencyType
-import com.android.gradle.replicator.model.ProjectInfo
 import com.android.gradle.replicator.model.Serializer
 import com.android.gradle.replicator.model.internal.DefaultDependenciesInfo
 import java.io.File
@@ -41,10 +42,13 @@ internal class BuildGenerator(private val params: Params) {
     fun generate() {
         val project = Serializer.instance().deserializeProject(params.jsonFile)
 
+        val dslWriter: DslWriter = GroovyDslWriter(true)
+
         val projectGenerator = ProjectGenerator(
             params.destination,
             libraryFilter,
-            libraryAdditions
+            libraryAdditions,
+            dslWriter
         )
 
         println("Project: ':'")
@@ -61,9 +65,10 @@ internal class BuildGenerator(private val params: Params) {
             index++
         }
 
-        generateSettingsFile(project)
+        projectGenerator.generateSettingsFile(project)
         generateGradleProperties(project.gradleProperties)
 
+        dslWriter.flush()
         println("Done.")
     }
 
@@ -104,13 +109,6 @@ internal class BuildGenerator(private val params: Params) {
 
             result
         } ?: mapOf()
-    }
-
-
-    private fun generateSettingsFile(project: ProjectInfo) {
-        println("Generate settings.gradle")
-        val settingsGradle = File(params.destination, "settings.gradle")
-        settingsGradle.writeText(project.subModules.map { "include(\"${it.path}\")" }.sorted().joinToString("\n"))
     }
 
     private fun generateGradleProperties(properties: List<String>) {

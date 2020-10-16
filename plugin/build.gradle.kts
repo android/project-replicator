@@ -19,6 +19,8 @@ plugins {
     `java-gradle-plugin`
     `maven-publish`
 
+    id("agp-function-tests")
+
     // Apply the Kotlin JVM plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm")
 }
@@ -28,89 +30,19 @@ repositories {
     jcenter()
 }
 
-val gradleVersion = gradle.gradleVersion
-val agpVersion = "4.2.0-alpha13"
-val kotlinVersion: String by rootProject.extra
-val pluginVersion = "0.2"
-val pluginArtifactId = "project-replicator"
-
-// Add a source set for the functional test suite
-val functionalTestSourceSet = sourceSets.create("functionalTest") {
-}
-
-gradlePlugin.testSourceSets(functionalTestSourceSet)
-configurations.getByName("functionalTestImplementation").extendsFrom(configurations.getByName("testImplementation"))
-
-val initScriptLinter by tasks.registering(DefaultTask::class) {
-    doLast {
-        require(project.rootProject.file("initscript/init.gradle").readText().contains("$pluginArtifactId:$pluginVersion")) {
-            throw AssertionError("init script does not reference $pluginArtifactId:$pluginVersion")
-        }
-    }
-}
-
-// Add a task to run the functional tests
-val functionalTest by tasks.registering(Test::class) {
-    testClassesDirs = functionalTestSourceSet.output.classesDirs
-    classpath = functionalTestSourceSet.runtimeClasspath
-}
-
-val check by tasks.getting(Task::class) {
-    // Run the functional tests as part of `check`
-    dependsOn(functionalTest)
-    dependsOn(initScriptLinter)
-}
-
 dependencies {
     implementation(project(":model"))
 
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    compileOnly("com.android.tools.build:gradle:$agpVersion")
-    testImplementation("com.android.tools.build:gradle:$agpVersion")
+    compileOnly("com.android.tools.build:gradle:${Versions.agpVersion}")
+    testImplementation("com.android.tools.build:gradle:${Versions.agpVersion}")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("com.google.truth:truth:1.0.1")
 }
-
-abstract class AgpClasspathTask: DefaultTask() {
-    @get:org.gradle.api.tasks.InputFiles
-    @get:org.gradle.api.tasks.PathSensitive(PathSensitivity.RELATIVE)
-    abstract val classpath: ConfigurableFileCollection
-
-    @get:org.gradle.api.tasks.OutputFile
-    abstract val outputFile: RegularFileProperty
-
-    @org.gradle.api.tasks.TaskAction
-    fun action() {
-        outputFile.get().asFile.writeText(
-            classpath.files.joinToString(separator = "\n")
-        )
-    }
-}
-
-val agpClasspath = configurations.maybeCreate("agpClasspath")
-
-val outputFileLocation = layout.buildDirectory.file("agpclasspath.txt")
-
-val agpTask by tasks.registering(AgpClasspathTask::class) {
-    classpath.from(agpClasspath.incoming.artifacts.artifactFiles)
-    outputFile.set(outputFileLocation)
-}
-
-functionalTest.configure {
-    systemProperty("agp.classpath", outputFileLocation.forUseAtConfigurationTime().get().asFile.absolutePath)
-    environment("ANDROID_SDK_ROOT", System.getenv("ANDROID_SDK_ROOT"))
-    environment("AGP_VERSION", agpVersion)
-    environment("KOTLIN_VERSION", kotlinVersion)
-    environment("GRADLE_VERSION", gradleVersion)
-    dependsOn(agpTask)
-}
-
-dependencies.add(agpClasspath.name, "com.android.tools.build:gradle:$agpVersion")
-dependencies.add(agpClasspath.name, "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
 
 gradlePlugin {
     val extractor by plugins.creating {
@@ -134,8 +66,8 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             groupId = "com.android.gradle.replicator"
-            artifactId = pluginArtifactId
-            version = pluginVersion
+            artifactId = Versions.pluginArtifactId
+            version = Versions.pluginVersion
 
             from(components["java"])
             pom {

@@ -12,23 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
-package com.android.gradle.replicator.model
-
-interface DependenciesInfo {
-    val dependency: String
-    val type: DependencyType
-    val scope: String
-}
-
-enum class DependencyType(val jsonValue: String) {
-    MODULE("moduleName") {
-        override fun getString(value: String, asString: (String) -> String) = "project(${asString(value)})"
-    },
-    EXTERNAL_LIBRARY("library") {
-        override fun getString(value: String, asString: (String) -> String) = asString(value)
-    };
-
-    abstract fun getString(value: String, asString: (String) -> String): String
+class Versions {
+    companion object {
+        val gradleVersion = "6.7" // FIXME gradle.gradleVersion
+        const val agpVersion = "4.2.0-alpha13"
+        const val kotlinVersion = "1.3.72"
+        const val pluginVersion = "0.2"
+        const val pluginArtifactId = "project-replicator"
+    }
 }

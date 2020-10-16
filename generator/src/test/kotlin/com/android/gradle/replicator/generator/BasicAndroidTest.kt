@@ -59,57 +59,54 @@ class BasicAndroidTest: BaseTest() {
 """)
 
         val rootBuildFile = File(output, "build.gradle")
-        Truth.assertWithMessage(rootBuildFile.absolutePath).that(rootBuildFile.readText()).isEqualTo("""
-            |
-            |buildscript {
-            |    repositories {
-            |        google()
-            |        jcenter()
-            |    }
-            |    dependencies {
-            |        classpath("com.android.tools.build:gradle:4.0.1")    
-            |    }
-            |}
-            |
-            |plugins {
-            |
-            |}
-            |
-            |allprojects {
-            |    repositories {
-            |        google()
-            |        jcenter()
-            |        maven { url 'https://jitpack.io' }
-            |    }
-            |}
-            |
-            |dependencies {
-            |}
-            |
-        """.trimMargin())
+        Truth.assertWithMessage(rootBuildFile.absolutePath).that(rootBuildFile.readText()).isEqualTo(
+            """
+                |buildscript {
+                |  repositories {
+                |    google()
+                |    jcenter()
+                |  }
+                |  dependencies {
+                |    classpath 'com.android.tools.build:gradle:4.0.1'
+                |  }
+                |}
+                |plugins {
+                |}
+                |allprojects {
+                |  repositories {
+                |    google()
+                |    jcenter()
+                |    maven {
+                |      url 'https://jitpack.io'
+                |    }
+                |  }
+                |}
+                |dependencies {
+                |}
+                |
+            """.trimMargin()
+        )
 
         val settingsFile = File(output, "settings.gradle")
         Truth.assertWithMessage(settingsFile.absolutePath).that(settingsFile.readText()).isEqualTo("""
-            |include(":module1")
+            |include ':module1'
+            |
         """.trimMargin())
 
         val moduleBuildFile = File(File(output, "module1"), "build.gradle")
         Truth.assertWithMessage(moduleBuildFile.absolutePath).that(moduleBuildFile.readText()).isEqualTo("""
-            |apply plugin: "com.android.application"
-            |
+            |apply plugin: 'com.android.application'
             |android {
-            |    compileSdkVersion = "android-30"
-            |    defaultConfig {
-            |        minSdkVersion 21
-            |        targetSdkVersion 30
-            |    }
-            |    compileOptions {
-            |        sourceCompatibility JavaVersion.VERSION_1_8
-            |        targetCompatibility JavaVersion.VERSION_1_8
-            |    }
-            |
+            |  compileSdkVersion = 'android-30'
+            |  defaultConfig {
+            |    minSdkVersion = 21
+            |    targetSdkVersion = 30
+            |  }
+            |  compileOptions {
+            |    sourceCompatibility = JavaVersion.VERSION_1_8
+            |    targetCompatibility = JavaVersion.VERSION_1_8
+            |  }
             |}
-            |
             |dependencies {
             |}
             |""".trimMargin())
