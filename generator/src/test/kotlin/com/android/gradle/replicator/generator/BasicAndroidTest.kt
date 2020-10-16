@@ -80,8 +80,6 @@ class BasicAndroidTest: BaseTest() {
                     |    classpath("com.android.tools.build:gradle:4.0.1")
                     |  }
                     |}
-                    |plugins {
-                    |}
                     |allprojects {
                     |  repositories {
                     |    google()
@@ -104,8 +102,6 @@ class BasicAndroidTest: BaseTest() {
                     |  dependencies {
                     |    classpath 'com.android.tools.build:gradle:4.0.1'
                     |  }
-                    |}
-                    |plugins {
                     |}
                     |allprojects {
                     |  repositories {

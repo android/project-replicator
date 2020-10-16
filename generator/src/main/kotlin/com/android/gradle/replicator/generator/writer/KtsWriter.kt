@@ -28,7 +28,7 @@ class KtsWriter(
         writeIndent()
         buffer.append("""id("$pluginId")""")
         version?.let {
-            buffer.append(" version '$version'")
+            buffer.append(" version \"$version\"")
         }
         if (!apply) {
             buffer.append(" apply false")

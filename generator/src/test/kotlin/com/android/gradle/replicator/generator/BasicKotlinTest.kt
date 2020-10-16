@@ -26,13 +26,13 @@ import org.junit.runners.Parameterized
 import java.io.File
 
 @RunWith(Parameterized::class)
-class BasicAndroidWithKotlinTest: BaseTest() {
+class BasicKotlinTest: BaseTest() {
 
     companion object {
         private const val TEST_STRUCTURE: String = """
 {
   "gradle": "6.1.1",
-  "agp": "4.0.1",
+  "agp": "n/a",
   "kotlin": "1.3.72",
   "properties": [],
   "rootModule": {
@@ -44,19 +44,12 @@ class BasicAndroidWithKotlinTest: BaseTest() {
     {
       "path": ":module1",
       "plugins": [
-        "kotlin-android",
-        "com.android.application"
+        "org.jetbrains.kotlin.jvm"
       ],
       "javaSources": {
         "fileCount": 1
       },
-      "dependencies": [],
-      "android": {
-        "compileSdkVersion": "android-30",
-        "minSdkVersion": 21,
-        "targetSdkVersion": 30,
-        "buildFeatures": {}
-      }
+      "dependencies": []
     }
   ]
 }
@@ -72,15 +65,8 @@ class BasicAndroidWithKotlinTest: BaseTest() {
         Truth.assertWithMessage(rootBuildFile.absolutePath).that(rootBuildFile.readText()).isEqualTo(
             select(
                 kts = """
-                    |buildscript {
-                    |  repositories {
-                    |    google()
-                    |    jcenter()
-                    |  }
-                    |  dependencies {
-                    |    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
-                    |    classpath("com.android.tools.build:gradle:4.0.1")
-                    |  }
+                    |plugins {
+                    |  id("org.jetbrains.kotlin.jvm") version "1.3.72" apply false
                     |}
                     |allprojects {
                     |  repositories {
@@ -96,15 +82,8 @@ class BasicAndroidWithKotlinTest: BaseTest() {
                     |
                 """.trimMargin(),
                 groovy = """
-                    |buildscript {
-                    |  repositories {
-                    |    google()
-                    |    jcenter()
-                    |  }
-                    |  dependencies {
-                    |    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72'
-                    |    classpath 'com.android.tools.build:gradle:4.0.1'
-                    |  }
+                    |plugins {
+                    |  id 'org.jetbrains.kotlin.jvm' version '1.3.72' apply false
                     |}
                     |allprojects {
                     |  repositories {
@@ -142,22 +121,7 @@ class BasicAndroidWithKotlinTest: BaseTest() {
             select(
                 kts = """
                     |plugins {
-                    |  id("com.android.application")
-                    |  id("kotlin-android")
-                    |}
-                    |android {
-                    |  compileSdkVersion = "android-30"
-                    |  defaultConfig {
-                    |    minSdkVersion(21)
-                    |    targetSdkVersion(30)
-                    |  }
-                    |  compileOptions {
-                    |    sourceCompatibility = JavaVersion.VERSION_1_8
-                    |    targetCompatibility = JavaVersion.VERSION_1_8
-                    |  }
-                    |  kotlinOptions {
-                    |    jvmTarget = "1.8"
-                    |  }
+                    |  id("org.jetbrains.kotlin.jvm")
                     |}
                     |dependencies {
                     |}
@@ -165,22 +129,7 @@ class BasicAndroidWithKotlinTest: BaseTest() {
                 """.trimMargin(),
                 groovy = """
                     |plugins {
-                    |  id 'com.android.application'
-                    |  id 'kotlin-android'
-                    |}
-                    |android {
-                    |  compileSdkVersion = 'android-30'
-                    |  defaultConfig {
-                    |    minSdkVersion 21
-                    |    targetSdkVersion 30
-                    |  }
-                    |  compileOptions {
-                    |    sourceCompatibility = JavaVersion.VERSION_1_8
-                    |    targetCompatibility = JavaVersion.VERSION_1_8
-                    |  }
-                    |  kotlinOptions {
-                    |    jvmTarget = '1.8'
-                    |  }
+                    |  id 'org.jetbrains.kotlin.jvm'
                     |}
                     |dependencies {
                     |}

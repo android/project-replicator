@@ -42,62 +42,69 @@ class ProjectGenerator(
             allPlugins.addAll(module.plugins)
         }
 
-        dslWriter.block("buildscript") {
-            block("repositories") {
-                google()
-                jcenter()
-            }
-            block("dependencies") {
-                // now prepare the classpaths for plugins *not* using the new DSL
-                val classpaths = allPlugins.asSequence()
-                    .filter { !it.useNewDsl }
-                    .mapNotNull {
-                        when (it) {
-                            PluginType.ANDROID_APP, PluginType.ANDROID_LIB, PluginType.ANDROID_TEST, PluginType.ANDROID_DYNAMIC_FEATURE -> {
-                                "com.android.tools.build:gradle:${project.agpVersion}"
-                            }
-                            PluginType.KOTLIN_ANDROID, PluginType.KOTLIN_JVM, PluginType.KAPT -> {
-                                "org.jetbrains.kotlin:kotlin-gradle-plugin:${project.kotlinVersion}"
-                            }
-                            else -> null
-                        }
-                    }.toSet()
+        val requiresBuildscript = allPlugins.any { !it.useNewDsl }
 
-                for (cp in classpaths) {
-                    call("classpath", asString(cp))
+        if (requiresBuildscript) {
+            dslWriter.block("buildscript") {
+                block("repositories") {
+                    google()
+                    jcenter()
+                }
+                block("dependencies") {
+                    // now prepare the classpaths for plugins *not* using the new DSL
+                    val classpaths = allPlugins.asSequence()
+                        .filter { !it.useNewDsl }
+                        .mapNotNull {
+                            when (it) {
+                                PluginType.ANDROID_APP, PluginType.ANDROID_LIB, PluginType.ANDROID_TEST, PluginType.ANDROID_DYNAMIC_FEATURE -> {
+                                    "com.android.tools.build:gradle:${project.agpVersion}"
+                                }
+                                PluginType.KOTLIN_ANDROID, PluginType.KOTLIN_JVM, PluginType.KAPT -> {
+                                    "org.jetbrains.kotlin:kotlin-gradle-plugin:${project.kotlinVersion}"
+                                }
+                                else -> null
+                            }
+                        }.toSet()
+
+                    for (cp in classpaths) {
+                        call("classpath", asString(cp))
+                    }
                 }
             }
         }
 
-        dslWriter.block("plugins") {
-            // Because AGP does not support the new DSL, we need a mix and match of both of DSL.
-            // First figure out the full list of plugins knowing whether it's applied to the root module or not.
-            // build a list of plugins to put in the root module.
-            val rootPluginInfos = allPlugins.map { RootPluginInfo(it, rootPlugins.contains(it)) }
+        val requiresPluginsBlock = allPlugins.any { it.useNewDsl && it.requireVersions }
+        if (requiresPluginsBlock) {
+            dslWriter.block("plugins") {
+                // Because AGP does not support the new DSL, we need a mix and match of both of DSL.
+                // First figure out the full list of plugins knowing whether it's applied to the root module or not.
+                // build a list of plugins to put in the root module.
+                val rootPluginInfos = allPlugins.map { RootPluginInfo(it, rootPlugins.contains(it)) }
 
-            // now prepare the new DSL for all the plugins that support it.
-            rootPluginInfos.asSequence()
-                .filter { it.plugin.useNewDsl }
-                .forEach { pluginInfo ->
-                    val p: Pair<String, String?>? = when (pluginInfo.plugin) {
-                        PluginType.JAVA, PluginType.JAVA_LIBRARY, PluginType.APPLICATION -> {
-                            if (pluginInfo.applied) {
-                                pluginInfo.plugin.id to null
-                            } else {
-                                null
+                // now prepare the new DSL for all the plugins that support it.
+                rootPluginInfos.asSequence()
+                    .filter { it.plugin.useNewDsl }
+                    .forEach { pluginInfo ->
+                        val p: Pair<String, String?>? = when (pluginInfo.plugin) {
+                            PluginType.JAVA, PluginType.JAVA_LIBRARY, PluginType.APPLICATION -> {
+                                if (pluginInfo.applied) {
+                                    pluginInfo.plugin.id to null
+                                } else {
+                                    null
+                                }
                             }
+                            PluginType.KOTLIN_ANDROID, PluginType.KOTLIN_JVM, PluginType.KAPT -> {
+                                pluginInfo.plugin.id to project.kotlinVersion
+                            }
+                            else -> throw RuntimeException("Unexpected plugin in root plugin infos.")
                         }
-                        PluginType.KOTLIN_ANDROID, PluginType.KOTLIN_JVM, PluginType.KAPT -> {
-                            pluginInfo.plugin.id to project.kotlinVersion
+
+                        p?.let {
+                            pluginInBlock(p.first, p.second, pluginInfo.applied)
                         }
-                        else -> throw RuntimeException("Unexpected plugin in root plugin infos.")
-                    }
 
-                    p?.let {
-                        pluginInBlock(p.first, p.second, pluginInfo.applied)
                     }
-
-                }
+            }
         }
 
         dslWriter.block("allprojects") {

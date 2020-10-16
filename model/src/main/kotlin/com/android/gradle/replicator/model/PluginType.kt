@@ -25,6 +25,7 @@ enum class PluginType(
     val isKotlin: Boolean = false,
     val isJava: Boolean = false,
     val useNewDsl: Boolean = true,
+    val requireVersions: Boolean = false,
     val priority: Int = 0
 ) {
     JAVA_LIBRARY(
@@ -37,45 +38,53 @@ enum class PluginType(
     ),
     APPLICATION(
         id = "application",
-        isJava = true
+        isJava = true,
+        requireVersions = true
     ),
     KOTLIN_JVM(
         id = "org.jetbrains.kotlin.jvm",
         oldId = "kotlin",
         kotlinId = "jvm",
-        isKotlin = true
+        isKotlin = true,
+        requireVersions = true
     ),
     KOTLIN_ANDROID(
         id = "kotlin-android",
         isAndroid = true,
         isKotlin = true,
         useNewDsl = false,
+        requireVersions = true,
         priority = 10
     ),
     KAPT(
         id = "kotlin-kapt",
         isKotlin = true,
         useNewDsl = false,
+        requireVersions = true,
         priority = 11
     ),
     ANDROID_APP(
         id = "com.android.application",
         isAndroid = true,
-        useNewDsl = false
+        useNewDsl = false,
+        requireVersions = true
     ),
     ANDROID_LIB(
         id = "com.android.library",
         isAndroid = true,
-        useNewDsl = false
+        useNewDsl = false,
+        requireVersions = true
     ),
     ANDROID_TEST(
         id = "com.android.test",
         isAndroid = true,
-        useNewDsl = false
+        useNewDsl = false,
+        requireVersions = true
     ),
     ANDROID_DYNAMIC_FEATURE(
         id = "com.android.dynamic-feature",
         isAndroid = true,
-        useNewDsl = false
+        useNewDsl = false,
+        requireVersions = true
     ),
 }
