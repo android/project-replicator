@@ -25,6 +25,8 @@ import org.gradle.plugin.devel.GradlePluginDevelopmentExtension
 
 class AgpFunctionalTestPlugin: Plugin<Project> {
     override fun apply(project: Project) {
+        project.pluginManager.apply(VersionPlugin::class.java)
+
         project.plugins.withType(JavaLibraryPlugin::class.java) {
             val sourceSets = project.extensions.getByType(SourceSetContainer::class.java)
             val functionalSourceSet = sourceSets.create("functionalTest")

@@ -1,6 +1,5 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.testing.Test
 
 /*
  * Copyright (C) 2020 The Android Open Source Project
@@ -19,17 +18,8 @@ import org.gradle.api.tasks.testing.Test
  *
  */
 
-class DefaultConfigPlugin: Plugin<Project> {
+class VersionPlugin: Plugin<Project> {
     override fun apply(project: Project) {
-        project.pluginManager.apply(VersionPlugin::class.java)
-
-        project.repositories.apply {
-            google()
-            jcenter()
-        }
-
-        project.tasks.withType(Test::class.java).configureEach {
-            it.maxParallelForks = 10 //Runtime.runtime.availableProcessors()
-        }
+        Versions._gradleVersion = project.gradle.gradleVersion
     }
 }

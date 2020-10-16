@@ -17,7 +17,12 @@
 
 class Versions {
     companion object {
-        val gradleVersion = "6.7" // FIXME gradle.gradleVersion
+        val gradleVersion: String
+            get() =
+                _gradleVersion ?: throw RuntimeException("Access to gradleVersion without applying a buildSrc plugin")
+
+        internal var _gradleVersion: String? = null
+
         const val agpVersion = "4.2.0-alpha13"
         const val kotlinVersion = "1.3.72"
         const val pluginVersion = "0.2"
