@@ -43,8 +43,7 @@ abstract class DslWriter(
         file = File(folder, "settings.$extension")
     }
 
-    abstract fun pluginInNewBlock(pluginId: String, version: String? = null, apply: Boolean = true)
-    abstract fun applyPluginOldWay(pluginId: String)
+    abstract fun pluginInBlock(pluginId: String, version: String? = null, apply: Boolean = true)
 
     fun block(name: String, action: DslWriter.() -> Unit) {
         writeIndent()
@@ -67,13 +66,13 @@ abstract class DslWriter(
 
     abstract fun compileSdkPreview(level: String)
 
-    fun call(methodName: String, vararg values: String) {
+    fun call(methodName: String, vararg values: Any) {
         writeIndent()
         doMethodCall(methodName = methodName, withBlock = false, values = *values)
         buffer.append("\n")
     }
 
-    fun callWithBlock(methodName: String, vararg values: String, action: DslWriter.() -> Unit) {
+    fun callWithBlock(methodName: String, vararg values: Any, action: DslWriter.() -> Unit) {
         writeIndent()
         doMethodCall(methodName = methodName, withBlock = true, values = *values)
         buffer.append(" {\n")
@@ -94,6 +93,8 @@ abstract class DslWriter(
         buffer.append("jcenter()\n")
     }
 
+    abstract fun url(uri: String)
+
     fun flush() {
         file?.let {
             it.appendText(buffer.toString())
@@ -103,7 +104,7 @@ abstract class DslWriter(
 
     protected abstract val extension: String
 
-    protected abstract fun doMethodCall(methodName: String, withBlock: Boolean, vararg values: String)
+    protected abstract fun doMethodCall(methodName: String, withBlock: Boolean, vararg values: Any)
 
     protected fun writeIndent() {
         for (i in 1..indent) {

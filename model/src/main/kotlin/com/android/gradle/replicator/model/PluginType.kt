@@ -25,7 +25,7 @@ enum class PluginType(
     val isKotlin: Boolean = false,
     val isJava: Boolean = false,
     val useNewDsl: Boolean = true,
-    val last: Boolean = false
+    val priority: Int = 0
 ) {
     JAVA_LIBRARY(
         id = "java-library",
@@ -50,13 +50,13 @@ enum class PluginType(
         isAndroid = true,
         isKotlin = true,
         useNewDsl = false,
-        last = true
+        priority = 10
     ),
     KAPT(
         id = "kotlin-kapt",
         isKotlin = true,
         useNewDsl = false,
-        last = true
+        priority = 11
     ),
     ANDROID_APP(
         id = "com.android.application",

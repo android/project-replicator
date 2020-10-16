@@ -64,7 +64,7 @@ class ProjectGenerator(
                     }.toSet()
 
                 for (cp in classpaths) {
-                    call("classpath", "'$cp'")
+                    call("classpath", asString(cp))
                 }
             }
         }
@@ -94,7 +94,7 @@ class ProjectGenerator(
                     }
 
                     p?.let {
-                        pluginInNewBlock(p.first, p.second , pluginInfo.applied)
+                        pluginInBlock(p.first, p.second, pluginInfo.applied)
                     }
 
                 }
@@ -105,7 +105,7 @@ class ProjectGenerator(
                 google()
                 jcenter()
                 block("maven") {
-                    call("url", asString("https://jitpack.io"))
+                    url("https://jitpack.io")
                 }
             }
         }
@@ -120,18 +120,12 @@ class ProjectGenerator(
     ) {
         dslWriter.newBuildFile(folder)
 
-        val newDslPlugin = module.plugins.filter { it.useNewDsl }
-        if (newDslPlugin.isNotEmpty()) {
+        if (module.plugins.isNotEmpty()) {
             dslWriter.block("plugins") {
-                for (plugin in newDslPlugin) {
-                    dslWriter.pluginInNewBlock(plugin.id)
+                for (plugin in module.plugins.sortedBy { it.priority }) {
+                    dslWriter.pluginInBlock(plugin.id)
                 }
             }
-        }
-
-        val oldDslPlugin = module.plugins.filter { !it.useNewDsl }.sortedBy { it.last }
-        for (plugin in oldDslPlugin) {
-            dslWriter.applyPluginOldWay(plugin.id)
         }
 
         generateModuleInfo(folder, module)

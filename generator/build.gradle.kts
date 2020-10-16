@@ -19,9 +19,13 @@ plugins {
     application
 
     // Apply the Kotlin JVM plugin to add support for Kotlin.
-    id("org.jetbrains.kotlin.jvm")
+    kotlin("jvm")
 
     id("default-config")
+}
+
+repositories {
+    maven { url = uri("https://repo.gradle.org/gradle/libs-releases-local/") }
 }
 
 application {
@@ -35,6 +39,10 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
     }
 }
 
+tasks.test {
+    environment("test-gradle-user-home", project.layout.buildDirectory.file("gradle-user-home").get().asFile)
+}
+
 dependencies {
     implementation(project(":model"))
 
@@ -44,4 +52,5 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("com.google.truth:truth:1.0.1")
+    testImplementation("org.gradle:gradle-tooling-api:${Versions.gradleVersion}")
 }
