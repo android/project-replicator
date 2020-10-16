@@ -29,7 +29,7 @@ repositories {
 }
 
 application {
-    mainClass.set("com.android.gradle.structure.generator.Main")
+    mainClass.set("com.android.gradle.replicator.generator.Main")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {

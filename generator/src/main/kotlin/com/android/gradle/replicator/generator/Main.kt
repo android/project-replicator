@@ -106,7 +106,7 @@ class Main {
                 -f, --filter-libraries: a file containing a list of libraries to filter or replace
                                         Format for removal is one line per maven coordinates to remove
                                         To replace a library, add " -> <coordinate to replace with>"
-                -d, --add-libraries: a file containing libraries to add to specific sub-projects. Line format is:
+                -a, --add-libraries: a file containing libraries to add to specific sub-projects. Line format is:
                                      <modulepath><space><configuration name><space><dependency string>
                 --kts: generates kts-based build files
 """.trimIndent()
