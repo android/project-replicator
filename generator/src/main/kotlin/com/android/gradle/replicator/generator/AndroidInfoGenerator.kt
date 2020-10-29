@@ -17,6 +17,7 @@
 
 package com.android.gradle.replicator.generator
 
+import com.android.gradle.replicator.generator.resources.ResourceGenerator
 import com.android.gradle.replicator.generator.writer.DslWriter
 import com.android.gradle.replicator.model.AndroidInfo
 import com.android.gradle.replicator.model.BuildFeaturesInfo
@@ -25,6 +26,7 @@ import java.io.File
 internal fun AndroidInfo.generate(
     folder: File,
     dslWriter: DslWriter,
+    resourceGenerator: ResourceGenerator,
     gradlePath: String,
     hasKotlin: Boolean) {
 
@@ -54,25 +56,11 @@ internal fun AndroidInfo.generate(
     }
 
     // generate a main manifest.
-    generateManifest(folder, gradlePath)
-}
-
-private fun generateManifest(folder: File, gradlePath: String) {
-    val manifestFile = folder.join("src", "main", "AndroidManifest.xml")
-    val parentFolder = manifestFile.parentFile
-    parentFolder.createDirWithParents()
-
     // compute package name based on gradle path
-    val packageName = gradlePath.split(":").filter { it.isNotBlank() }.joinToString(".")
-
     // add "pkg.android." prefix to package in order to guarantee at least 2 segments to the package since it's
     // by aapt
-    manifestFile.writeText(""" 
-            <?xml version="1.0" encoding="utf-8"?>
-            <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-                package="pkg.android.$packageName">
-            </manifest>
-        """.trimIndent())
+    val packageName = "pkg.android.${gradlePath.split(":").filter { it.isNotBlank() }.joinToString(".")}"
+    resourceGenerator.generateManifest(folder, packageName)
 }
 
 private fun BuildFeaturesInfo.generateBuildFeatures(dslWriter: DslWriter) {

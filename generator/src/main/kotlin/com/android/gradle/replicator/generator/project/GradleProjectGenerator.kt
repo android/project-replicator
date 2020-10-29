@@ -15,8 +15,11 @@
  *
  */
 
-package com.android.gradle.replicator.generator
+package com.android.gradle.replicator.generator.project
 
+import com.android.gradle.replicator.generator.containsKotlin
+import com.android.gradle.replicator.generator.generate
+import com.android.gradle.replicator.generator.resources.ResourceGenerator
 import com.android.gradle.replicator.generator.writer.DslWriter
 import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.ModuleInfo
@@ -24,14 +27,15 @@ import com.android.gradle.replicator.model.PluginType
 import com.android.gradle.replicator.model.ProjectInfo
 import java.io.File
 
-class ProjectGenerator(
+class GradleProjectGenerator(
     private val destinationFolder: File,
     private val libraryFilter: Map<String, String>,
     private val libraryAdditions: Map<String, List<DependenciesInfo>>,
-    private val dslWriter: DslWriter
-) {
+    private val dslWriter: DslWriter,
+    private val resGenerator: ResourceGenerator
+): ProjectGenerator {
 
-    internal fun generateRootModule(project: ProjectInfo) {
+    override fun generateRootModule(project: ProjectInfo) {
         dslWriter.newBuildFile(destinationFolder)
 
         val rootPlugins = project.rootModule.plugins
@@ -121,7 +125,7 @@ class ProjectGenerator(
         generateModuleInfo(destinationFolder, project.rootModule)
     }
 
-    internal fun generateModule(
+    override fun generateModule(
         folder: File,
         module: ModuleInfo
     ) {
@@ -138,13 +142,17 @@ class ProjectGenerator(
         generateModuleInfo(folder, module)
     }
 
-    internal fun generateSettingsFile(project: ProjectInfo) {
+    override fun generateSettingsFile(project: ProjectInfo) {
         println("Generate settings.gradle")
         dslWriter.newSettingsFile(destinationFolder)
 
         project.subModules.map { it.path }.sorted().forEach {
             dslWriter.call("include", dslWriter.asString(it))
         }
+    }
+
+    override fun close() {
+        dslWriter.flush()
     }
 
     private fun generateModuleInfo(
@@ -154,6 +162,7 @@ class ProjectGenerator(
         module.android?.generate(
             folder = folder,
             dslWriter = dslWriter,
+            resourceGenerator = resGenerator,
             gradlePath = module.path,
             hasKotlin = module.plugins.containsKotlin()
         )

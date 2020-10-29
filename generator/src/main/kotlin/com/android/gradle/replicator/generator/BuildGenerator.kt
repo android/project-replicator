@@ -17,9 +17,7 @@
 
 package com.android.gradle.replicator.generator
 
-import com.android.gradle.replicator.generator.writer.DslWriter
-import com.android.gradle.replicator.generator.writer.GroovyDslWriter
-import com.android.gradle.replicator.generator.writer.KtsWriter
+import com.android.gradle.replicator.generator.project.ProjectGenerator
 import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.DependencyType
 import com.android.gradle.replicator.model.Serializer
@@ -29,7 +27,7 @@ import java.io.File
 /**
  * Generates all the files for a build.
  */
-internal class BuildGenerator(private val params: Params) {
+class BuildGenerator(private val params: Params) {
     interface Params {
         val jsonFile: File
         val destination: File
@@ -38,20 +36,13 @@ internal class BuildGenerator(private val params: Params) {
         val kts: Boolean
     }
 
-    private val libraryFilter = generateLibraryFilter()
-    private val libraryAdditions = generateLibraryAdditions()
+    private val libraryFilter: Map<String, String> = generateLibraryFilter()
+    private val libraryAdditions: Map<String, List<DependenciesInfo>> = generateLibraryAdditions()
 
     fun generate() {
         val project = Serializer.instance().deserializeProject(params.jsonFile)
 
-        val dslWriter: DslWriter = if (params.kts) KtsWriter(true) else GroovyDslWriter(true)
-
-        val projectGenerator = ProjectGenerator(
-            params.destination,
-            libraryFilter,
-            libraryAdditions,
-            dslWriter
-        )
+        val projectGenerator = ProjectGenerator.createGenerator(params, libraryFilter, libraryAdditions)
 
         println("Project: ':'")
         projectGenerator.generateRootModule(project)
@@ -70,7 +61,7 @@ internal class BuildGenerator(private val params: Params) {
         projectGenerator.generateSettingsFile(project)
         generateGradleProperties(project.gradleProperties)
 
-        dslWriter.flush()
+        projectGenerator.close()
         println("Done.")
     }
 
