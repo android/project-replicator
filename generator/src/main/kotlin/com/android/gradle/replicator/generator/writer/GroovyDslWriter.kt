@@ -17,6 +17,8 @@
 
 package com.android.gradle.replicator.generator.writer
 
+import com.android.gradle.replicator.model.PluginType
+
 class GroovyDslWriter(
     protected val newDsl: Boolean
 ): DslWriter(newDsl) {
@@ -24,9 +26,9 @@ class GroovyDslWriter(
     override val extension: String
         get() = "gradle"
 
-    override fun pluginInBlock(pluginId: String, version: String?, apply: Boolean) {
+    override fun pluginInBlock(plugin: PluginType, version: String?, apply: Boolean) {
         writeIndent()
-        buffer.append("id '$pluginId'")
+        buffer.append("id '${plugin.id}'")
         version?.let {
             buffer.append(" version '$version'")
         }

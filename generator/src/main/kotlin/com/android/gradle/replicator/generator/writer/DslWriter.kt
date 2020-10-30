@@ -17,6 +17,7 @@
 
 package com.android.gradle.replicator.generator.writer
 
+import com.android.gradle.replicator.model.PluginType
 import java.io.File
 
 abstract class DslWriter(
@@ -43,7 +44,7 @@ abstract class DslWriter(
         file = File(folder, "settings.$extension")
     }
 
-    abstract fun pluginInBlock(pluginId: String, version: String? = null, apply: Boolean = true)
+    abstract fun pluginInBlock(plugin: PluginType, version: String? = null, apply: Boolean = true)
 
     fun block(name: String, action: DslWriter.() -> Unit) {
         writeIndent()
@@ -81,6 +82,11 @@ abstract class DslWriter(
         indent--
         writeIndent()
         buffer.append("}\n")
+    }
+
+    fun gradlePluginPortal() {
+        writeIndent()
+        buffer.append("gradlePluginPortal()\n")
     }
 
     fun google() {

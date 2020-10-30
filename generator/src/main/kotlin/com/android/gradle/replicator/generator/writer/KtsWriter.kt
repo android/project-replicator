@@ -17,6 +17,8 @@
 
 package com.android.gradle.replicator.generator.writer
 
+import com.android.gradle.replicator.model.PluginType
+
 class KtsWriter(
     private val newDsl: Boolean
 ): DslWriter(newDsl) {
@@ -24,9 +26,13 @@ class KtsWriter(
     override val extension: String
         get() = "gradle.kts"
 
-    override fun pluginInBlock(pluginId: String, version: String?, apply: Boolean) {
+    override fun pluginInBlock(plugin: PluginType, version: String?, apply: Boolean) {
         writeIndent()
-        buffer.append("""id("$pluginId")""")
+        if (plugin.kotlinId != null) {
+            buffer.append("""kotlin("${plugin.kotlinId}")""")
+        } else {
+            buffer.append("""id("${plugin.id}")""")
+        }
         version?.let {
             buffer.append(" version \"$version\"")
         }

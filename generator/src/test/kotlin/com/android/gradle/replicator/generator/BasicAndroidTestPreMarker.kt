@@ -26,7 +26,7 @@ import org.junit.runners.Parameterized
 import java.io.File
 
 @RunWith(Parameterized::class)
-class BasicAndroidTest: BaseTest() {
+class BasicAndroidTestPreMarker: BaseTest() {
 
     companion object {
         private const val TEST_STRUCTURE = """

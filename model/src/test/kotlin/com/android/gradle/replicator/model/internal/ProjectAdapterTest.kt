@@ -136,7 +136,7 @@ private val FULL_PROJECT = """
         "path": ":foo",
         "plugins": [
           "com.android.application",
-          "kotlin-android"
+          "org.jetbrains.kotlin.android"
         ],
         "javaSources": {
           "fileCount": 1

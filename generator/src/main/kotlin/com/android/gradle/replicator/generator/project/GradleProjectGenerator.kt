@@ -17,6 +17,7 @@
 
 package com.android.gradle.replicator.generator.project
 
+import com.android.gradle.replicator.generator.containsAndroid
 import com.android.gradle.replicator.generator.containsKotlin
 import com.android.gradle.replicator.generator.generate
 import com.android.gradle.replicator.generator.resources.ResourceGenerator
@@ -39,14 +40,9 @@ class GradleProjectGenerator(
         dslWriter.newBuildFile(destinationFolder)
 
         val rootPlugins = project.rootModule.plugins
-        // gather all the plugins from all the modules.
-        val allPlugins = mutableSetOf<PluginType>()
-        allPlugins.addAll(rootPlugins)
-        for (module in project.subModules) {
-            allPlugins.addAll(module.plugins)
-        }
+        val allPlugins = project.getAllPlugins()
 
-        val requiresBuildscript = allPlugins.any { !it.useNewDsl }
+        val requiresBuildscript = allPlugins.any { !it.useNewDsl(project) }
 
         if (requiresBuildscript) {
             dslWriter.block("buildscript") {
@@ -57,16 +53,13 @@ class GradleProjectGenerator(
                 block("dependencies") {
                     // now prepare the classpaths for plugins *not* using the new DSL
                     val classpaths = allPlugins.asSequence()
-                        .filter { !it.useNewDsl }
+                        .filter { !it.useNewDsl(project) }
                         .mapNotNull {
                             when (it) {
                                 PluginType.ANDROID_APP, PluginType.ANDROID_LIB, PluginType.ANDROID_TEST, PluginType.ANDROID_DYNAMIC_FEATURE -> {
                                     "com.android.tools.build:gradle:${project.agpVersion}"
                                 }
-                                PluginType.KOTLIN_ANDROID, PluginType.KOTLIN_JVM, PluginType.KAPT -> {
-                                    "org.jetbrains.kotlin:kotlin-gradle-plugin:${project.kotlinVersion}"
-                                }
-                                else -> null
+                                else -> throw RuntimeException("Unexpected plugin requiring buildscript: ${it.id}")
                             }
                         }.toSet()
 
@@ -77,37 +70,28 @@ class GradleProjectGenerator(
             }
         }
 
-        val requiresPluginsBlock = allPlugins.any { it.useNewDsl && it.requireVersions }
-        if (requiresPluginsBlock) {
+        // Because some AGP versions do not support the new DSL, we need a mix and match of both of DSL.
+        // First figure out the full list of plugins knowing whether it's applied to the root module or not.
+        // build a list of plugins to put in the root module.
+        val rootPluginInfos = allPlugins
+            .asSequence()
+            .map { RootPluginInfo(plugin = it, applied = rootPlugins.contains(it)) }
+            .filter { (it.plugin.useNewDsl(project) && it.plugin.requireVersions) || it.applied }
+            .sortedBy { it.plugin.priority }
+            .toList()
+
+        if (rootPluginInfos.isNotEmpty()) {
             dslWriter.block("plugins") {
-                // Because AGP does not support the new DSL, we need a mix and match of both of DSL.
-                // First figure out the full list of plugins knowing whether it's applied to the root module or not.
-                // build a list of plugins to put in the root module.
-                val rootPluginInfos = allPlugins.map { RootPluginInfo(it, rootPlugins.contains(it)) }
-
-                // now prepare the new DSL for all the plugins that support it.
-                rootPluginInfos.asSequence()
-                    .filter { it.plugin.useNewDsl }
-                    .forEach { pluginInfo ->
-                        val p: Pair<String, String?>? = when (pluginInfo.plugin) {
-                            PluginType.JAVA, PluginType.JAVA_LIBRARY, PluginType.APPLICATION -> {
-                                if (pluginInfo.applied) {
-                                    pluginInfo.plugin.id to null
-                                } else {
-                                    null
-                                }
-                            }
-                            PluginType.KOTLIN_ANDROID, PluginType.KOTLIN_JVM, PluginType.KAPT -> {
-                                pluginInfo.plugin.id to project.kotlinVersion
-                            }
-                            else -> throw RuntimeException("Unexpected plugin in root plugin infos.")
-                        }
-
-                        p?.let {
-                            pluginInBlock(p.first, p.second, pluginInfo.applied)
-                        }
-
+                for (pluginInfo in rootPluginInfos) {
+                    val version: String? = when (pluginInfo.plugin) {
+                        PluginType.JAVA, PluginType.JAVA_LIBRARY, PluginType.APPLICATION -> null
+                        PluginType.KOTLIN_ANDROID, PluginType.KOTLIN_JVM, PluginType.KAPT -> project.kotlinVersion
+                        PluginType.ANDROID_APP, PluginType.ANDROID_LIB, PluginType.ANDROID_TEST, PluginType.ANDROID_DYNAMIC_FEATURE -> project.agpVersion
+                        else -> throw RuntimeException("Unexpected plugin in root plugin infos.")
                     }
+
+                    pluginInBlock(pluginInfo.plugin, version, pluginInfo.applied)
+                }
             }
         }
 
@@ -125,6 +109,15 @@ class GradleProjectGenerator(
         generateModuleInfo(destinationFolder, project.rootModule)
     }
 
+    private fun PluginType.useNewDsl(info: ProjectInfo): Boolean {
+        return if (isAndroid) {
+            val version = useNewDslSince ?: throw RuntimeException("Android plugin without 'useNewDslSince' value: $id")
+            info.agpVersion >= version
+        } else  {
+            true
+        }
+    }
+
     override fun generateModule(
         folder: File,
         module: ModuleInfo
@@ -134,7 +127,7 @@ class GradleProjectGenerator(
         if (module.plugins.isNotEmpty()) {
             dslWriter.block("plugins") {
                 for (plugin in module.plugins.sortedBy { it.priority }) {
-                    dslWriter.pluginInBlock(plugin.id)
+                    dslWriter.pluginInBlock(plugin)
                 }
             }
         }
@@ -146,6 +139,16 @@ class GradleProjectGenerator(
         println("Generate settings.gradle")
         dslWriter.newSettingsFile(destinationFolder)
 
+        val plugins = project.getAllPlugins()
+        if (plugins.containsAndroid() && PluginType.ANDROID_APP.useNewDsl(project)) {
+            dslWriter.block("pluginManagement") {
+                dslWriter.block("repositories") {
+                    gradlePluginPortal()
+                    google()
+                }
+            }
+        }
+
         project.subModules.map { it.path }.sorted().forEach {
             dslWriter.call("include", dslWriter.asString(it))
         }
@@ -153,6 +156,16 @@ class GradleProjectGenerator(
 
     override fun close() {
         dslWriter.flush()
+    }
+
+    private fun ProjectInfo.getAllPlugins(): Set<PluginType> {
+        val allPlugins = mutableSetOf<PluginType>()
+        allPlugins.addAll(rootModule.plugins)
+        for (module in subModules) {
+            allPlugins.addAll(module.plugins)
+        }
+
+        return allPlugins
     }
 
     private fun generateModuleInfo(

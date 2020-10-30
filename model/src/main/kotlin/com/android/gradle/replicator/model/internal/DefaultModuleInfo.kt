@@ -78,7 +78,7 @@ class ModuleAdapter: TypeAdapter<DefaultModuleInfo>() {
                 "path" -> path = nextString()
                 "plugins" -> plugins = input.readArrayToList {
                     val id = nextString()
-                    PluginType.values().firstOrNull { it.id == id }
+                    PluginType.values().firstOrNull { it.id == id || it.oldId == id }
                             ?: throw RuntimeException("Unable to find PluginType for value '$id'")
                 }
 
