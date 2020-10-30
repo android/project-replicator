@@ -26,14 +26,14 @@ import org.junit.runners.Parameterized
 import java.io.File
 
 @RunWith(Parameterized::class)
-class BasicAndroidWithKotlinTest: BaseTest() {
+class BasicAndroidTestPostMarker: BaseTest() {
 
     companion object {
-        private const val TEST_STRUCTURE: String = """
+        private const val TEST_STRUCTURE = """
 {
-  "gradle": "6.1.1",
-  "agp": "4.0.1",
-  "kotlin": "1.3.72",
+  "gradle": "6.7",
+  "agp": "4.2.0-alpha15",
+  "kotlin": "n/a",
   "properties": [],
   "rootModule": {
     "path": ":",
@@ -44,7 +44,6 @@ class BasicAndroidWithKotlinTest: BaseTest() {
     {
       "path": ":module1",
       "plugins": [
-        "kotlin-android",
         "com.android.application"
       ],
       "javaSources": {
@@ -59,7 +58,7 @@ class BasicAndroidWithKotlinTest: BaseTest() {
       }
     }
   ]
-}
+}            
 """
 
     }
@@ -72,17 +71,8 @@ class BasicAndroidWithKotlinTest: BaseTest() {
         Truth.assertWithMessage(rootBuildFile.absolutePath).that(rootBuildFile.readText()).isEqualTo(
             select(
                 kts = """
-                    |buildscript {
-                    |  repositories {
-                    |    google()
-                    |    jcenter()
-                    |  }
-                    |  dependencies {
-                    |    classpath("com.android.tools.build:gradle:4.0.1")
-                    |  }
-                    |}
                     |plugins {
-                    |  kotlin("android") version "1.3.72" apply false
+                    |  id("com.android.application") version "4.2.0-alpha15" apply false
                     |}
                     |allprojects {
                     |  repositories {
@@ -98,17 +88,8 @@ class BasicAndroidWithKotlinTest: BaseTest() {
                     |
                 """.trimMargin(),
                 groovy = """
-                    |buildscript {
-                    |  repositories {
-                    |    google()
-                    |    jcenter()
-                    |  }
-                    |  dependencies {
-                    |    classpath 'com.android.tools.build:gradle:4.0.1'
-                    |  }
-                    |}
                     |plugins {
-                    |  id 'org.jetbrains.kotlin.android' version '1.3.72' apply false
+                    |  id 'com.android.application' version '4.2.0-alpha15' apply false
                     |}
                     |allprojects {
                     |  repositories {
@@ -130,10 +111,22 @@ class BasicAndroidWithKotlinTest: BaseTest() {
         Truth.assertWithMessage(settingsFile.absolutePath).that(settingsFile.readText()).isEqualTo(
             select(
                 kts = """
+                    |pluginManagement {
+                    |  repositories {
+                    |    gradlePluginPortal()
+                    |    google()
+                    |  }
+                    |}
                     |include(":module1")
                     |
                 """.trimMargin(),
                 groovy = """
+                    |pluginManagement {
+                    |  repositories {
+                    |    gradlePluginPortal()
+                    |    google()
+                    |  }
+                    |}
                     |include ':module1'
                     |
                 """.trimMargin()
@@ -141,13 +134,11 @@ class BasicAndroidWithKotlinTest: BaseTest() {
         )
 
         val moduleBuildFile = File(File(output, "module1"), buildFileName)
-
         Truth.assertWithMessage(moduleBuildFile.absolutePath).that(moduleBuildFile.readText()).isEqualTo(
             select(
                 kts = """
                     |plugins {
                     |  id("com.android.application")
-                    |  kotlin("android")
                     |}
                     |android {
                     |  compileSdkVersion = "android-30"
@@ -159,9 +150,6 @@ class BasicAndroidWithKotlinTest: BaseTest() {
                     |    sourceCompatibility = JavaVersion.VERSION_1_8
                     |    targetCompatibility = JavaVersion.VERSION_1_8
                     |  }
-                    |  kotlinOptions {
-                    |    jvmTarget = "1.8"
-                    |  }
                     |}
                     |dependencies {
                     |}
@@ -170,7 +158,6 @@ class BasicAndroidWithKotlinTest: BaseTest() {
                 groovy = """
                     |plugins {
                     |  id 'com.android.application'
-                    |  id 'org.jetbrains.kotlin.android'
                     |}
                     |android {
                     |  compileSdkVersion = 'android-30'
@@ -181,9 +168,6 @@ class BasicAndroidWithKotlinTest: BaseTest() {
                     |  compileOptions {
                     |    sourceCompatibility = JavaVersion.VERSION_1_8
                     |    targetCompatibility = JavaVersion.VERSION_1_8
-                    |  }
-                    |  kotlinOptions {
-                    |    jvmTarget = '1.8'
                     |  }
                     |}
                     |dependencies {

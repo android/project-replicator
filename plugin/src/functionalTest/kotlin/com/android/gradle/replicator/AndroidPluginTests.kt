@@ -118,7 +118,7 @@ class AndroidPluginTests {
               "rootModule": {
                 "path": ":",
                 "plugins": [
-                  "kotlin-android",
+                  "org.jetbrains.kotlin.android",
                   "com.android.application"
                 ],
                 "javaSources": {

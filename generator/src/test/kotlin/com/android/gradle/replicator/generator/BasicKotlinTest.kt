@@ -66,7 +66,7 @@ class BasicKotlinTest: BaseTest() {
             select(
                 kts = """
                     |plugins {
-                    |  id("org.jetbrains.kotlin.jvm") version "1.3.72" apply false
+                    |  kotlin("jvm") version "1.3.72" apply false
                     |}
                     |allprojects {
                     |  repositories {
@@ -121,7 +121,7 @@ class BasicKotlinTest: BaseTest() {
             select(
                 kts = """
                     |plugins {
-                    |  id("org.jetbrains.kotlin.jvm")
+                    |  kotlin("jvm")
                     |}
                     |dependencies {
                     |}

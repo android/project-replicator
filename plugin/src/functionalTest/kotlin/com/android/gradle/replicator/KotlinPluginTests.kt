@@ -162,7 +162,7 @@ class KotlinPluginTests {
                 "plugins": [
                   "java",
                   "org.jetbrains.kotlin.jvm",
-                  "kotlin-kapt"
+                  "org.jetbrains.kotlin.kapt"
                 ],
                 "javaSources": {
                   "fileCount": 0
@@ -201,7 +201,7 @@ class KotlinPluginTests {
                 "plugins": [
                   "java",
                   "org.jetbrains.kotlin.jvm",
-                  "kotlin-kapt"
+                  "org.jetbrains.kotlin.kapt"
                 ],
                 "javaSources": {
                   "fileCount": 0
@@ -248,7 +248,7 @@ class KotlinPluginTests {
                 "plugins": [
                   "java",
                   "org.jetbrains.kotlin.jvm",
-                  "kotlin-kapt"
+                  "org.jetbrains.kotlin.kapt"
                 ],
                 "javaSources": {
                   "fileCount": 0
