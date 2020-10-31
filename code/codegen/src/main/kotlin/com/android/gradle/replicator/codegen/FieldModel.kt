@@ -12,12 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
+package com.android.gradle.replicator.codegen
 
-rootProject.name = "project-replicator"
+import kotlin.reflect.KClass
 
-include(":plugin")
-include(":model")
-include(":generator")
-include(":code:codegen")
-include(":code:test")
+data class FieldModel(
+    val name: String,
+    override val type: KClass<*>,
+    override val nullable: Boolean,
+    val modifiers: Int = 0
+): TypeModel
+
+typealias ParamModel= FieldModel
+
+data class TypeModelImpl(
+    override val type: KClass<*>,
+    override val nullable: Boolean
+): TypeModel
