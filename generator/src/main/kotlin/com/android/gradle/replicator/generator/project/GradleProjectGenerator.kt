@@ -203,7 +203,7 @@ class GradleProjectGenerator(
 
             // this is not very efficient, but good enough here.
             for (scope in scopes) {
-                for (dep in dependencyList.filter { it.scope == scope}) {
+                for (dep in dependencyList.filter { it.scope == scope }) {
                     // search for replacement. If none, use the original value
                     val replacement = libraryFilter[dep.dependency] ?: dep.dependency
                     // empty string means ignored dependency
@@ -212,10 +212,15 @@ class GradleProjectGenerator(
                         continue
                     }
 
-                    call(dep.scope, dep.type.getString(replacement, dslWriter::asString))
+                    call(rewriteDependencyScope(dep.scope), dep.type.getString(replacement, dslWriter::asString))
                 }
             }
         }
+    }
+
+    private fun rewriteDependencyScope(scope: String): String = when (scope) {
+        "provided" -> "compileOnly"
+        else -> scope
     }
 
     private data class RootPluginInfo(
