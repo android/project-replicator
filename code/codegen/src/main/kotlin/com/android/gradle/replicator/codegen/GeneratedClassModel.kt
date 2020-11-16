@@ -16,18 +16,27 @@
  */
 package com.android.gradle.replicator.codegen
 
-import kotlin.reflect.KClass
+/**
+ * Simple model for generated class.
+ */
+class GeneratedClassModel(
+        /**
+         * java package name
+         */
+        val packageName: String,
+        /**
+         * class simple name
+         */
+        val name: String
+) {
+    /**
+     * list of field currently defined in the class. If the class generation is over, this is the final list of fields.
+     */
+    val fields = mutableListOf<FieldModel>()
 
-data class FieldModel(
-        val name: String,
-        override val classModel: ClassModel<*>,
-        override val nullable: Boolean,
-        val modifiers: Int = 0
-): TypeModel
-
-typealias ParamModel= FieldModel
-
-data class TypeModelImpl(
-        override val classModel: ClassModel<*>,
-        override val nullable: Boolean
-): TypeModel
+    /**
+     * list of methods currently defined in the class. If the class generation is over, this is the final list of
+     * methods
+     */
+    val methods = mutableListOf<MethodModel>()
+}

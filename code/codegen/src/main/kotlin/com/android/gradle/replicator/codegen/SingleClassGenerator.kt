@@ -16,19 +16,25 @@
  */
 package com.android.gradle.replicator.codegen
 
+import java.lang.reflect.Modifier
 import kotlin.random.Random
 import kotlin.reflect.*
 import kotlin.reflect.full.createType
+import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.declaredMemberFunctions
-import kotlin.reflect.full.functions
+import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.jvm.javaType
 import kotlin.reflect.jvm.jvmErasure
+import kotlin.reflect.jvm.jvmName
+import kotlin.reflect.jvm.kotlinFunction
 
 class SingleClassGenerator(
         generator: ClassGenerator,
         private val params: ClassGenerationParameters,
         private val packageName: String,
         private val className: String,
-        private val eligibleClasses: List<KClass<*>>,
+        private val apiClassPicker: ImportClassPicker,
+        private val implClassPicker: ImportClassPicker,
         private val random: Random
 ) {
 
@@ -64,11 +70,11 @@ class SingleClassGenerator(
         // generate parameters.
         val parameters = mutableListOf<ParamModel>()
         for (j in 0..random.nextInt(0, params.maxNumberOfMethodParameters)) {
-            val parameterType = findSuitableType()
+            val parameterType = findSuitableType(apiClassPicker)
             parameters.add(
                 ParamModel(
                     "param$j",
-                    parameterType.type,
+                    parameterType,
                     false))
         }
         classGenerator.declareMethod("method", parameters, null, null) {
@@ -99,11 +105,11 @@ class SingleClassGenerator(
     }
 
     private fun addInstanceVariable(): KClass<*> {
-        val receiverType = findSuitableType()
+        val receiverType = findSuitableType(apiClassPicker)
 
         classGenerator.declareVariable(
-            FieldModel("instance_var", receiverType.type, false),
-            classGenerator.allocateValue(random, receiverType.type, receiverType.constructor))
+            FieldModel("instance_var", receiverType, false, Modifier.PRIVATE),
+            classGenerator.allocateValue(random, false, receiverType))
         return receiverType.type
     }
 
@@ -116,24 +122,16 @@ class SingleClassGenerator(
     }
 
     private fun addLocalVariableAndMethodCall() {
-        val methodCall = findMethodToCall()
-        val allocatableType = methodCall.first
+        val allocatableType = findSuitableType(implClassPicker)
         val variableName = classGenerator.declareVariable(
-                FieldModel("local_var", allocatableType.type, false),
-                classGenerator.allocateValue(random, allocatableType.type, allocatableType.constructor)
+                FieldModel("local_var", allocatableType, false),
+                classGenerator.allocateValue(random, false, allocatableType)
         )
         classGenerator.indent()
-        addMethodCall(variableName, methodCall.second)
+        addMethodCall(variableName, allocatableType.callableMethods.random(random))
         classGenerator.println()
     }
 
-    /**
-     * Information about a type that can be allocated through a constructor method reference.
-     */
-    private class AllocatableType(
-            val type:KClass<out Any>,
-            val constructor: KFunction<Any>
-    )
 
     /**
      * Information about a method call, the variable containing the instance to be invoked, and the method to invoke.
@@ -143,34 +141,29 @@ class SingleClassGenerator(
             val method: KFunction<*>
     )
 
-    private fun findMethodToCall(): Pair<AllocatableType, KFunction<*>> {
-        repeat(MaxTry) {
-            val receiverType = findSuitableType()
-            findSuitableMethodToCall(receiverType.type.declaredMemberFunctions)?.let {
-                return@findMethodToCall receiverType to it
-            }
-        }
-        return AllocatableType(String::class, String::class.constructors.first()) to String::toString
-    }
-
     private fun addFunctionParameterMethodCall() {
         classGenerator.getLocalVariables().forEach { paramModel ->
-            findSuitableMethodToCall(paramModel.type.declaredMemberFunctions)?.let {
+            if (paramModel.classModel.type.simpleName?.contains("String") == false) {
+                findSuitableMethodToCall(paramModel.classModel.type.declaredMemberFunctions)?.let {
                     classGenerator.indent()
                     addMethodCall(paramModel, it)
                     classGenerator.println()
                     return@addFunctionParameterMethodCall
-
+                }
             }
         }
     }
 
     private fun addMethodCall(receiver: FieldModel, method: KFunction<*>) {
+        addInlineMethodCall(receiver, method)
+        classGenerator.addLineDelimiter()
+    }
+
+    private fun addInlineMethodCall(receiver: FieldModel, method: KFunction<*>) {
         val parametersValues = method.parameters.filter {
             it.kind == KParameter.Kind.VALUE
         }.map {
-            val prefix= if (it.isVararg) "*" else ""
-            prefix + classGenerator.allocateValue(random, it.type.jvmErasure, it.findSuitableConstructor())
+            classGenerator.allocateValue(random, it.isVararg, it.type.jvmErasure.toTypeModel())
         }
         classGenerator.callFunction(
                 receiver,
@@ -198,20 +191,22 @@ class SingleClassGenerator(
         } else null
 
         if (methodToCall == null) {
-            classGenerator.ifBlock({ classGenerator.print("Object().equals(Object())") }, block, elseBlock)
+            val allocatedValue = classGenerator.allocateValue(random, false,
+                    ClassModel(
+                            Object::class,
+                            Object::class.primaryConstructor!!,
+                            listOf()))
+            classGenerator.ifBlock({ classGenerator.print("${allocatedValue}.equals(${allocatedValue})") }, block, elseBlock)
         } else {
-            classGenerator.ifBlock({ addMethodCall(methodToCall.variable, methodToCall.method) }, block, elseBlock)
+            classGenerator.ifBlock({ addInlineMethodCall(methodToCall.variable, methodToCall.method) }, block, elseBlock)
         }
     }
 
     private fun addLambda() {
         val methodToCall = findMethodReturning(Iterable::class.createType(listOf(KTypeProjection(KVariance.OUT, Any::class.createType()))))
-        val beforeBlock = if (methodToCall == null) {
-            // TODO: fix this, it is kotlin code.
-            { classGenerator.print("""listOf("1", "2", "3")""") }
-        } else {
+        val beforeBlock: (() -> Unit)? = if (methodToCall != null) {
             { addMethodCall(methodToCall.variable, methodToCall.method) }
-        }
+        } else null
         classGenerator.lambdaBlock(beforeBlock) {
             if (params.maxNumberOfBlocksInLambda > 0) {
                 for (statementIndex in 0..random.nextInt(params.maxNumberOfBlocksInLambda)) {
@@ -222,48 +217,47 @@ class SingleClassGenerator(
     }
 
     private fun findMethodReturning(desiredReturnType: KType): MethodCall? {
-        repeat(MaxTry) {
-            val methodCall = findMethodReturning(
-                    classGenerator.getMethodParametersVariables().random(),
-                    desiredReturnType
-            )
-            if (methodCall != null) return@findMethodReturning methodCall
-        }
-        repeat(MaxTry) {
-            val methodCall = findMethodReturning(
-                    classGenerator.getLocalVariables().random(),
-                    desiredReturnType
-            )
-            if (methodCall != null) return@findMethodReturning methodCall
-        }
-        return null
+        return findMethodReturning(classGenerator.getMethodParametersVariables(), desiredReturnType)
+                ?: findMethodReturning(classGenerator.getLocalVariables(), desiredReturnType)
+    }
+
+    private fun findMethodReturning(fieldModels: List<FieldModel>, desiredReturnType: KType): MethodCall? {
+        val startIndex = random.nextInt(fieldModels.size)
+        var methodCall: MethodCall?
+        var currentIndex = startIndex
+        do {
+            methodCall = findMethodReturning(fieldModels[currentIndex], desiredReturnType)
+            currentIndex = (currentIndex + 1) % fieldModels.size
+        } while (methodCall == null && startIndex != currentIndex)
+        return methodCall
     }
 
     private fun findMethodReturning(fieldModel: FieldModel, desiredReturnType: KType): MethodCall? {
-        val methodsWithCorrectReturnType =
-                fieldModel.type.functions.filter { method ->
-//                            method.javaMethod?.declaringClass != Object::class.java
-                            method.returnType == desiredReturnType
-                }
-
-        findSuitableMethodToCall(methodsWithCorrectReturnType)?.let {
-            return MethodCall(fieldModel, it)
-        }
+        // TODO : add support for looking up java methods. be aware of the issues related to kotlin reflection.
+//        fieldModel.classModel.type.java.methods.filter {
+//            method -> method.returnType.typeName == desiredReturnType.javaType.typeName
+//        }
+//        val methodsWithCorrectReturnType =
+//            fieldModel.classModel.type.declaredFunctions.filter { method ->
+//                         method.returnType == desiredReturnType
+//            }
+//
+//        findSuitableMethodToCall(methodsWithCorrectReturnType)?.let {
+//            return MethodCall(fieldModel, it)
+//        }
         return null
     }
 
-    companion object {
-        /**
-         * Number of times we should try to randomly select a suitable type from a collection.
-         */
-        private const val MaxTry = 10
-    }
+    private val stringClassModel = ClassModel(String::class,
+            String::class.constructors.first(),
+            String::class.java.methods.mapNotNull {
+                try { it.kotlinFunction } catch (t: Throwable) { null } })
 
-    private fun findSuitableType(): AllocatableType {
-        val selectedType = eligibleClasses.random(random)
-        val selectedConstructor = selectedType.findSuitableConstructor()
-            ?: throw IllegalStateException("$selectedType does not have an eligible constructor, yet it was selected.")
-        return AllocatableType(selectedType, selectedConstructor)
+    private fun findSuitableType(classPicker: ImportClassPicker): ClassModel<*> {
+        val selectedType = classPicker.pickClass(random)
+                ?: apiClassPicker.pickClass(random)
+
+        return selectedType ?: stringClassModel
     }
 
     private fun findSuitableMethodToCall(methods: Collection<KFunction<*>>): KFunction<*>? {
@@ -271,7 +265,7 @@ class SingleClassGenerator(
             .filter {
                 it.isNotDeprecated()
                         && it.isPublic()
-                        && it.allParametersCanBeInstantiated()
+                        && it.allParametersCanBeInstantiated(mutableListOf<Class<*>>())
                         && (it.parameters.any { parameter -> parameter.kind == KParameter.Kind.INSTANCE })
                 }
         return suitableMethods.randomOrNull(random)
