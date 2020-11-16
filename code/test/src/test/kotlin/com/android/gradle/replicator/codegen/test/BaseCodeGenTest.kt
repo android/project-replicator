@@ -18,37 +18,39 @@ package com.android.gradle.replicator.codegen.test
 
 import com.android.gradle.replicator.codegen.gradlegen.groovy.GradleKotlinBuildFileGenerator
 import com.android.gradle.replicator.codegen.PrettyPrintStream
+import com.android.gradle.replicator.codegen.gradlegen.groovy.GradleJavaBuildFileGenerator
 import java.io.File
 import java.io.PrintStream
 
 open class BaseCodeGenTest(
-        val projectDir: ()->File,
         val target: Target,
-        val type: Type) {
+        val type: BuildScriptType) {
 
-    enum class Target { KOTLIN, JAVA, MIXED }
+    enum class Target { Kotlin, Java, Mixed }
 
-    enum class Type { GROOVY, KTS }
+    enum class BuildScriptType { Groovy, Kts }
 
-    protected val kotlinSourceFolder by lazy {
-        File(projectDir(), "src/main/kotlin").also {
-            it.mkdirs()
-        }
-    }
-
-    protected fun generateProject(dependencies: List<String>) {
+    protected fun generateProject(projectDir: File, dependencies: List<String>) {
         when(type) {
-            Type.GROOVY -> {
-                PrintStream(File(projectDir(), "build.gradle")).use {
-                    GradleKotlinBuildFileGenerator().generate(dependencies, PrettyPrintStream((it)))
+            BuildScriptType.Groovy -> {
+                when(target) {
+                    Target.Kotlin -> {
+                        PrintStream(File(projectDir, "build.gradle")).use {
+                            GradleKotlinBuildFileGenerator().generate(dependencies, PrettyPrintStream((it)))
+                        }
+                    }
+                    Target.Java -> {
+                        PrintStream(File(projectDir, "build.gradle")).use {
+                            GradleJavaBuildFileGenerator().generate(dependencies, PrettyPrintStream((it)))
+                        }
+
+                    }
                 }
-                PrintStream(File(projectDir(), "settings.gradle")).use {
+                PrintStream(File(projectDir, "settings.gradle")).use {
                     it.println()
                 }
             }
             else -> throw RuntimeException("Not implemented")
         }
     }
-
-    protected fun addKotlinSource(name: String): File = File(kotlinSourceFolder, name)
 }

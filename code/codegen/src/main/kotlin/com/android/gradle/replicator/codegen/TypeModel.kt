@@ -19,6 +19,6 @@ package com.android.gradle.replicator.codegen
 import kotlin.reflect.KClass
 
 interface TypeModel {
-    val type: KClass<*>
+    val classModel: ClassModel<*>
     val nullable: Boolean
 }

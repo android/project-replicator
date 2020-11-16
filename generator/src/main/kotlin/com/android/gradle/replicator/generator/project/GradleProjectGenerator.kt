@@ -106,7 +106,7 @@ class GradleProjectGenerator(
         }
 
         // now the generic module info stuff
-        generateModuleInfo(destinationFolder, project.rootModule)
+        generateModuleInfo(destinationFolder, project, project.rootModule)
     }
 
     private fun PluginType.useNewDsl(info: ProjectInfo): Boolean {
@@ -120,6 +120,7 @@ class GradleProjectGenerator(
 
     override fun generateModule(
         folder: File,
+        project: ProjectInfo,
         module: ModuleInfo
     ) {
         dslWriter.newBuildFile(folder)
@@ -132,7 +133,7 @@ class GradleProjectGenerator(
             }
         }
 
-        generateModuleInfo(folder, module)
+        generateModuleInfo(folder, project, module)
     }
 
     override fun generateSettingsFile(project: ProjectInfo) {
@@ -170,6 +171,7 @@ class GradleProjectGenerator(
 
     private fun generateModuleInfo(
         folder: File,
+        project: ProjectInfo,
         module: ModuleInfo
     ) {
         module.android?.generate(
@@ -180,11 +182,11 @@ class GradleProjectGenerator(
             hasKotlin = module.plugins.containsKotlin()
         )
 
-        module.generateDependencies()
+        module.generateDependencies(project)
     }
 
 
-    private fun ModuleInfo.generateDependencies() {
+    private fun ModuleInfo.generateDependencies(project: ProjectInfo) {
         val moduleInfo = this
         dslWriter.block("dependencies") {
             var dependencyList = dependencies
@@ -195,6 +197,7 @@ class GradleProjectGenerator(
                 list.forEach {
                     println("\t\t- ${it.dependency}(${it.scope})")
                 }
+                println("\t\t      implementation \"org.jetbrains.kotlin:kotlin-stdlib:${project.kotlinVersion}")
                 dependencyList = dependencyList + list
             }
 
