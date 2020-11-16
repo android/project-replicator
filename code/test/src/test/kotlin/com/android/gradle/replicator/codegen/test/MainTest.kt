@@ -21,20 +21,23 @@ import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 import java.io.File
 import java.io.FileReader
 import java.util.*
 
-class MainTest: BaseCodeGenTest(
-    { getProjectDir() },
-        Target.KOTLIN,
-        Type.GROOVY) {
+@RunWith(Parameterized::class)
+class MainTest(target: Target): BaseCodeGenTest(
+        target,
+        BuildScriptType.Groovy) {
 
     companion object {
-        fun getProjectDir(): File =
-            File(File(System.getProperty("parameter.file")).parentFile.parentFile, "mainTest").also {
-                it.mkdirs()
-            }
+        @JvmStatic
+        @Parameterized.Parameters(name = "target = {0}")
+        fun testParameters(): Array<Target> = arrayOf(Target.Kotlin, Target.Java)
+
+
     }
 
     @get:Rule
@@ -43,20 +46,23 @@ class MainTest: BaseCodeGenTest(
     @Test
     fun simpleTest() {
         val parameterFile = System.getProperty("parameter.file")
-        val projectDir = getProjectDir()
+        val sourceFolder = File(projectDir, "src/main/${target.toString().toLowerCase()}").also {
+            it.mkdirs()
+        }
         println("reading $parameterFile")
         val arguments = FileReader(parameterFile).use {
             Properties().also { properties -> properties.load(it) }
         }
         val dependencies = arguments["dependencies"]?.toString()?.split(",") ?: listOf()
 
-        generateProject(dependencies)
+        generateProject(projectDir, dependencies)
 
         // generate one file.
         Main().process(
             arrayOf(
+                "-gen", target.toString(),
                 "-i", System.getProperty("parameter.file"),
-                "-o", kotlinSourceFolder.absolutePath
+                "-o", sourceFolder.absolutePath
             )
         )
         val gradleRunner = GradleRunner.create()
@@ -66,4 +72,9 @@ class MainTest: BaseCodeGenTest(
 
         gradleRunner.build()
     }
+
+    private val projectDir =
+            File(File(System.getProperty("parameter.file")).parentFile.parentFile, "mainTest/$target").also {
+                it.mkdirs()
+            }
 }

@@ -118,11 +118,12 @@ class ProjectGenerator(
         }
 
         // now the generic module info stuff
-        generateModuleInfo(destinationFolder, project.rootModule)
+        generateModuleInfo(destinationFolder, project, project.rootModule)
     }
 
     internal fun generateModule(
         folder: File,
+        project: ProjectInfo,
         module: ModuleInfo
     ) {
         dslWriter.newBuildFile(folder)
@@ -135,7 +136,7 @@ class ProjectGenerator(
             }
         }
 
-        generateModuleInfo(folder, module)
+        generateModuleInfo(folder, project, module)
     }
 
     internal fun generateSettingsFile(project: ProjectInfo) {
@@ -149,6 +150,7 @@ class ProjectGenerator(
 
     private fun generateModuleInfo(
         folder: File,
+        project: ProjectInfo,
         module: ModuleInfo
     ) {
         module.android?.generate(
@@ -158,11 +160,11 @@ class ProjectGenerator(
             hasKotlin = module.plugins.containsKotlin()
         )
 
-        module.generateDependencies()
+        module.generateDependencies(project)
     }
 
 
-    private fun ModuleInfo.generateDependencies() {
+    private fun ModuleInfo.generateDependencies(project: ProjectInfo) {
         val moduleInfo = this
         dslWriter.block("dependencies") {
             var dependencyList = dependencies
@@ -173,6 +175,7 @@ class ProjectGenerator(
                 list.forEach {
                     println("\t\t- ${it.dependency}(${it.scope})")
                 }
+                println("\t\t      implementation \"org.jetbrains.kotlin:kotlin-stdlib:${project.kotlinVersion}")
                 dependencyList = dependencyList + list
             }
 

@@ -22,6 +22,7 @@ import com.android.gradle.replicator.generator.writer.GroovyDslWriter
 import com.android.gradle.replicator.generator.writer.KtsWriter
 import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.DependencyType
+import com.android.gradle.replicator.model.ProjectInfo
 import com.android.gradle.replicator.model.Serializer
 import com.android.gradle.replicator.model.internal.DefaultDependenciesInfo
 import java.io.File
@@ -63,12 +64,13 @@ internal class BuildGenerator(private val params: Params) {
         var index = 1
         for (module in project.subModules) {
             println("Project(${formatter.format(index)}): '${module.path}'")
-            projectGenerator.generateModule(getFolder(module.path), module)
+            projectGenerator.generateModule(getFolder(module.path), project, module)
             index++
         }
 
         projectGenerator.generateSettingsFile(project)
         generateGradleProperties(project.gradleProperties)
+        generateCodeGeneratorInitGradleFile(project)
 
         dslWriter.flush()
         println("Done.")
@@ -119,6 +121,32 @@ internal class BuildGenerator(private val params: Params) {
         println("Generate gradle.properties")
         val settingsGradle = File(params.destination, "gradle.properties")
         settingsGradle.writeText(properties.sorted().joinToString("\n"))
+    }
+
+    private fun generateCodeGeneratorInitGradleFile(project: ProjectInfo) {
+        println("Generate init.gradle")
+        val initGradle = File(params.destination, "init.gradle")
+        initGradle.writeText("""
+allprojects {
+    buildscript {
+        repositories {
+            mavenLocal()
+            jcenter()
+        }
+        dependencies {
+            classpath 'com.android.gradle.replicator:codegen-plugin:0.1'
+        }
+    }
+    repositories {
+          mavenLocal()
+    }    
+    afterEvaluate { project ->
+        if (project.plugins.hasPlugin('com.android.application') || project.plugins.hasPlugin('com.android.library')) {
+            project.getPluginManager().apply('com.android.gradle.replicator.codegen-plugin')
+        }
+    }
+}            
+        """.trimIndent())
     }
 
     private fun getFolder(path: String): File {
