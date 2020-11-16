@@ -14,19 +14,28 @@
  * limitations under the License.
  *
  */
-package com.android.gradle.replicator.codegen
+package com.android.gradle.replicator.codegen.kotlin
 
-import com.android.gradle.replicator.codegen.kotlin.KotlinClassGenerator
+import com.android.gradle.replicator.codegen.ClassModel
+import com.android.gradle.replicator.codegen.FieldModel
+import com.android.gradle.replicator.codegen.ParamModel
+import com.android.gradle.replicator.codegen.PrettyPrintStream
+import com.android.gradle.replicator.codegen.TypeModelImpl
 import com.google.common.truth.Truth
 import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import kotlin.reflect.full.declaredFunctions
 
 class KotlinClassGeneratorTest {
 
     private val outputStream = ByteArrayOutputStream()
     private val printer = PrettyPrintStream(PrintStream(outputStream))
     private val kotlinClassGenerator = KotlinClassGenerator(printer, listOf())
+    private val stringClassModel = ClassModel(
+            String::class,
+            String::class.constructors.first(),
+            String::class.declaredFunctions)
 
     @Test
     fun testClassGeneration() {
@@ -100,27 +109,27 @@ class FooClass {
 
     @Test
     fun declareVariable() {
-        kotlinClassGenerator.declareVariable(FieldModel("myVar1", String::class, false), "Foo")
-        kotlinClassGenerator.declareVariable(FieldModel("myVar2", String::class, false), "Bar")
+        kotlinClassGenerator.declareVariable(FieldModel("myVar1", stringClassModel, false), "\"Foo\"")
+        kotlinClassGenerator.declareVariable(FieldModel("myVar2", stringClassModel, false), "\"Bar\"")
         Truth.assertThat(prettyPrint(outputStream)).isEqualTo(
-                """val myVar1: String = Foo
-val myVar2: String = Bar
+                """val myVar1: String = "Foo"
+val myVar2: String = "Bar"
 """
         )
     }
 
     @Test
     fun declareNullableVariable() {
-        kotlinClassGenerator.declareVariable(FieldModel("myVar1", String::class, true), "Foo")
+        kotlinClassGenerator.declareVariable(FieldModel("myVar1", stringClassModel, true), "\"Foo\"")
         Truth.assertThat(prettyPrint(outputStream)).isEqualTo(
-                """val myVar1: String? = Foo
+                """val myVar1: String? = "Foo"
 """
         )
     }
 
     @Test
     fun declareNoValueVariable() {
-        kotlinClassGenerator.declareVariable(FieldModel("myVar1", String::class, true))
+        kotlinClassGenerator.declareVariable(FieldModel("myVar1", stringClassModel, true))
         Truth.assertThat(prettyPrint(outputStream)).isEqualTo(
                 """val myVar1: String?
 """
@@ -131,9 +140,14 @@ val myVar2: String = Bar
     @Test
     fun declareParameterizedVariable() {
         class ParameterizedType<T: Iterable<U>, U: CharSequence>
-        kotlinClassGenerator.declareVariable(FieldModel("myVar1", ParameterizedType::class, false))
+        kotlinClassGenerator.declareVariable(FieldModel("myVar1",
+                ClassModel(ParameterizedType::class,
+                        ParameterizedType::class.constructors.first(),
+                        ParameterizedType::class.declaredFunctions
+                ),
+                false))
         Truth.assertThat(prettyPrint(outputStream)).isEqualTo(
-                """val myVar1: com.android.gradle.replicator.codegen.KotlinClassGeneratorTest${'$'}declareParameterizedVariable${'$'}ParameterizedType<kotlin.collections.Iterable,kotlin.CharSequence>
+                """val myVar1: com.android.gradle.replicator.codegen.kotlin.KotlinClassGeneratorTest${'$'}declareParameterizedVariable${'$'}ParameterizedType<kotlin.collections.Iterable,kotlin.CharSequence>
 """
         )
     }
@@ -142,10 +156,15 @@ val myVar2: String = Bar
     fun declareMethodWithMultipleParameters() {
         kotlinClassGenerator.declareMethod("method",
                 listOf(
-                        ParamModel("param0", String::class, false),
-                        ParamModel("param1", Float::class, false)
+                        ParamModel("param0", stringClassModel, false),
+                        ParamModel("param1",
+                                ClassModel(
+                                        Float::class,
+                                        Float::class.constructors.first(),
+                                        Float::class.declaredFunctions),
+                                false)
                 ),
-                TypeModelImpl(String::class, false),
+                TypeModelImpl(stringClassModel, false),
         """"SomeValue"""") {}
         Truth.assertThat(prettyPrint(outputStream)).isEqualTo(
                 """
@@ -163,9 +182,9 @@ param1: float
     fun declareMethodWithSingleParameter() {
         kotlinClassGenerator.declareMethod("method",
                 listOf(
-                        ParamModel("param0", String::class, false)
+                        ParamModel("param0", stringClassModel, false)
                 ),
-                TypeModelImpl(String::class, false),
+                TypeModelImpl(stringClassModel, false),
                 """"someString"""") {}
         Truth.assertThat(prettyPrint(outputStream)).isEqualTo(
                 """
@@ -182,9 +201,9 @@ param0: String
     fun declareMethodWithNullableReturnType() {
         kotlinClassGenerator.declareMethod("method",
                 listOf(
-                        ParamModel("param0", String::class, false)
+                        ParamModel("param0", stringClassModel, false)
                 ),
-                TypeModelImpl(String::class,true),
+                TypeModelImpl(stringClassModel,true),
                 """"someString"""") {}
         Truth.assertThat(prettyPrint(outputStream)).isEqualTo(
                 """
@@ -201,9 +220,9 @@ param0: String
     fun declareMethodWithNullableParameter() {
         kotlinClassGenerator.declareMethod("method",
                 listOf(
-                        ParamModel("param0", String::class, true)
+                        ParamModel("param0", stringClassModel, true)
                 ),
-                TypeModelImpl(String::class, false),
+                TypeModelImpl(stringClassModel, false),
                 """"someString"""") {}
         Truth.assertThat(prettyPrint(outputStream)).isEqualTo(
                 """
@@ -220,7 +239,7 @@ param0: String?
     fun declareMethodWithUnitReturnType() {
         kotlinClassGenerator.declareMethod("method",
                 listOf(
-                        ParamModel("param0", String::class, false)
+                        ParamModel("param0", stringClassModel, false)
                 ),
                 null,
                 null) {}
@@ -237,7 +256,7 @@ param0: String
     @Test
     fun callMethodWithoutParameters() {
         kotlinClassGenerator.callFunction(
-                FieldModel("local_field", String::class, false),
+                FieldModel("local_field", stringClassModel, false),
                 String::toString,
                 listOf())
         Truth.assertThat(prettyPrint(outputStream)).isEqualTo(
@@ -248,7 +267,7 @@ param0: String
     @Test
     fun callMethodWithParameters() {
         kotlinClassGenerator.callFunction(
-                FieldModel("local_field", String::class, false),
+                FieldModel("local_field", stringClassModel, false),
                 String::compareTo,
                 listOf(""""someString""""))
         Truth.assertThat(prettyPrint(outputStream)).isEqualTo(

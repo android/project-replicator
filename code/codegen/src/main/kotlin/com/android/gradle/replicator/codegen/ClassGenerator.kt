@@ -17,7 +17,6 @@
 package com.android.gradle.replicator.codegen
 
 import kotlin.random.Random
-import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 
 /**
@@ -63,9 +62,9 @@ interface ClassGenerator {
     /**
      * Adds a simple [Iterable.forEach]lambda block in the current scope.
      * @param beforeBlock this is the block allowing for a lambda call, like setting up a collection so
-     * [Iterable.forEach] can be called.
+     * [Iterable.forEach] can be called. If not provided, the generator should create it.
      */
-    fun lambdaBlock(beforeBlock: () -> Unit, block: () -> Unit)
+    fun lambdaBlock(beforeBlock: (() -> Unit)?, block: () -> Unit)
 
     /**
      * Adds an if-then-else statement to the current scope.
@@ -87,12 +86,12 @@ interface ClassGenerator {
     /**
      * Allocate a value for a type.
      * @param random random value provider.
-     * @param type the type of the value to be allocated.
-     * @param constructor the [KFunction] referencing the [type] constructor that should be used to instantiate the
-     * value.
+     * @param classModel the [ClassModel] of the value to be allocated.
      * @return the value or code to instantiate a value to be inserted in the class generation.
      */
-    fun allocateValue(random: Random, type: KClass<*>, constructor: KFunction<Any>?): String
+    fun allocateValue(random: Random,
+                      isVararg: Boolean,
+                      classModel: AbstractTypeModel<*>): String
 
     /**
      * Prints a new line
@@ -109,4 +108,6 @@ interface ClassGenerator {
      * @param strings 0 to many strings to be printed.
      */
     fun print(vararg strings: String)
+
+    fun addLineDelimiter()
 }

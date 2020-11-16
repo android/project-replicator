@@ -28,6 +28,7 @@ import java.io.PrintStream
 import kotlin.random.Random
 import kotlin.reflect.KClass
 import kotlin.reflect.KTypeParameter
+import kotlin.reflect.full.declaredFunctions
 
 class CodeGenerationListenerTest {
 
@@ -37,6 +38,12 @@ class CodeGenerationListenerTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
+    }
+
+    private class ClassWithBooleanReturn {
+        fun booleanMethod(): Boolean {
+            return true;
+        }
     }
 
     @Test
@@ -63,12 +70,18 @@ class CodeGenerationListenerTest {
         }
 
         val outputStream = ByteArrayOutputStream()
+        val importClassPicker = Mockito.mock(ImportClassPicker::class.java)
+        Mockito.`when`(importClassPicker.pickClass(random)).thenReturn(
+                ClassModel(ClassWithBooleanReturn::class,
+                    ClassWithBooleanReturn::class.constructors.first(),
+                    ClassWithBooleanReturn::class.declaredFunctions))
         SingleClassGenerator(
                 generator = KotlinClassGenerator(PrettyPrintStream(PrintStream(outputStream)), listOf(listener)),
                 params = params,
                 packageName = "foo.package",
                 className = "FooClass",
-                eligibleClasses = listOf(SingleClassGeneratorTest.ClassWithBooleanReturn::class),
+                apiClassPicker = importClassPicker,
+                implClassPicker = importClassPicker,
                 random = random).generate()
 
         Mockito.`when`(random.nextInt(1)).thenReturn(0) // use first import in list.
@@ -80,11 +93,11 @@ class CodeGenerationListenerTest {
 @Suppress("UNUSED_PARAMETER")
 class FooClass {
     @org.mockito.Mock
-    val instance_var_1_0: com.android.gradle.replicator.codegen.SingleClassGeneratorTest${'$'}ClassWithBooleanReturn = com.android.gradle.replicator.codegen.SingleClassGeneratorTest.ClassWithBooleanReturn()
+    private     val instance_var_1_0: com.android.gradle.replicator.codegen.CodeGenerationListenerTest${'$'}ClassWithBooleanReturn = com.android.gradle.replicator.codegen.CodeGenerationListenerTest.ClassWithBooleanReturn()
 
     @org.junit.Test
     fun method0(
-        param0: com.android.gradle.replicator.codegen.SingleClassGeneratorTest${'$'}ClassWithBooleanReturn
+        param0: com.android.gradle.replicator.codegen.CodeGenerationListenerTest${'$'}ClassWithBooleanReturn
     ) {
     }
 }

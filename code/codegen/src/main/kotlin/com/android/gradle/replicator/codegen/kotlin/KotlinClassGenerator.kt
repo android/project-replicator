@@ -16,14 +16,16 @@
  */
 package com.android.gradle.replicator.codegen.kotlin
 
+import com.android.gradle.replicator.codegen.AbstractTypeModel
 import com.android.gradle.replicator.codegen.ClassGenerator
+import com.android.gradle.replicator.codegen.ClassModel
 import com.android.gradle.replicator.codegen.CodeGenerationListener
 import com.android.gradle.replicator.codegen.FieldModel
 import com.android.gradle.replicator.codegen.ParamModel
 import com.android.gradle.replicator.codegen.PrettyPrintStream
 import com.android.gradle.replicator.codegen.TypeModel
 import com.android.gradle.replicator.codegen.findSuitableConstructor
-import java.lang.IllegalStateException
+import com.android.gradle.replicator.codegen.toTypeModel
 import java.lang.reflect.Modifier
 import kotlin.random.Random
 import kotlin.reflect.KClass
@@ -70,7 +72,7 @@ class KotlinClassGenerator(
 
 
     private fun TypeModel.toKotlinDeclaration(): String =
-            type.toKotlinDeclaration()
+            classModel.type.toKotlinDeclaration()
 
     private fun KClass<*>.toKotlinDeclaration(): String =
         when {
@@ -109,7 +111,7 @@ class KotlinClassGenerator(
 
     override fun declareVariable(model: FieldModel, initialValue: String?): FieldModel {
         listeners.forEach { listener ->
-            listener.instanceVariableDeclaration(model.name, model.type, printer)
+            listener.instanceVariableDeclaration(model.name, model.classModel.type, printer)
         }
         if (model.modifiers.and(Modifier.PRIVATE) != 0) {
             printer.printIndented("private ")
@@ -129,6 +131,10 @@ class KotlinClassGenerator(
         strings.forEach(printer::print)
     }
 
+    override fun addLineDelimiter() {
+        printer.println()
+    }
+
     override fun callFunction(receiver: FieldModel, function: KFunction<*>, parameterValues: List<String>) {
         val typeParameters = if (function.typeParameters.isEmpty()) ""
         else function.typeParameters.joinToString(
@@ -142,32 +148,33 @@ class KotlinClassGenerator(
                 "${receiver.name}${if (receiver.nullable) "?." else "."}${function.name}$typeParameters(${parameterValues.joinToString(", ")})")
     }
 
-    override fun lambdaBlock(beforeBlock: () -> Unit, block: () -> Unit) {
+    override fun lambdaBlock(beforeBlock: (() -> Unit)?, block: () -> Unit) {
         printer.printIndented("")
-        beforeBlock()
+        beforeBlock?.invoke() ?: printer.print("listOf(\"1\", \"2\", \"3\")")
         printer.println(".forEach {")
         printer.addBlock()
         block()
         printer.endBlock()
     }
 
-    override fun allocateValue(random: Random, type: KClass<*>, constructor: KFunction<Any>?): String {
-        return when (type.simpleName) {
+    override fun allocateValue(random: Random, isVararg: Boolean, classModel: AbstractTypeModel<*>): String {
+        return if (isVararg) "*" else "" + when (classModel.type.simpleName) {
             "String" -> """"SomeString""""
             "Double" -> random.nextFloat().toString()
-            "Float" -> random.nextFloat().toString()
+            "Float" -> "${random.nextFloat()}f"
             "Long" -> random.nextLong().toString()
+            "Short" -> random.nextInt(128).toString()
+            "Byte" -> """${random.nextBytes(1)[0]}"""
             "Int" -> random.nextInt(0, 100).toString()
             "Char" -> """'C'"""
             "Boolean" -> random.nextBoolean().toString()
             "Class" -> "this.javaClass"
             else -> {
-                val selectorConstructor = constructor ?: type.findSuitableConstructor()
-                ?: throw IllegalStateException("Selected class $type does not have a public constructor")
+                val selectorConstructor = classModel.constructor
                 val parametersValue = selectorConstructor.parameters.joinToString {
-                    allocateValue(random, it.type.jvmErasure, null)
+                    allocateValue(random, it.isVararg, it.type.jvmErasure.toTypeModel())
                 }
-                return "${type.qualifiedName}($parametersValue)"
+                return "${classModel.type.qualifiedName}($parametersValue)"
             }
         }
     }
