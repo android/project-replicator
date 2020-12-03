@@ -12,12 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
+package com.android.gradle.replicator.codegen.gradlegen
 
-rootProject.name = "project-replicator"
+import com.android.gradle.replicator.codegen.PrettyPrintStream
 
-include(":plugin")
-include(":model")
-include(":generator")
-include(":code:codegen")
-include(":code:test")
+/**
+ * Generates a build file for a build system.
+ */
+interface BuildFileGenerator {
+    fun generate(dependencies: List<String>, printer: PrettyPrintStream)
+}
