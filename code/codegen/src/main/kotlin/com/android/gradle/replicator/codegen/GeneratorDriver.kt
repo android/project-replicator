@@ -142,11 +142,20 @@ class GeneratorDriver(
                 .forEach { file ->
                     val eligibleClasses = mutableListOf<String>()
                     if (!file.exists()) return@forEach
-                    JarFile(file).use { jarFile: JarFile ->
-                        jarFile.entries().iterator().forEach { jarEntry ->
-                            // so far I do not handle inner types.
-                            if (isEntryAnEligibleClass(jarEntry.name)) {
-                                val className = entryNameToClassName(jarEntry.name)
+                    if (file.isFile) {
+                        JarFile(file).use { jarFile: JarFile ->
+                            jarFile.entries().iterator().forEach { jarEntry ->
+                                // so far I do not handle inner types.
+                                if (isEntryAnEligibleClass(jarEntry.name)) {
+                                    val className = entryNameToClassName(jarEntry.name)
+                                    eligibleClasses.add(className)
+                                }
+                            }
+                        }
+                    } else {
+                        file.walk().forEach {
+                            if (isEntryAnEligibleClass(it.name)) {
+                                val className = entryNameToClassName(it.relativeTo(file).path)
                                 eligibleClasses.add(className)
                             }
                         }

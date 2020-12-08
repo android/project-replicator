@@ -53,20 +53,45 @@ class Main {
         } else {
             parseArguments(parsedArguments, argumentsBuilder)
         }
-        var generatorType: GeneratorType = GeneratorType.Kotlin
-        parsedArguments["-gen"]?.let {
-            if (it.size != 1) throw IllegalArgumentException("Only one generator supported per invocation.")
-            generatorType = GeneratorType.valueOf(it.first())
-        }
+        val kotlinGenerator: GeneratorType = GeneratorType.Kotlin
+        val javaGenerator = GeneratorType.Java
 
         val outputFolder = File(checkNotNull(parsedArguments["-o"]).first())
         outputFolder.deleteRecursively()
         outputFolder.mkdirs()
         println("Generating in $outputFolder")
 
-        val generator = generatorType.initialize(argumentsBuilder.build())
+        val arguments = argumentsBuilder.build()
         val moduleName = parsedArguments["-module"]?.first() ?: "module"
-        repeat(10) { count ->
+
+        if (arguments.numberOfJavaSources > 0) {
+            generateSources(
+                    arguments.numberOfJavaSources,
+                    javaGenerator,
+                    arguments,
+                    moduleName,
+                    outputFolder
+            )
+        }
+        if (arguments.numberOfKotlinSources > 0) {
+            generateSources(
+                    arguments.numberOfKotlinSources,
+                    kotlinGenerator,
+                    arguments,
+                    moduleName,
+                    outputFolder
+            )
+        }
+    }
+
+    private fun generateSources(
+            numberOfSources: Int,
+            generatorType: GeneratorType,
+            parameters: GenerationParameters,
+            moduleName: String,
+            outputFolder: File) {
+        val generator = generatorType.initialize(parameters)
+        repeat(numberOfSources) { count ->
             val className = "Class" + ('A'+ count/(26*26)) + ('A'+ (count/26)%26) + ('A'+ count%26)
             val sourceFolder = File(outputFolder, "com/android/example/$moduleName")
             sourceFolder.mkdirs()
@@ -123,12 +148,17 @@ class Main {
         arguments["seed"]?.also {
             parametersBuilder.setSeed((it as String).toInt())
         }
+        arguments["nbOfJavaFiles"]?.also {
+            parametersBuilder.setNumberOfJavaSources((it as String).toInt())
+        }
+        arguments["nbOfKotlinFiles"]?.also {
+            parametersBuilder.setNumberOfKotlinSources((it as String).toInt())
+        }
     }
 
     fun usage() {
         println("usage: Main <args>")
         println("\t-seed : seed value for the randomizer")
-        println("\t-gen : type of generated [Kotlin, Java, Mixed]" )
         println("\t-cp : classpath for all private (implementation) libraries, each element is a .jar file")
         println("\t-api : classpath for all public (api) libraries, each element is a .jar file")
     }

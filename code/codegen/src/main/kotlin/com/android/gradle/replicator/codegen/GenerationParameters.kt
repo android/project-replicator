@@ -70,7 +70,17 @@ data class GenerationParameters(
         /**
          * Seed value for the randomizer
          */
-        val seed: Int
+        val seed: Int,
+
+        /**
+         * Number of Java source files that should be generated in this module.
+         */
+        val numberOfJavaSources: Int,
+
+        /**
+         * Number of Kotlin source files that should be generated in this module
+         */
+        val numberOfKotlinSources: Int
 ) {
     class Builder {
         private val runtimeClasspath = mutableListOf<File>()
@@ -81,7 +91,8 @@ data class GenerationParameters(
         private var javaLanguageLevel: String? = null
         private val classGenerationParametersBuilder = ClassGenerationParameters.Builder()
         private var seed = 1
-
+        private var nbOfJavaSources = 0
+        private var nbOfKotlinSources = 0
 
         fun addApiClasspathElement(element: File) {
             apiClasspath.add(element)
@@ -105,6 +116,9 @@ data class GenerationParameters(
 
         fun setSeed(seed: Int) { this.seed = seed }
 
+        fun setNumberOfJavaSources(numberOfJavaSources: Int) { this.nbOfJavaSources = numberOfJavaSources }
+
+        fun setNumberOfKotlinSources(numberOfKotlinSources: Int) { this.nbOfKotlinSources = numberOfKotlinSources }
 
         fun setJavaLanguageLevel(languageLevel: String) {
             this.javaLanguageLevel = languageLevel
@@ -119,7 +133,9 @@ data class GenerationParameters(
                         implClasspath = implClasspath.toList(),
                         javaLanguageLevel = javaLanguageLevel ?: "1.8",
                         classGenerationParameters = classGenerationParametersBuilder.build(),
-                        seed = seed
+                        seed = seed,
+                        numberOfJavaSources = nbOfJavaSources,
+                        numberOfKotlinSources = nbOfKotlinSources
                 )
     }
 }
@@ -150,7 +166,10 @@ data class ClassGenerationParameters(
         val maxNumberOfBlocksInLambda: Int,
 
         // max number of blocks in loop
-        val maxNumberOfBlocksInLoop: Int
+        val maxNumberOfBlocksInLoop: Int,
+
+        // max block depth in method implementation.
+        val maxMethodDepth: Int
 ) {
     class Builder(
             var minNumberOfInstanceVars: Int = 1,
@@ -163,7 +182,8 @@ data class ClassGenerationParameters(
             var maxNumberOfBlocksInIf: Int = 2,
             var maxNumberOfBlocksInIfElse: Int = 2,
             var maxNumberOfBlocksInLambda: Int = 2,
-            var maxNumberOfBlocksInLoop: Int = 4
+            var maxNumberOfBlocksInLoop: Int = 4,
+            var maxMethodDepth: Int = 3
     ) {
 
         fun build(): ClassGenerationParameters =
@@ -178,7 +198,8 @@ data class ClassGenerationParameters(
                         maxNumberOfBlocksInIf = maxNumberOfBlocksInIf,
                         maxNumberOfBlocksInIfElse = maxNumberOfBlocksInIfElse,
                         maxNumberOfBlocksInLambda = maxNumberOfBlocksInLambda,
-                        maxNumberOfBlocksInLoop = maxNumberOfBlocksInLoop
+                        maxNumberOfBlocksInLoop = maxNumberOfBlocksInLoop,
+                        maxMethodDepth = maxMethodDepth
                 )
     }
 }

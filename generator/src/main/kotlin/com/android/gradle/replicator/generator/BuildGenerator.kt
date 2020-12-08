@@ -125,7 +125,7 @@ allprojects {
             jcenter()
         }
         dependencies {
-            classpath 'com.android.gradle.replicator:codegen-plugin:0.1'
+            classpath 'com.android.gradle.replicator:codegen-plugin:0.2'
         }
     }
     repositories {
@@ -134,6 +134,10 @@ allprojects {
     afterEvaluate { project ->
         if (project.plugins.hasPlugin('com.android.application') || project.plugins.hasPlugin('com.android.library')) {
             project.getPluginManager().apply('com.android.gradle.replicator.codegen-plugin')
+        } else {
+            if (project.plugins.hasPlugin("java-library")) {
+                 project.getPluginManager().apply('com.android.gradle.replicator.java-library-codegen-plugin')
+            }     
         }
     }
 }            

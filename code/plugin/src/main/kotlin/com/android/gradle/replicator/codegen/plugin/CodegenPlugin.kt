@@ -148,6 +148,9 @@ class CodegenPlugin: Plugin<Project> {
             task.paramsFile.set(project.layout.buildDirectory.file("test.params"))
             // Randomizer values should be set during project replication along the number of java and kotlin files.
             task.seed.set(Random.nextInt())
+
+            task.nbOfJavaFiles.set(10)
+
             // make sure we depend on our dependencies built artifacts so we have access to their generated classes.
             projectDependencies.forEach {
                 // hack : use Variant API when dealing with android.
