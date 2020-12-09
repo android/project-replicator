@@ -19,7 +19,7 @@ package com.android.gradle.replicator.codegen
 class ModelBuilderClassGenerator(
     private val generator: ClassGenerator
 ): ClassGenerator by generator {
-    private var model: ClassModel? = null
+    private var model: GeneratedClassModel? = null
     private val blocks = ArrayDeque<Block>()
 
     class Block {
@@ -30,7 +30,7 @@ class ModelBuilderClassGenerator(
     }
 
     override fun defineClass(packageName: String, name: String, classContent: () -> Unit) {
-        val model = ClassModel(packageName, name)
+        val model = GeneratedClassModel(packageName, name)
         this.model = model
         val blockWithScope = {
             startBlockScope()
@@ -59,7 +59,7 @@ class ModelBuilderClassGenerator(
         endBlockScope()
     }
 
-    override fun lambdaBlock(beforeBlock: () -> Unit, block: () -> Unit) {
+    override fun lambdaBlock(beforeBlock: (() -> Unit)?, block: () -> Unit) {
         startBlockScope()
         generator.lambdaBlock(beforeBlock, block)
         endBlockScope()
@@ -82,7 +82,7 @@ class ModelBuilderClassGenerator(
         val scope = currentScope()
         val updatedModel = ParamModel(
             scope.nextVariableName("${model.name}_${blocks.size}_"),
-            model.type,
+            model.classModel,
             model.nullable,
             model.modifiers)
         scope.declaredVariables.add(updatedModel)

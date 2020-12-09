@@ -16,6 +16,7 @@
  */
 package com.android.gradle.replicator.codegen
 
+import com.android.gradle.replicator.codegen.java.JavaClassGenerator
 import com.android.gradle.replicator.codegen.kotlin.KotlinClassGenerator
 import java.lang.IllegalStateException
 import kotlin.random.Random
@@ -28,11 +29,12 @@ enum class GeneratorType {
      * Kotlin [SourceGenerator]
      */
     Kotlin {
-        override fun initialize(params: GenerationParameters, random: Random) =
-            GeneratorDriver(params, random) { printer, listeners ->
+        override fun initialize(params: GenerationParameters) =
+            GeneratorDriver(params, Random(params.seed)) { printer, listeners ->
                 KotlinClassGenerator(printer, listeners)
             }
 
+        override fun classNameToSourceFileName(className: String) = "$className.kt"
     },
 
     /**
@@ -40,9 +42,12 @@ enum class GeneratorType {
      */
     Java {
         override fun initialize(
-                params: GenerationParameters,
-                random: Random
-        ) = throw IllegalStateException("Not Implemented")
+                params: GenerationParameters
+        ) = GeneratorDriver(params, Random(params.seed)) { printer, listeners ->
+            JavaClassGenerator(printer, listeners)
+        }
+
+        override fun classNameToSourceFileName(className: String) = "${className}.java"
     },
 
     /**
@@ -50,13 +55,17 @@ enum class GeneratorType {
      */
     Mixed {
         override fun initialize(
-                params: GenerationParameters,
-                random: Random
+                params: GenerationParameters
         ) = throw IllegalStateException("Not Implemented")
+
+        override fun classNameToSourceFileName(className: String): String {
+            TODO("Not yet implemented")
+        }
     };
 
     abstract fun initialize(
-            params: GenerationParameters,
-            random: Random
+            params: GenerationParameters
     ): SourceGenerator
+
+    abstract fun classNameToSourceFileName(className: String): String
 }

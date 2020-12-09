@@ -19,12 +19,26 @@ plugins {
     kotlin("jvm")
 
     id("default-config")
+    `maven-publish`
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs = listOf("-Xjvm-default=enable")
+    }
+}
+
+// publish to maven local, it is where the init script is expecting it.
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.android.gradle.replicator"
+            artifactId = "codegen"
+            version = Versions.pluginVersion
+
+            from(components["java"])
+        }
     }
 }
 
