@@ -20,12 +20,9 @@ import java.lang.reflect.Modifier
 import kotlin.random.Random
 import kotlin.reflect.*
 import kotlin.reflect.full.createType
-import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.primaryConstructor
-import kotlin.reflect.jvm.javaType
 import kotlin.reflect.jvm.jvmErasure
-import kotlin.reflect.jvm.jvmName
 import kotlin.reflect.jvm.kotlinFunction
 
 class SingleClassGenerator(
@@ -39,6 +36,8 @@ class SingleClassGenerator(
 ) {
 
     private val classGenerator = ModelBuilderClassGenerator(generator)
+
+    private var currentBlockDepth: Int = 0;
 
     /**
      * Generate a single class using the provided generation parameters.
@@ -85,12 +84,17 @@ class SingleClassGenerator(
     }
 
     private fun addBlock() {
-        when(random.nextInt(10)) {
-            in 0..1 -> addLoopBlock()
-            in 2..6 -> addMethodCall()
-            7 -> addLambda()
-            in 8..9 -> addIfStatement()
-            else -> println("No statement !")
+        currentBlockDepth++
+        if (currentBlockDepth > params.maxMethodDepth) {
+            addMethodCall()
+        } else {
+            when (random.nextInt(10)) {
+                in 0..1 -> addLoopBlock()
+                in 2..6 -> addMethodCall()
+                7 -> addLambda()
+                in 8..9 -> addIfStatement()
+                else -> println("No statement !")
+            }
         }
     }
 

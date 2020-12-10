@@ -22,6 +22,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import kotlin.random.Random
@@ -50,6 +51,14 @@ abstract class GenerateParamsTask: DefaultTask() {
     abstract val gradleDependencies: ListProperty<String>
 
     @get:Input
+    @get:Optional
+    abstract val nbOfKotlinFiles: Property<Int>
+
+    @get:Input
+    @get:Optional
+    abstract val nbOfJavaFiles: Property<Int>
+
+    @get:Input
     abstract val seed: Property<Int>
 
     @TaskAction
@@ -67,6 +76,8 @@ abstract class GenerateParamsTask: DefaultTask() {
                     apiClasspath=${apiJarFiles.files.joinToString(separator = ",") { it.absolutePath }}
                     implClasspath=${implJarFiles.files.joinToString(separator = ",") { it.absolutePath }}
                     dependencies=${gradleDependencies.get().joinToString(separator = ",")}
+                    nbOfKotlinFiles=${nbOfKotlinFiles.getOrElse(0)}
+                    nbOfJavaFiles=${nbOfJavaFiles.getOrElse(0)}
                 """.trimIndent()
         )
     }
