@@ -111,17 +111,9 @@ open class ImportClassPicker(
      */
     private fun loadModel(kClass: Class<*>): ClassModel<*>? {
         val selectedType = kClass.kotlin
-        try {
-            return ClassModel<Any>(selectedType,
-                    selectedType.constructors.first(),
-                    selectedType.declaredFunctions)
-        } catch (e: Exception) {
-            println("Caught !")
-            return null
-        } catch (e: Error) {
-            println("Caught !")
-            return null
-        }
+        return ClassModel<Any>(selectedType,
+                selectedType.constructors.first(),
+                selectedType.declaredFunctions)
     }
     /**
      * Returns true if the class is eligible to used for code generation. It must follows all the constraints

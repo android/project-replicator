@@ -52,7 +52,7 @@ gradlePlugin {
 
     val javaLibraryCodegen by plugins.creating {
         id = "com.android.gradle.replicator.java-library-codegen-plugin"
-        version = 0.1
+        version = Versions.pluginVersion
         implementationClass = "com.android.gradle.replicator.codegen.plugin.JavaLibraryCodegenPlugin"
     }
 }
