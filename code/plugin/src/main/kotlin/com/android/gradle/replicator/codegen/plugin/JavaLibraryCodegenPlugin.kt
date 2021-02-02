@@ -26,15 +26,15 @@ import kotlin.random.Random
 @Suppress("UnstableApiUsage")
 class JavaLibraryCodegenPlugin: AbstractCodeGenPlugin() {
     override fun apply(project: Project) {
-        println("Java Library plugin applied !")
-
         val topProjectName by lazy {
             var current = project
             while (current.parent != null) current = current.parent!!
             current.name
         }
 
-        val hasKotlinSources = project.pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
+        val hasKotlinSources = project.plugins.map { it.toString() }.find {
+            it.contains("org.jetbrains.kotlin")
+        } != null
 
         val generateTask = project.tasks.register(
                 "generateCodegenParams",
@@ -84,9 +84,12 @@ class JavaLibraryCodegenPlugin: AbstractCodeGenPlugin() {
             // Randomizer values should be set during project replication along the number of java and kotlin files.
             task.seed.set(Random.nextInt())
 
-            if (hasKotlinSources)
+            if (hasKotlinSources) {
                 task.nbOfKotlinFiles.set(10)
-            else task.nbOfJavaFiles.set(10)        }
+            } else {
+                task.nbOfJavaFiles.set(10)
+            }
+        }
 
         val generateCodeTask = project.tasks.register(
                 "generateCode",
