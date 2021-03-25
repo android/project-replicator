@@ -59,3 +59,7 @@ dependencies {
     testImplementation("com.google.truth:truth:1.0.1")
     testImplementation("org.mockito:mockito-core:3.6.0")
 }
+// easier to run task for local publishing
+val publishLocal by tasks.registering {
+    dependsOn("publishMavenPublicationToMavenLocal")
+}

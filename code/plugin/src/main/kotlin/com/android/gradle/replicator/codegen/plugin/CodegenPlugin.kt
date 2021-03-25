@@ -16,7 +16,6 @@
 package com.android.gradle.replicator.codegen.plugin
 
 import org.gradle.api.Action
-import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ArtifactView
 import org.gradle.api.artifacts.ExternalModuleDependency
@@ -29,7 +28,8 @@ import org.gradle.api.internal.artifacts.ArtifactAttributes
 import kotlin.random.Random
 
 @Suppress("UnstableApiUsage")
-class CodegenPlugin: Plugin<Project> {
+class CodegenPlugin: AbstractCodeGenPlugin() {
+
     override fun apply(project: Project) {
 
         val topProjectName by lazy {
@@ -149,7 +149,9 @@ class CodegenPlugin: Plugin<Project> {
             // Randomizer values should be set during project replication along the number of java and kotlin files.
             task.seed.set(Random.nextInt())
 
-            task.nbOfJavaFiles.set(10)
+            val projectMetadata = loadModuleMetadata(project)
+            task.nbOfJavaFiles.set(projectMetadata.javaSources)
+            task.nbOfKotlinFiles.set(projectMetadata.kotlinSources)
 
             // make sure we depend on our dependencies built artifacts so we have access to their generated classes.
             projectDependencies.forEach {

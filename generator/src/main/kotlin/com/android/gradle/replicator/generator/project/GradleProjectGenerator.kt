@@ -20,12 +20,14 @@ package com.android.gradle.replicator.generator.project
 import com.android.gradle.replicator.generator.containsAndroid
 import com.android.gradle.replicator.generator.containsKotlin
 import com.android.gradle.replicator.generator.generate
+import com.android.gradle.replicator.generator.join
 import com.android.gradle.replicator.generator.resources.ResourceGenerator
 import com.android.gradle.replicator.generator.writer.DslWriter
 import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.ModuleInfo
 import com.android.gradle.replicator.model.PluginType
 import com.android.gradle.replicator.model.ProjectInfo
+import com.google.gson.JsonObject
 import java.io.File
 
 class GradleProjectGenerator(
@@ -107,6 +109,9 @@ class GradleProjectGenerator(
 
         // now the generic module info stuff
         generateModuleInfo(destinationFolder, project.rootModule)
+
+        // create module metadata file
+        generateModuleMetadata(destinationFolder, project.rootModule)
     }
 
     private fun PluginType.useNewDsl(info: ProjectInfo): Boolean {
@@ -133,6 +138,8 @@ class GradleProjectGenerator(
         }
 
         generateModuleInfo(folder, module)
+        // create module metadata file
+        generateModuleMetadata(folder, module)
     }
 
     override fun generateSettingsFile(project: ProjectInfo) {
@@ -183,6 +190,18 @@ class GradleProjectGenerator(
         module.generateDependencies()
     }
 
+    internal fun generateModuleMetadata(
+            folder: File,
+            module: ModuleInfo
+    ) {
+        val metadataFile = folder.join("module-metadata.json")
+
+        val metadataJson = JsonObject()
+        metadataJson.addProperty("javaSources", module.javaSources?.fileCount ?: 0)
+        metadataJson.addProperty("kotlinSources", module.kotlinSources?.fileCount ?: 0)
+
+        metadataFile.writeBytes(metadataJson.toString().toByteArray())
+    }
 
     private fun ModuleInfo.generateDependencies() {
         val moduleInfo = this
