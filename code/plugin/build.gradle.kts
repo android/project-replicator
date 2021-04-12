@@ -56,3 +56,7 @@ gradlePlugin {
         implementationClass = "com.android.gradle.replicator.codegen.plugin.JavaLibraryCodegenPlugin"
     }
 }
+// easier to run task for local publishing
+val publishLocal by tasks.registering {
+    dependsOn("publishMavenPublicationToMavenLocal")
+}

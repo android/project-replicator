@@ -40,3 +40,7 @@ To build the generator, use the following command:
 To launch the generator:
 
 `generator/build/install/generator/bin/generator  --structure /path/to/project-structure.json --destination /path/to/empty/folder`
+
+To use the code generator, run the following command from the root of the generated project:
+
+`./gradlew  -I init.gradle generateCode`

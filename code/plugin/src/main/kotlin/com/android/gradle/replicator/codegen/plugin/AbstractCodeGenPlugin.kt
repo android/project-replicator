@@ -16,15 +16,24 @@
  */
 package com.android.gradle.replicator.codegen.plugin
 
+import com.google.gson.Gson
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ProjectDependency
+import java.io.File
+
+import java.nio.file.Files
+
 
 abstract class AbstractCodeGenPlugin: Plugin<Project> {
 
     class ModuleApi(val apiModules: List<String>, val projectDependencies: List<String>)
+
+    data class ProjectMetadata (
+        val javaSources: Int,
+        val kotlinSources: Int)
 
     fun calculateApiList(configuration: Configuration, topProjectName: String): ModuleApi {
         // construct our API modules list so we can filter them out from the implementation classpath.
@@ -46,5 +55,25 @@ abstract class AbstractCodeGenPlugin: Plugin<Project> {
             }
         }
         return ModuleApi(apiModules = apiModules.toList(), projectDependencies = projectDependencies.toList())
+    }
+
+    // read metadata file added to each project in json format
+    fun loadModuleMetadata(project: Project): ProjectMetadata {
+        var javaSources = 0
+        var kotlinSources = 0
+        val gson = Gson()
+        val metadata = project.file("module-metadata.json")
+
+        with(Files.newBufferedReader(metadata.toPath())) {
+            val map: Map<String, Int> = gson.fromJson(this, MutableMap::class.java) as MutableMap<String, Int>
+            if (map.containsKey("javaSources")) {
+                javaSources = map["javaSources"]!!
+            }
+            if (map.containsKey("kotlinSources")) {
+                kotlinSources = map["kotlinSources"]!!
+            }
+        }
+
+        return ProjectMetadata(javaSources, kotlinSources)
     }
 }
