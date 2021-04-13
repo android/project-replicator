@@ -24,6 +24,8 @@ class ModuleBuilder(var path: String = "") {
     var plugins: List<PluginType> = listOf()
     var javaSources: SourceFilesBuilder? = null
     var kotlinSources: SourceFilesBuilder? = null
+    var androidResources: AndroidResourcesBuilder? = null
+    var javaResources: SourceFilesBuilder? = null
     var dependencies: List<DependenciesInfo> = listOf()
     var android: AndroidBuilder? = null
 
@@ -35,6 +37,14 @@ class ModuleBuilder(var path: String = "") {
         action(kotlinSources ?: SourceFilesBuilder().also { kotlinSources = it })
     }
 
+    fun androidResources(action: AndroidResourcesBuilder.() -> Unit) {
+        action(androidResources ?: AndroidResourcesBuilder().also { androidResources = it })
+    }
+
+    fun javaResources(action: SourceFilesBuilder.() -> Unit) {
+        action(javaResources ?: SourceFilesBuilder().also { javaResources = it })
+    }
+
     fun android(action: AndroidBuilder.() -> Unit) {
         action(android ?: AndroidBuilder().also { android = it })
     }
@@ -44,6 +54,8 @@ class ModuleBuilder(var path: String = "") {
         plugins,
         javaSources?.toInfo(),
         kotlinSources?.toInfo(),
+        androidResources?.toInfo(),
+        javaResources?.toInfo(),
         dependencies,
         android?.toInfo()
     )

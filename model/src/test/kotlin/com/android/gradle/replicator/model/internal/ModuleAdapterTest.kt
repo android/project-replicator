@@ -16,8 +16,7 @@
 
 package com.android.gradle.replicator.model.internal
 
-import com.android.gradle.replicator.model.DependencyType
-import com.android.gradle.replicator.model.PluginType
+import com.android.gradle.replicator.model.*
 import com.android.gradle.replicator.model.internal.fixtures.module
 import com.google.common.truth.Truth
 import org.junit.Test
@@ -85,6 +84,28 @@ internal class ModuleAdapterTest {
         kotlinSources {
             fileCount = 2
         }
+        androidResources {
+            fileCount = AndroidResourceFolders(mutableMapOf(
+                    "mipmap" to AndroidResourceQualifiers(mutableMapOf(
+                            "" to AndroidResourceExtensions(mutableMapOf(
+                                    ".xml" to 3,
+                                    ".png" to 2
+                            )),
+                            "hidpi" to AndroidResourceExtensions(mutableMapOf(
+                                    ".xml" to 3,
+                                    ".png" to 2
+                            ))
+                    )),
+                    "values" to AndroidResourceQualifiers(mutableMapOf(
+                            "" to AndroidResourceExtensions(mutableMapOf(
+                                    ".xml" to 5
+                            ))
+                    ))
+            ))
+        }
+        javaResources {
+            fileCount = 3
+        }
 
         dependencies = listOf(
             DefaultDependenciesInfo(DependencyType.MODULE, "module1", "api"),
@@ -125,6 +146,26 @@ private val FULL_MODULE = """
       },
       "kotlinSources": {
         "fileCount": 2
+      },
+      "androidResources": {
+        "mipmap": {
+          "": {
+            ".xml": 3,
+            ".png": 2
+          },
+          "hidpi": {
+            ".xml": 3,
+            ".png": 2
+          }
+        },
+        "values": {
+          "": {
+            ".xml": 5
+          }
+        }
+      },
+      "javaResources": {
+        "fileCount": 3
       },
       "dependencies": [
         {
