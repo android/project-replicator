@@ -85,11 +85,20 @@ abstract class GatherModuleInfoTask : DefaultTask() {
             null
         }
 
-        val androidResources = getAndroidResourceFilesInfo(
-                ANDROID_RESOURCE_FOLDERS
-                , androidInputs)
+        val androidResources = if (pluginList.containsAndroid()) {
+            getAndroidResourceFilesInfo(
+                    ANDROID_RESOURCE_FOLDERS, androidInputs)
+        } else {
+            null
+        }
 
-        val javaResources = getJavaResourceFilesInfo(androidInputs)
+        val javaResources = if (pluginList.containsJava()
+                || pluginList.containsAndroid()
+                || pluginList.containsKotlin()) {
+            getJavaResourceFilesInfo(androidInputs)
+        } else {
+            null
+        }
 
         val moduleInfo = DefaultModuleInfo(
             path = projectPath.get(),
