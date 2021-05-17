@@ -29,18 +29,26 @@ val ANDROID_RESOURCE_FOLDERS = mapOf(
         "anim" to listOf(".xml"),
         "color" to listOf(".xml"),
         "drawable" to listOf(".xml", ".png", ".9.png", ".jpg", ".gif"),
-        "mipmap" to listOf(".xml", ".png", ".9.png", ".jpg", ".gif", ".webp"),
+        "font" to listOf(".ttf", ".otf", ".ttc"),
         "layout" to listOf(".xml"),
         "menu" to listOf(".xml"),
+        "mipmap" to listOf(".xml", ".png", ".9.png", ".jpg", ".gif", ".webp"),
         "raw" to listOf("*"),
+        "transition" to listOf(".xml"),
         "values" to listOf(".xml"),
-        "xml" to listOf(".xml"),
-        "font" to listOf(".ttf", ".otf", ".ttc")
+        "xml" to listOf(".xml")
 )
 
 data class DefaultAndroidResourcesInfo(
         override val fileCount: AndroidResourceFolders
-) : AndroidResourcesInfo
+) : AndroidResourcesInfo {
+    override val asMap: MutableMap<String, MutableMap<String, MutableMap<String, Int>>> =
+        fileCount.folders.mapValues { folder ->
+                folder.value.qualifiers.mapValues { qualifier ->
+                            qualifier.value.extensions
+                } as MutableMap
+        } as MutableMap
+}
 
 /* Resource division is done in the following way:
  * fname-mod1, fname, fname-mod2 are resource folders. This becomes:

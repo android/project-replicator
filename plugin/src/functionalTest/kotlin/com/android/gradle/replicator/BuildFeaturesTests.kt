@@ -56,13 +56,14 @@ class BuildFeaturesTests {
               "anim": {},
               "color": {},
               "drawable": {},
-              "mipmap": {},
+              "font": {},
               "layout": {},
               "menu": {},
+              "mipmap": {},
               "raw": {},
+              "transition": {},
               "values": {},
-              "xml": {},
-              "font": {}
+              "xml": {}
             },
             "javaResources": {
               "fileCount": 0
@@ -116,13 +117,14 @@ class BuildFeaturesTests {
               "anim": {},
               "color": {},
               "drawable": {},
-              "mipmap": {},
+              "font": {},
               "layout": {},
               "menu": {},
+              "mipmap": {},
               "raw": {},
+              "transition": {},
               "values": {},
-              "xml": {},
-              "font": {}
+              "xml": {}
             },
             "javaResources": {
               "fileCount": 0
@@ -176,13 +178,14 @@ class BuildFeaturesTests {
               "anim": {},
               "color": {},
               "drawable": {},
-              "mipmap": {},
+              "font": {},
               "layout": {},
               "menu": {},
+              "mipmap": {},
               "raw": {},
+              "transition": {},
               "values": {},
-              "xml": {},
-              "font": {}
+              "xml": {}
             },
             "javaResources": {
               "fileCount": 0
@@ -237,13 +240,14 @@ class BuildFeaturesTests {
               "anim": {},
               "color": {},
               "drawable": {},
-              "mipmap": {},
+              "font": {},
               "layout": {},
               "menu": {},
+              "mipmap": {},
               "raw": {},
+              "transition": {},
               "values": {},
-              "xml": {},
-              "font": {}
+              "xml": {}
             },
             "javaResources": {
               "fileCount": 0
@@ -298,13 +302,14 @@ class BuildFeaturesTests {
               "anim": {},
               "color": {},
               "drawable": {},
-              "mipmap": {},
+              "font": {},
               "layout": {},
               "menu": {},
+              "mipmap": {},
               "raw": {},
+              "transition": {},
               "values": {},
-              "xml": {},
-              "font": {}
+              "xml": {}
             },
             "javaResources": {
               "fileCount": 0
@@ -359,13 +364,14 @@ class BuildFeaturesTests {
               "anim": {},
               "color": {},
               "drawable": {},
-              "mipmap": {},
+              "font": {},
               "layout": {},
               "menu": {},
+              "mipmap": {},
               "raw": {},
+              "transition": {},
               "values": {},
-              "xml": {},
-              "font": {}
+              "xml": {}
             },
             "javaResources": {
               "fileCount": 0
@@ -420,13 +426,14 @@ class BuildFeaturesTests {
               "anim": {},
               "color": {},
               "drawable": {},
-              "mipmap": {},
+              "font": {},
               "layout": {},
               "menu": {},
+              "mipmap": {},
               "raw": {},
+              "transition": {},
               "values": {},
-              "xml": {},
-              "font": {}
+              "xml": {}
             },
             "javaResources": {
               "fileCount": 0
@@ -481,13 +488,14 @@ class BuildFeaturesTests {
               "anim": {},
               "color": {},
               "drawable": {},
-              "mipmap": {},
+              "font": {},
               "layout": {},
               "menu": {},
+              "mipmap": {},
               "raw": {},
+              "transition": {},
               "values": {},
-              "xml": {},
-              "font": {}
+              "xml": {}
             },
             "javaResources": {
               "fileCount": 0
@@ -547,13 +555,14 @@ class BuildFeaturesTests {
               "anim": {},
               "color": {},
               "drawable": {},
-              "mipmap": {},
+              "font": {},
               "layout": {},
               "menu": {},
+              "mipmap": {},
               "raw": {},
+              "transition": {},
               "values": {},
-              "xml": {},
-              "font": {}
+              "xml": {}
             },
             "javaResources": {
               "fileCount": 0
@@ -625,13 +634,14 @@ class BuildFeaturesTests {
               "anim": {},
               "color": {},
               "drawable": {},
-              "mipmap": {},
+              "font": {},
               "layout": {},
               "menu": {},
+              "mipmap": {},
               "raw": {},
+              "transition": {},
               "values": {},
-              "xml": {},
-              "font": {}
+              "xml": {}
             },
             "javaResources": {
               "fileCount": 0

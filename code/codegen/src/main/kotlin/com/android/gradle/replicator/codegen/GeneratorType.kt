@@ -29,7 +29,7 @@ enum class GeneratorType {
      * Kotlin [SourceGenerator]
      */
     Kotlin {
-        override fun initialize(params: GenerationParameters) =
+        override fun initialize(params: CodeGenerationParameters) =
             GeneratorDriver(params, Random(params.seed)) { printer, listeners ->
                 KotlinClassGenerator(printer, listeners)
             }
@@ -42,7 +42,7 @@ enum class GeneratorType {
      */
     Java {
         override fun initialize(
-                params: GenerationParameters
+                params: CodeGenerationParameters
         ) = GeneratorDriver(params, Random(params.seed)) { printer, listeners ->
             JavaClassGenerator(printer, listeners)
         }
@@ -55,7 +55,7 @@ enum class GeneratorType {
      */
     Mixed {
         override fun initialize(
-                params: GenerationParameters
+                params: CodeGenerationParameters
         ) = throw IllegalStateException("Not Implemented")
 
         override fun classNameToSourceFileName(className: String): String {
@@ -64,7 +64,7 @@ enum class GeneratorType {
     };
 
     abstract fun initialize(
-            params: GenerationParameters
+            params: CodeGenerationParameters
     ): SourceGenerator
 
     abstract fun classNameToSourceFileName(className: String): String

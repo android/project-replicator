@@ -20,7 +20,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileReader
 import java.io.PrintStream
-import java.lang.IllegalArgumentException
 import java.util.Properties
 
 fun main(args: Array<String>) {
@@ -44,7 +43,7 @@ class Main {
             }
         }
 
-        val argumentsBuilder = GenerationParameters.Builder()
+        val argumentsBuilder = CodeGenerationParameters.Builder()
         val pathToArgumentsFile = parsedArguments["-i"]
         if (pathToArgumentsFile!=null
             && pathToArgumentsFile.size > 0
@@ -87,7 +86,7 @@ class Main {
     private fun generateSources(
             numberOfSources: Int,
             generatorType: GeneratorType,
-            parameters: GenerationParameters,
+            parameters: CodeGenerationParameters,
             moduleName: String,
             outputFolder: File) {
         val generator = generatorType.initialize(parameters)
@@ -107,7 +106,7 @@ class Main {
         }
     }
 
-    private fun parseArguments(arguments: Map<String, List<String>>, parametersBuilder: GenerationParameters.Builder) {
+    private fun parseArguments(arguments: Map<String, List<String>>, parametersBuilder: CodeGenerationParameters.Builder) {
         arguments["-cp"]?.forEach { path ->
             File(path).let {
                 if (!it.exists()) {
@@ -126,7 +125,7 @@ class Main {
         }
     }
 
-    private fun parseArgumentFile(argumentsFile: File, parametersBuilder: GenerationParameters.Builder) {
+    private fun parseArgumentFile(argumentsFile: File, parametersBuilder: CodeGenerationParameters.Builder) {
         val arguments = FileReader(argumentsFile).use {
             Properties().also { properties -> properties.load(it) }
         }

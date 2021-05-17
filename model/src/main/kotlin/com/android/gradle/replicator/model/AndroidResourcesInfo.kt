@@ -33,4 +33,5 @@ data class AndroidResourceFolders(
  */
 interface AndroidResourcesInfo {
     val fileCount: AndroidResourceFolders
+    val asMap: MutableMap<String, MutableMap<String, MutableMap<String, Int>>>
 }

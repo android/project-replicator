@@ -15,19 +15,18 @@
  */
 package com.android.gradle.replicator.codegen.plugin
 
+import com.google.gson.Gson
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Classpath
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
+import java.io.File
+import java.nio.file.Files
 import kotlin.random.Random
 
-abstract class GenerateParamsTask: DefaultTask() {
+abstract class GenerateCodegenParamsTask: DefaultTask() {
 
     @get:Classpath
     abstract val runtimeClasspath: ConfigurableFileCollection
@@ -45,29 +44,27 @@ abstract class GenerateParamsTask: DefaultTask() {
     abstract val implJarFiles: ConfigurableFileCollection
 
     @get:OutputFile
-    abstract val paramsFile: RegularFileProperty
+    abstract val codeGenParamsFile: RegularFileProperty
 
     @get:Input
     abstract val gradleDependencies: ListProperty<String>
 
-    @get:Input
-    @get:Optional
-    abstract val nbOfKotlinFiles: Property<Int>
-
-    @get:Input
-    @get:Optional
-    abstract val nbOfJavaFiles: Property<Int>
+    @get:InputFile
+    abstract val moduleMetadataJson: RegularFileProperty
 
     @get:Input
     abstract val seed: Property<Int>
 
     @TaskAction
     fun action() {
-        val outputFile = paramsFile.get().asFile
-        println("Writing params to ${outputFile.absolutePath}")
+        val codeGenOutputFile = codeGenParamsFile.get().asFile
+        println("Writing codegen params to ${codeGenOutputFile.absolutePath}")
         val randomizer = if (seed.isPresent) Random(seed.get()) else Random
+
+        val metadata = loadModuleMetadata(moduleMetadataJson.get().asFile)
+
         // each module will get a random seed.
-        outputFile.writeText(
+        codeGenOutputFile.writeText(
                 """
                     seed=${randomizer.nextInt()}
                     runtimeClasspath=${runtimeClasspath.files.joinToString(separator = ",") { it.absolutePath }}
@@ -76,9 +73,25 @@ abstract class GenerateParamsTask: DefaultTask() {
                     apiClasspath=${apiJarFiles.files.joinToString(separator = ",") { it.absolutePath }}
                     implClasspath=${implJarFiles.files.joinToString(separator = ",") { it.absolutePath }}
                     dependencies=${gradleDependencies.get().joinToString(separator = ",")}
-                    nbOfKotlinFiles=${nbOfKotlinFiles.getOrElse(0)}
-                    nbOfJavaFiles=${nbOfJavaFiles.getOrElse(0)}
+                    nbOfKotlinFiles=${metadata.kotlinSources}
+                    nbOfJavaFiles=${metadata.javaSources}
                 """.trimIndent()
         )
+    }
+
+    private data class ModuleMetadata (
+            val javaSources: Int,
+            val kotlinSources: Int)
+
+    // read metadata file added to each project in json format
+    private fun loadModuleMetadata(moduleMetadataJson: File): ModuleMetadata {
+        val gson = Gson()
+        var moduleMetadata: ModuleMetadata
+
+        with(Files.newBufferedReader(moduleMetadataJson.toPath())) {
+            moduleMetadata = gson.fromJson(this, ModuleMetadata::class.java)
+        }
+
+        return moduleMetadata
     }
 }

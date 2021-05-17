@@ -21,7 +21,7 @@ import java.io.File
 /**
  * Parameters for the generation for a module.
  */
-data class GenerationParameters(
+data class CodeGenerationParameters(
         /**
          * Runtime classpath for the module we generate code for. The runtime classpath should guarantee that any
          * classes imported by this module should be able to loaded successfully as it represents the transitive
@@ -124,8 +124,8 @@ data class GenerationParameters(
             this.javaLanguageLevel = languageLevel
         }
 
-        fun build(): GenerationParameters =
-                GenerationParameters(
+        fun build(): CodeGenerationParameters =
+                CodeGenerationParameters(
                         runtimeClasspath = runtimeClasspath.toList(),
                         apiClasspath = apiClasspath.toList(),
                         codeGeneratedModuleApiClasspath = codeGeneratedModuleApiClasspath.toList(),

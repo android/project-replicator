@@ -27,6 +27,7 @@ import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.ModuleInfo
 import com.android.gradle.replicator.model.PluginType
 import com.android.gradle.replicator.model.ProjectInfo
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import java.io.File
 
@@ -110,8 +111,9 @@ class GradleProjectGenerator(
         // now the generic module info stuff
         generateModuleInfo(destinationFolder, project.rootModule)
 
-        // create module metadata file
+        // create module metadata files
         generateModuleMetadata(destinationFolder, project.rootModule)
+        generateModuleResourceMetadata(destinationFolder, project.rootModule)
     }
 
     private fun PluginType.useNewDsl(info: ProjectInfo): Boolean {
@@ -138,8 +140,9 @@ class GradleProjectGenerator(
         }
 
         generateModuleInfo(folder, module)
-        // create module metadata file
+        // create module metadata files
         generateModuleMetadata(folder, module)
+        generateModuleResourceMetadata(folder, module)
     }
 
     override fun generateSettingsFile(project: ProjectInfo) {
@@ -190,7 +193,7 @@ class GradleProjectGenerator(
         module.generateDependencies()
     }
 
-    internal fun generateModuleMetadata(
+    private fun generateModuleMetadata(
             folder: File,
             module: ModuleInfo
     ) {
@@ -199,6 +202,21 @@ class GradleProjectGenerator(
         val metadataJson = JsonObject()
         metadataJson.addProperty("javaSources", module.javaSources?.fileCount ?: 0)
         metadataJson.addProperty("kotlinSources", module.kotlinSources?.fileCount ?: 0)
+
+        metadataFile.writeBytes(metadataJson.toString().toByteArray())
+    }
+
+    private fun generateModuleResourceMetadata(
+            folder: File,
+            module: ModuleInfo
+    ) {
+        val metadataFile = folder.join("resource-metadata.json")
+
+        val metadataJson = JsonObject()
+        module.androidResources?.also {
+            metadataJson.add("androidResources", Gson().toJsonTree(it.asMap))
+        }
+        metadataJson.addProperty("javaResources", module.javaResources?.fileCount ?: 0)
 
         metadataFile.writeBytes(metadataJson.toString().toByteArray())
     }

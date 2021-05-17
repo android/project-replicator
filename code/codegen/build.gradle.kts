@@ -20,6 +20,7 @@ plugins {
 
     id("default-config")
     `maven-publish`
+    //application
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
@@ -28,6 +29,10 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
         freeCompilerArgs = listOf("-Xjvm-default=enable")
     }
 }
+
+/*application {
+    mainClass.set("com.android.gradle.replicator.resgen.Main")
+}*/
 
 // publish to maven local, it is where the init script is expecting it.
 publishing {
@@ -51,8 +56,10 @@ kotlin {
 dependencies {
     implementation(project(":model"))
 
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("com.google.guava:guava:30.0-jre")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
