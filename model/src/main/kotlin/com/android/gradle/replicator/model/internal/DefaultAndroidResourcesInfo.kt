@@ -50,8 +50,7 @@ data class DefaultAndroidResourcesInfo(
         } as MutableMap
 }
 
-/* Resource division is done in the following way:
- * fname-mod1, fname, fname-mod2 are resource folders. This becomes:
+/* Resource folders fname-mod1, fname, fname-mod2 becomes:
  * "resources": {
  *     "fname" : {
  *         "":  {

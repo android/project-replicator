@@ -21,13 +21,14 @@ import com.android.gradle.replicator.generator.containsAndroid
 import com.android.gradle.replicator.generator.containsKotlin
 import com.android.gradle.replicator.generator.generate
 import com.android.gradle.replicator.generator.join
-import com.android.gradle.replicator.generator.resources.ResourceGenerator
+import com.android.gradle.replicator.generator.manifest.ManifestGenerator
 import com.android.gradle.replicator.generator.writer.DslWriter
 import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.ModuleInfo
 import com.android.gradle.replicator.model.PluginType
 import com.android.gradle.replicator.model.ProjectInfo
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import java.io.File
 
@@ -36,7 +37,7 @@ class GradleProjectGenerator(
     private val libraryFilter: Map<String, String>,
     private val libraryAdditions: Map<String, List<DependenciesInfo>>,
     private val dslWriter: DslWriter,
-    private val resGenerator: ResourceGenerator
+    private val resGenerator: ManifestGenerator
 ): ProjectGenerator {
 
     override fun generateRootModule(project: ProjectInfo) {
@@ -185,7 +186,7 @@ class GradleProjectGenerator(
         module.android?.generate(
             folder = folder,
             dslWriter = dslWriter,
-            resourceGenerator = resGenerator,
+            manifestGenerator = resGenerator,
             gradlePath = module.path,
             hasKotlin = module.plugins.containsKotlin()
         )
@@ -203,7 +204,7 @@ class GradleProjectGenerator(
         metadataJson.addProperty("javaSources", module.javaSources?.fileCount ?: 0)
         metadataJson.addProperty("kotlinSources", module.kotlinSources?.fileCount ?: 0)
 
-        metadataFile.writeBytes(metadataJson.toString().toByteArray())
+        metadataFile.writeBytes(GsonBuilder().setPrettyPrinting().create().toJson(metadataJson).toByteArray())
     }
 
     private fun generateModuleResourceMetadata(
@@ -218,7 +219,7 @@ class GradleProjectGenerator(
         }
         metadataJson.addProperty("javaResources", module.javaResources?.fileCount ?: 0)
 
-        metadataFile.writeBytes(metadataJson.toString().toByteArray())
+        metadataFile.writeBytes(GsonBuilder().setPrettyPrinting().create().toJson(metadataJson).toByteArray())
     }
 
     private fun ModuleInfo.generateDependencies() {

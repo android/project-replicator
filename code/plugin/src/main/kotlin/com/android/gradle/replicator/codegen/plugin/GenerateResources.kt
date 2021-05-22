@@ -26,7 +26,7 @@ import kotlin.random.Random
 abstract class GenerateResources: DefaultTask() {
 
     @get:InputFile
-    abstract val resourceGenParamFile: RegularFileProperty
+    abstract val parameters: RegularFileProperty
 
     @get:Input
     abstract val seed: Property<Int>
@@ -43,10 +43,10 @@ abstract class GenerateResources: DefaultTask() {
         // generate files.
         Main().process(
                 arrayOf(
-                        "-resjson", resourceGenParamFile.get().asFile.absolutePath,
-                        "-ao", androidOutputDirectory.get().asFile.absolutePath,
-                        "-jo", javaOutputDirectory.get().asFile.absolutePath,
-                        "-seed", randomizer.nextInt().toString()
+                        "--resJson", parameters.get().asFile.absolutePath,
+                        "--androidOutput", androidOutputDirectory.get().asFile.absolutePath,
+                        "--javaOutput", javaOutputDirectory.get().asFile.absolutePath,
+                        "--seed", randomizer.nextInt().toString()
                 )
         )
         println("Done with $name")

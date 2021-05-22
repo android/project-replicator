@@ -18,7 +18,7 @@
 package com.android.gradle.replicator.generator.project
 
 import com.android.gradle.replicator.generator.BuildGenerator
-import com.android.gradle.replicator.generator.resources.ResourceGenerator
+import com.android.gradle.replicator.generator.manifest.ManifestGenerator
 import com.android.gradle.replicator.generator.writer.DslWriter
 import com.android.gradle.replicator.generator.writer.GroovyDslWriter
 import com.android.gradle.replicator.generator.writer.KtsWriter
@@ -46,7 +46,7 @@ interface ProjectGenerator {
             libraryFilter: Map<String, String>,
             libraryAdditions: Map<String, List<DependenciesInfo>>
         ): ProjectGenerator {
-            val resGenerator = ResourceGenerator()
+            val resGenerator = ManifestGenerator()
 
             val dslWriter: DslWriter = if (params.kts) KtsWriter(true) else GroovyDslWriter(true)
 

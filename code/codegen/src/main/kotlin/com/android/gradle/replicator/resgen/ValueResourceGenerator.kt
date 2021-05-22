@@ -139,7 +139,6 @@ class ValueResourceGenerator (val random: Random): ResourceGenerator {
         return "    <color name=\"$name\">#$value</color>"
     }
 
-
     private fun dimenBlock (): String {
         val name = genName(random)
         val units = listOf("dp", "sp", "pt", "px", "mm", "in")
@@ -156,7 +155,7 @@ class ValueResourceGenerator (val random: Random): ResourceGenerator {
     private fun intArrayBlock (): List<String> {
         val name = genName(random)
         val size = random.nextInt(20)
-        val result = mutableListOf<String>("    <integer-array name=\"$name\">")
+        val result = mutableListOf("    <integer-array name=\"$name\">")
 
         repeat(size) { count ->
             val value = random.nextInt()

@@ -44,7 +44,7 @@ abstract class GenerateCodegenParamsTask: DefaultTask() {
     abstract val implJarFiles: ConfigurableFileCollection
 
     @get:OutputFile
-    abstract val codeGenParamsFile: RegularFileProperty
+    abstract val paramsFile: RegularFileProperty
 
     @get:Input
     abstract val gradleDependencies: ListProperty<String>
@@ -57,14 +57,14 @@ abstract class GenerateCodegenParamsTask: DefaultTask() {
 
     @TaskAction
     fun action() {
-        val codeGenOutputFile = codeGenParamsFile.get().asFile
-        println("Writing codegen params to ${codeGenOutputFile.absolutePath}")
+        val outputFile = paramsFile.get().asFile
+        println("Writing codegen params to ${outputFile.absolutePath}")
         val randomizer = if (seed.isPresent) Random(seed.get()) else Random
 
         val metadata = loadModuleMetadata(moduleMetadataJson.get().asFile)
 
         // each module will get a random seed.
-        codeGenOutputFile.writeText(
+        outputFile.writeText(
                 """
                     seed=${randomizer.nextInt()}
                     runtimeClasspath=${runtimeClasspath.files.joinToString(separator = ",") { it.absolutePath }}

@@ -16,6 +16,7 @@
  */
 package com.android.gradle.replicator.resgen
 
+import com.android.gradle.replicator.parsing.ArgsParser
 import com.google.gson.Gson
 import java.io.File
 import java.io.FileNotFoundException
@@ -40,26 +41,38 @@ class Main {
     var random: Random = Random(10)
 
     fun process(args: Array<String>) {
-        var lastKey = ""
-        val parsedArguments = args.fold(mutableMapOf()) { acc: MutableMap<String, MutableList<String>>, s: String ->
-            acc.apply {
-                if (s.startsWith('-')) {
-                    this[s] = mutableListOf()
-                    lastKey = s
-                }
-                else this[lastKey]?.add(s)
-            }
-        }
+
+        val parser = ArgsParser()
+
+        val androidOutputFolderOption = parser.option(longName = "androidOutput", shortName = "ao", argc = 1)
+        val javaOutputFolderOption = parser.option(longName = "javaOutput", shortName = "jo", argc = 1)
+        val resJsonOption = parser.option(longName = "resJson", shortName = "rj", argc = 1)
+        val seedOption = parser.option(longName = "seed", shortName = "s", argc = 1)
+
+        parser.parseArgs(args)
 
         val argumentsBuilder = ResourceGenerationParameters.Builder()
-        parseArguments(parsedArguments, argumentsBuilder)
 
-        val androidOutputFolder = File(checkNotNull(parsedArguments["-ao"]).first())
+        resJsonOption.orNull?.first?.let { path ->
+            File(path).let {
+                if (!it.exists()) {
+                    throw FileNotFoundException(it.toString())
+                }
+                val metadata = loadModuleMetadata(it)
+                argumentsBuilder.setNumberOfAndroidResources(metadata.androidResources)
+                argumentsBuilder.setNumberOfJavaResources(metadata.javaResources)
+            }
+        }
+        seedOption.orNull?.first?.let {
+            argumentsBuilder.setSeed(it.toInt())
+        }
+
+        val androidOutputFolder = File(checkNotNull(androidOutputFolderOption.orNull?.first))
         androidOutputFolder.deleteRecursively()
         androidOutputFolder.mkdirs()
         println("Generating android resources in $androidOutputFolder")
 
-        val javaOutputFolder = File(checkNotNull(parsedArguments["-jo"]).first())
+        val javaOutputFolder = File(checkNotNull(javaOutputFolderOption.orNull?.first))
         javaOutputFolder.deleteRecursively()
         javaOutputFolder.mkdirs()
         println("Generating java resources in $javaOutputFolder")
@@ -139,22 +152,6 @@ class Main {
         return
     }
 
-    private fun parseArguments(arguments: Map<String, List<String>>, parametersBuilder: ResourceGenerationParameters.Builder) {
-        arguments["-resjson"]?.first().let { path ->
-            File(path!!).let {
-                if (!it.exists()) {
-                    throw FileNotFoundException(path)
-                }
-                val metadata = loadModuleMetadata(it)
-                parametersBuilder.setNumberOfAndroidResources(metadata.androidResources)
-                parametersBuilder.setNumberOfJavaResources(metadata.javaResources)
-            }
-        }
-        arguments["-seed"]?.first()?.let { seed ->
-            parametersBuilder.setSeed(seed.toInt())
-        }
-    }
-
     private data class ResourceMetadata (
             val androidResources: AndroidResourceMap,
             val javaResources: Int)
@@ -185,9 +182,9 @@ class Main {
 
     fun usage() {
         println("usage: Main <args>")
-        println("\t-seed : seed value for the randomizer")
-        println("\t-resjson : classpath for all private (implementation) libraries, each element is a .jar file")
-        println("\t-ao : android resources output folder")
-        println("\t-jo : java resources output folder")
+        println("\t-s/--seed : seed value for the randomizer")
+        println("\t-rj/--resJson : classpath for all private (implementation) libraries, each element is a .jar file")
+        println("\t-ao/--androidOutput : android resources output folder")
+        println("\t-jo/--javaOutput : java resources output folder")
     }
 }

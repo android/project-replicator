@@ -15,13 +15,13 @@
  *
  */
 
-package com.android.gradle.replicator.generator.resources
+package com.android.gradle.replicator.generator.manifest
 
 import com.android.gradle.replicator.generator.createDirWithParents
 import com.android.gradle.replicator.generator.join
 import java.io.File
 
-class ResourceGenerator {
+class ManifestGenerator {
 
     internal fun generateManifest(folder: File, packageName: String) {
         val manifestFile = folder.join("src", "main", "AndroidManifest.xml")

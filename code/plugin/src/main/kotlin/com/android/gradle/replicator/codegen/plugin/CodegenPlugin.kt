@@ -42,7 +42,7 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
                 "generateResources",
                 GenerateResources::class.java) { task ->
 
-            task.resourceGenParamFile.set(project.layout.projectDirectory.file("resource-metadata.json"))
+            task.parameters.set(project.layout.projectDirectory.file("resource-metadata.json"))
             task.seed.set(Random.nextInt())
             task.androidOutputDirectory.set(project.layout.projectDirectory.dir("src/res"))
             task.javaOutputDirectory.set(project.layout.projectDirectory.dir("src/resources"))
@@ -155,7 +155,7 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
             task.codeGeneratedModuleImplClasspath.from(implProjectArtifacts.artifactFiles)
             task.apiJarFiles.from(apiArtifacts.artifactFiles)
             task.implJarFiles.from(androidApis, implArtifacts.artifactFiles)
-            task.codeGenParamsFile.set(project.layout.buildDirectory.file("test.params"))
+            task.paramsFile.set(project.layout.buildDirectory.file("test.params"))
             // Randomizer values should be set during project replication along the number of java and kotlin files.
             task.seed.set(Random.nextInt())
 
@@ -175,7 +175,7 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
                 "generateCode",
                 GenerateCode::class.java) { task ->
 
-            task.parameters.set(generateTask.flatMap(GenerateCodegenParamsTask::codeGenParamsFile))
+            task.parameters.set(generateTask.flatMap(GenerateCodegenParamsTask::paramsFile))
             task.outputDirectory.set(
                     project.layout.projectDirectory.dir("src/main/java")
             )

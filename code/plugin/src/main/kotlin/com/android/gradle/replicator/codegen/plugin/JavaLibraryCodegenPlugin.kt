@@ -41,7 +41,7 @@ class JavaLibraryCodegenPlugin: AbstractCodeGenPlugin() {
                 "generateCodegenParams",
                 GenerateCodegenParamsTask::class.java) { task ->
 
-            task.codeGenParamsFile.set(project.layout.buildDirectory.file("test.params"))
+            task.paramsFile.set(project.layout.buildDirectory.file("test.params"))
 
             // elements we publish to others, all of our public methods must only use types coming from these elements.
             val configApi = project.configurations.getAt("apiElements")
@@ -81,7 +81,7 @@ class JavaLibraryCodegenPlugin: AbstractCodeGenPlugin() {
 
             task.runtimeClasspath.from(runtimeClasspath.incoming.artifacts.artifactFiles)
             task.apiJarFiles.from(apiArtifacts.artifactFiles)
-            task.codeGenParamsFile.set(project.layout.buildDirectory.file("test.params"))
+            task.paramsFile.set(project.layout.buildDirectory.file("test.params"))
             // Randomizer values should be set during project replication along the number of java and kotlin files.
             task.seed.set(Random.nextInt())
 
@@ -92,7 +92,7 @@ class JavaLibraryCodegenPlugin: AbstractCodeGenPlugin() {
                 "generateCode",
                 GenerateCode::class.java) { task ->
 
-            task.parameters.set(generateTask.flatMap(GenerateCodegenParamsTask::codeGenParamsFile))
+            task.parameters.set(generateTask.flatMap(GenerateCodegenParamsTask::paramsFile))
             task.outputDirectory.set(
                     project.layout.projectDirectory.dir("src/main/java")
             )

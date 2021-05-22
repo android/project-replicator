@@ -16,9 +16,9 @@
  */
 package com.android.gradle.replicator.resgen.util
 
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.random.Random
-import kotlin.random.nextUBytes
 
 private val words = listOf (
         "pizza",
@@ -59,13 +59,13 @@ fun genName(random: Random): String {
     return genString(3, "_", random)
 }
 
-@kotlin.ExperimentalUnsignedTypes
 fun genHex(numberOfDigits: Int, random: Random): String {
-    // Bytes are 2 hex digits
-    return random.nextUBytes(ceil(numberOfDigits/2.0).toInt())
-            .map { "%02x".format(it.toInt()) }
-            .joinToString("")
-            .substring(0, numberOfDigits)
+    val toHex = { byte: Byte -> "%02x".format(abs(byte.toInt())) }
+
+    // Note: Bytes are 2 hex digits, ex: 9 = 09, 255 = FF, etc.
+    return random.nextBytes(ceil(numberOfDigits / 2.0).toInt())
+            .joinToString("") { byte -> toHex(byte) }
+            .substring(0, numberOfDigits) // Trim if odd number of hex requested
 }
 
 fun genFileNameCharacters(count: Int, minFileNameCharacters: Int = 3): String {

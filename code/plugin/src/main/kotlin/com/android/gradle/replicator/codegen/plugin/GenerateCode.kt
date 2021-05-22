@@ -36,8 +36,7 @@ abstract class GenerateCode: DefaultTask() {
         // generate files.
         Main().process(
                 arrayOf(
-                        "-gen", "Java",
-                        "-module", path.removeSuffix(":$name").removePrefix(":").replace(':', '_'),
+                        "--module", path.removeSuffix(":$name").removePrefix(":").replace(':', '_'),
                         "-i", parameters.get().asFile.absolutePath,
                         "-o", outputDirectory.get().asFile.absolutePath
                 )

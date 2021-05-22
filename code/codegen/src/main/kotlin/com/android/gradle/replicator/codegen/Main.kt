@@ -16,11 +16,9 @@
  */
 package com.android.gradle.replicator.codegen
 
+import com.android.gradle.replicator.parsing.ArgsParser
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileReader
 import java.io.PrintStream
-import java.util.Properties
 
 fun main(args: Array<String>) {
     val main= Main()
@@ -32,36 +30,63 @@ fun main(args: Array<String>) {
 class Main {
 
     fun process(args: Array<String>) {
-        var lastKey = ""
-        val parsedArguments = args.fold(mutableMapOf()) { acc: MutableMap<String, MutableList<String>>, s: String ->
-            acc.apply {
-                if (s.startsWith('-')) {
-                    this[s] = mutableListOf()
-                    lastKey = s
-                }
-                else this[lastKey]?.add(s)
-            }
-        }
 
-        val argumentsBuilder = CodeGenerationParameters.Builder()
-        val pathToArgumentsFile = parsedArguments["-i"]
+        val parser = ArgsParser()
+
+        val pathToArgumentsFileOption = parser.option(longName = "argsFile", shortName = "i", argc = 1)
+        val outputFolderOption = parser.option(longName = "outputFolder", shortName = "o", argc = 1)
+        val moduleOption = parser.option(longName = "module", shortName = "m", argc = 1)
+        val implClasspathElementOption = parser.option(
+                longName = "implClassPath",
+                shortName = "cp",
+                propertyName = "implClasspath",
+                argc = ArgsParser.UNLIMITED_ARGC)
+        val apiOption = parser.option(
+                longName = "apiClassPath",
+                shortName = "api",
+                propertyName = "apiClasspath",
+                argc = ArgsParser.UNLIMITED_ARGC)
+        val codeGenModuleApiClasspathOption = parser.option(
+                propertyName = "codeGeneratedModuleApiClasspath",
+                argc = ArgsParser.UNLIMITED_ARGC)
+        val codeGenModuleImplClasspathOption = parser.option(
+                propertyName = "codeGeneratedModuleImplClasspath",
+                argc = ArgsParser.UNLIMITED_ARGC)
+        val runtimeClasspathOption = parser.option(propertyName = "runtimeClasspath", argc = ArgsParser.UNLIMITED_ARGC)
+
+        val seedOption = parser.option(longName = "seed", shortName = "s", propertyName = "seed", argc = 1)
+        val nbOfJavaFilesOption = parser.option(propertyName = "nbOfJavaFiles", argc = 1)
+        val nbOfKotlinFilesOption = parser.option(propertyName = "nbOfKotlinFiles", argc = 1)
+
+        parser.parseArgs(args)
+
+        val parametersBuilder = CodeGenerationParameters.Builder()
+        val pathToArgumentsFile = pathToArgumentsFileOption.orNull?.first
         if (pathToArgumentsFile!=null
-            && pathToArgumentsFile.size > 0
-            && File(pathToArgumentsFile[0]).exists()) {
-            parseArgumentFile(File(pathToArgumentsFile[0]), argumentsBuilder)
-        } else {
-            parseArguments(parsedArguments, argumentsBuilder)
+            && File(pathToArgumentsFile).exists()) {
+            parser.parsePropertyFile(File(pathToArgumentsFile))
         }
+        buildParameters(
+                parametersBuilder,
+                implClasspathElementOption.orNull?.argv,
+                apiOption.orNull?.argv,
+                codeGenModuleApiClasspathOption.orNull?.argv,
+                codeGenModuleImplClasspathOption.orNull?.argv,
+                runtimeClasspathOption.orNull?.argv,
+                seedOption.orNull?.first,
+                nbOfJavaFilesOption.orNull?.first,
+                nbOfKotlinFilesOption.orNull?.first
+        )
         val kotlinGenerator: GeneratorType = GeneratorType.Kotlin
         val javaGenerator = GeneratorType.Java
 
-        val outputFolder = File(checkNotNull(parsedArguments["-o"]).first())
+        val outputFolder = File(checkNotNull(outputFolderOption.orNull?.first))
         outputFolder.deleteRecursively()
         outputFolder.mkdirs()
         println("Generating in $outputFolder")
 
-        val arguments = argumentsBuilder.build()
-        val moduleName = parsedArguments["-module"]?.first() ?: "module"
+        val arguments = parametersBuilder.build()
+        val moduleName = moduleOption.orNull?.first ?: "module"
 
         if (arguments.numberOfJavaSources > 0) {
             generateSources(
@@ -106,52 +131,40 @@ class Main {
         }
     }
 
-    private fun parseArguments(arguments: Map<String, List<String>>, parametersBuilder: CodeGenerationParameters.Builder) {
-        arguments["-cp"]?.forEach { path ->
-            File(path).let {
-                if (!it.exists()) {
-                    throw FileNotFoundException(path)
-                }
-                parametersBuilder.addImplClasspathElement(it)
-            }
-        }
-        arguments["-api"]?.forEach { path ->
-            File(path).let {
-                if (!it.exists()) {
-                    throw FileNotFoundException(path)
-                }
-                parametersBuilder.addApiClasspathElement(it)
-            }
-        }
-    }
-
-    private fun parseArgumentFile(argumentsFile: File, parametersBuilder: CodeGenerationParameters.Builder) {
-        val arguments = FileReader(argumentsFile).use {
-            Properties().also { properties -> properties.load(it) }
-        }
-        arguments["apiClasspath"]?.toString()?.split(",")?.forEach {
+    private fun buildParameters(
+            parametersBuilder: CodeGenerationParameters.Builder,
+            apiClasspath: List<String>?,
+            implClasspath: List<String>?,
+            codeGeneratedModuleApiClasspath: List<String>?,
+            codeGeneratedModuleImplClasspath: List<String>?,
+            runtimeClasspath: List<String>?,
+            seed: String?,
+            nbOfJavaFiles: String?,
+            nbOfKotlinFiles: String?
+    ) {
+        apiClasspath?.forEach {
             parametersBuilder.addApiClasspathElement(File(it))
         }
-        arguments["implClasspath"]?.toString()?.split(",")?.forEach {
+        implClasspath?.forEach {
             parametersBuilder.addImplClasspathElement(File(it))
         }
-        arguments["codeGeneratedModuleApiClasspath"]?.toString()?.split(",")?.forEach {
+        codeGeneratedModuleApiClasspath?.forEach {
             parametersBuilder.addCodeGeneratedModuleApiClasspathElement(File(it))
         }
-        arguments["codeGeneratedModuleImplClasspath"]?.toString()?.split(",")?.forEach {
+        codeGeneratedModuleImplClasspath?.forEach {
             parametersBuilder.addCodeGeneratedModuleImplClasspathElement(File(it))
         }
-        arguments["runtimeClasspath"]?.toString()?.split(",")?.forEach {
+        runtimeClasspath?.forEach {
             parametersBuilder.addRuntimeClasspathElement(File(it))
         }
-        arguments["seed"]?.also {
-            parametersBuilder.setSeed((it as String).toInt())
+        seed?.also {
+            parametersBuilder.setSeed((it).toInt())
         }
-        arguments["nbOfJavaFiles"]?.also {
-            parametersBuilder.setNumberOfJavaSources((it as String).toInt())
+        nbOfJavaFiles?.also {
+            parametersBuilder.setNumberOfJavaSources((it).toInt())
         }
-        arguments["nbOfKotlinFiles"]?.also {
-            parametersBuilder.setNumberOfKotlinSources((it as String).toInt())
+        nbOfKotlinFiles?.also {
+            parametersBuilder.setNumberOfKotlinSources((it).toInt())
         }
     }
 

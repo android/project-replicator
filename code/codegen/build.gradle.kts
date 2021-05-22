@@ -20,7 +20,6 @@ plugins {
 
     id("default-config")
     `maven-publish`
-    //application
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
@@ -29,10 +28,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
         freeCompilerArgs = listOf("-Xjvm-default=enable")
     }
 }
-
-/*application {
-    mainClass.set("com.android.gradle.replicator.resgen.Main")
-}*/
 
 // publish to maven local, it is where the init script is expecting it.
 publishing {
