@@ -101,12 +101,12 @@ class Main {
             //"animator" ->
             //"anim" ->
             //"color" ->
-            //"drawable" ->
-            //"font" ->
+            "drawable" -> DrawableResourceGenerator(random)
+            "font" -> FontResourceGenerator(random)
             //"layout" ->
             //"menu" ->
-            //"mipmap" ->
-            //"raw" ->
+            "mipmap" -> DrawableResourceGenerator(random)
+            "raw" -> RawResourceGenerator(random)
             //"transition" ->
             "values" -> ValueResourceGenerator(random)
             //"xml" ->
@@ -135,7 +135,9 @@ class Main {
                     generator.generateResource(
                             number = extension.value,
                             outputFolder = qualifiedFolder,
-                            resourceQualifier = qualifier.key,
+                            // resources can have more than one qualifier
+                            resourceQualifiers =
+                                if (qualifier.key.isEmpty()) listOf() else qualifier.key.split("-"),
                             resourceExtension = extension.key
                     )
                 }

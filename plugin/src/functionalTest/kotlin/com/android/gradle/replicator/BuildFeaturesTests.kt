@@ -744,14 +744,16 @@ class BuildFeaturesTests {
                   ".png": 0,
                   ".9.png": 0,
                   ".jpg": 0,
-                  ".gif": 0
+                  ".gif": 0,
+                  ".webp": 0
                 },
                 "v24": {
                   ".xml": 1,
                   ".png": 0,
                   ".9.png": 0,
                   ".jpg": 0,
-                  ".gif": 0
+                  ".gif": 0,
+                  ".webp": 0
                 }
               },
               "font": {},
