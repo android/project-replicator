@@ -16,10 +16,6 @@
  */
 package com.android.gradle.replicator.resgen
 
-import com.google.gson.Gson
-import java.io.File
-import java.nio.file.Files
-
 typealias AndroidResourceMap = Map<String, Map<String, Map<String, Int>>>
 
 /**

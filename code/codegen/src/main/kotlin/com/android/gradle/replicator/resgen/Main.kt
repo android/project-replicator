@@ -101,7 +101,7 @@ class Main {
             //"animator" ->
             //"anim" ->
             //"color" ->
-            //"drawable" ->
+            "drawable" -> DrawableResourceGenerator(random)
             //"font" ->
             //"layout" ->
             //"menu" ->
@@ -135,7 +135,9 @@ class Main {
                     generator.generateResource(
                             number = extension.value,
                             outputFolder = qualifiedFolder,
-                            resourceQualifier = qualifier.key,
+                            // resources can have more than one qualifier
+                            resourceQualifiers =
+                                if (qualifier.key.isEmpty()) listOf() else qualifier.key.split("-"),
                             resourceExtension = extension.key
                     )
                 }

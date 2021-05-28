@@ -96,16 +96,16 @@ class ResourceGenerationUnitTest {
     }
 
     @Test
-    fun testGeneration() {
+    fun testValueGeneration() {
         mockRandom(random)
         val generator = ValueResourceGenerator(random)
 
-        generator.numberOfResourceValues = 5
+        generator.numberOfResourceElements = 5
 
         generator.generateResource(
                 number = 2,
                 outputFolder = output.root,
-                resourceQualifier = "",
+                resourceQualifiers = listOf(),
                 resourceExtension = ".xml"
         )
 
@@ -132,5 +132,44 @@ class ResourceGenerationUnitTest {
 
         Truth.assertThat(generatedValues1).isEqualTo(expectedValues1)
         Truth.assertThat(generatedValues2).isEqualTo(expectedValues2)
+    }
+
+    @Test
+    fun testDrawableGeneration() {
+        mockRandom(random)
+        val generator = DrawableResourceGenerator(random)
+
+        generator.generateResource(
+                number = 2,
+                outputFolder = output.root,
+                resourceQualifiers = listOf(),
+                resourceExtension = ".png"
+        )
+
+        /*
+        val generatedValues1 = File(output.root, "valuesAAA.xml").readText()
+        val generatedValues2 = File(output.root, "valuesAAB.xml").readText()
+
+        val expectedValues1 = """
+            <resources>
+                <string name="cool_delivery">nice constable writer wire android</string>
+                <bool name="cookie_etc._the">false</bool>
+                <string name="chocolate_vanilla_strawberry">party cool</string>
+                <string name="nice_constable">wire android face pie cookie etc. the name max</string>
+            </resources>""".trimIndent()
+
+        val expectedValues2 = """
+            <resources>
+                <integer-array name="vanilla">
+                    <item>42</item>
+                </integer-array>
+                <color name="delivery_awesome_nice">#000</color>
+                <integer name="android_face_pie">54</integer>
+                <string name="max">chocolate vanilla strawberry pizza party cool delivery awesome nice constable writer wire android face pie cookie etc. the name max</string>
+            </resources>""".trimIndent()
+
+        Truth.assertThat(generatedValues1).isEqualTo(expectedValues1)
+        Truth.assertThat(generatedValues2).isEqualTo(expectedValues2)
+        */
     }
 }

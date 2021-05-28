@@ -27,12 +27,21 @@ import kotlin.random.Random
 class ValueResourceGenerator (val random: Random): ResourceGenerator {
 
     @set:VisibleForTesting
-    var numberOfResourceValues: Int?= null
+    var numberOfResourceElements: Int?= null
+
+    companion object {
+        private const val MAX_VALUES = 21
+        private const val MAX_ARRAY_ELEMENTS = 20
+        private const val MAX_STRING_WORD_COUNT = 20
+        private const val MAX_DIMENSION = 2048
+        private val POSSIBLE_COLOR_DIGITS = listOf(3, 4, 6, 8)
+        private val DIMENSION_UNITS = listOf("dp", "sp", "pt", "px", "mm", "in")
+    }
 
     override fun generateResource(
             number: Int,
             outputFolder: File,
-            resourceQualifier: String,
+            resourceQualifiers: List<String>,
             resourceExtension: String
     ) {
         var themesFiles = 0
@@ -45,7 +54,7 @@ class ValueResourceGenerator (val random: Random): ResourceGenerator {
                 ResourceType.THEME ->  {
                     val outputFile = File(outputFolder, "themes${genFileNameCharacters(themesFiles)}${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
-                    generateThemeResource(outputFile, resourceQualifier)
+                    generateThemeResource(outputFile, resourceQualifiers)
                     themesFiles++
                 }
                 ResourceType.VALUES -> {
@@ -69,7 +78,7 @@ class ValueResourceGenerator (val random: Random): ResourceGenerator {
     private fun generateXmlValueResource (
             outputFile: File
     ) {
-        val numberOfValues = numberOfResourceValues ?: random.nextInt(1, 21)
+        val numberOfValues = numberOfResourceElements ?: random.nextInt(1, MAX_VALUES)
         val allValueTypes = ValueType.values()
 
         val xmlLines = mutableListOf<String>()
@@ -77,7 +86,7 @@ class ValueResourceGenerator (val random: Random): ResourceGenerator {
         xmlLines.add("<resources>")
 
         repeat(numberOfValues) {
-            when(allValueTypes.get(random.nextInt(allValueTypes.size))) {
+            when(allValueTypes.random(random)) {
                 ValueType.STRING -> xmlLines.add(stringBlock())
                 ValueType.INT -> xmlLines.add(intBlock())
                 ValueType.BOOL -> xmlLines.add(boolBlock())
@@ -96,7 +105,7 @@ class ValueResourceGenerator (val random: Random): ResourceGenerator {
 
     private fun generateThemeResource (
             outputFile: File,
-            resourceQualifier: String
+            resourceQualifiers: List<String>
     ) {
         // To be implemented
         return
@@ -105,7 +114,7 @@ class ValueResourceGenerator (val random: Random): ResourceGenerator {
     private fun stringBlock (): String {
         val name = genName(random)
         val value = genString(
-                20,
+                MAX_STRING_WORD_COUNT,
                 separator = " ",
                 random = random)
         return "    <string name=\"$name\">$value</string>"
@@ -131,8 +140,7 @@ class ValueResourceGenerator (val random: Random): ResourceGenerator {
          * #RRGGBB
          * #AARRGGBB
          */
-        val possibleDigits = listOf(3, 4, 6, 8)
-        val numberOfDigits = possibleDigits.get(random.nextInt(possibleDigits.size))
+        val numberOfDigits = POSSIBLE_COLOR_DIGITS.random(random)
 
         val value = genHex(numberOfDigits, random)
 
@@ -141,8 +149,7 @@ class ValueResourceGenerator (val random: Random): ResourceGenerator {
 
     private fun dimenBlock (): String {
         val name = genName(random)
-        val units = listOf("dp", "sp", "pt", "px", "mm", "in")
-        val value = "${random.nextInt(2048)}${units.get(random.nextInt(units.size))}"
+        val value = "${random.nextInt(MAX_DIMENSION)}${DIMENSION_UNITS.random(random)}"
 
         return "    <dimen name=\"$name\">$value</dimen>"
     }
@@ -154,7 +161,7 @@ class ValueResourceGenerator (val random: Random): ResourceGenerator {
 
     private fun intArrayBlock (): List<String> {
         val name = genName(random)
-        val size = random.nextInt(20)
+        val size = random.nextInt(MAX_ARRAY_ELEMENTS)
         val result = mutableListOf("    <integer-array name=\"$name\">")
 
         repeat(size) { count ->
