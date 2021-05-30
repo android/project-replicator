@@ -214,8 +214,8 @@ class GradleProjectGenerator(
         val metadataFile = folder.join("resource-metadata.json")
 
         val metadataJson = JsonObject()
-        module.androidResources?.also {
-            metadataJson.add("androidResources", Gson().toJsonTree(it.asMap))
+        module.androidResources?.resourceMap?.also {
+            metadataJson.add("androidResources", Gson().toJsonTree(it))
         }
         metadataJson.addProperty("javaResources", module.javaResources?.fileCount ?: 0)
 

@@ -53,18 +53,18 @@ class BuildFeaturesTests {
               "fileCount": 0
             },
             "androidResources": {
-              "animator": {},
-              "anim": {},
-              "color": {},
-              "drawable": {},
-              "font": {},
-              "layout": {},
-              "menu": {},
-              "mipmap": {},
-              "raw": {},
-              "transition": {},
-              "values": {},
-              "xml": {}
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
             },
             "javaResources": {
               "fileCount": 0
@@ -114,18 +114,18 @@ class BuildFeaturesTests {
               "fileCount": 0
             },
             "androidResources": {
-              "animator": {},
-              "anim": {},
-              "color": {},
-              "drawable": {},
-              "font": {},
-              "layout": {},
-              "menu": {},
-              "mipmap": {},
-              "raw": {},
-              "transition": {},
-              "values": {},
-              "xml": {}
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
             },
             "javaResources": {
               "fileCount": 0
@@ -175,18 +175,18 @@ class BuildFeaturesTests {
               "fileCount": 0
             },
             "androidResources": {
-              "animator": {},
-              "anim": {},
-              "color": {},
-              "drawable": {},
-              "font": {},
-              "layout": {},
-              "menu": {},
-              "mipmap": {},
-              "raw": {},
-              "transition": {},
-              "values": {},
-              "xml": {}
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
             },
             "javaResources": {
               "fileCount": 0
@@ -237,18 +237,18 @@ class BuildFeaturesTests {
               "fileCount": 0
             },
             "androidResources": {
-              "animator": {},
-              "anim": {},
-              "color": {},
-              "drawable": {},
-              "font": {},
-              "layout": {},
-              "menu": {},
-              "mipmap": {},
-              "raw": {},
-              "transition": {},
-              "values": {},
-              "xml": {}
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
             },
             "javaResources": {
               "fileCount": 0
@@ -299,18 +299,18 @@ class BuildFeaturesTests {
               "fileCount": 0
             },
             "androidResources": {
-              "animator": {},
-              "anim": {},
-              "color": {},
-              "drawable": {},
-              "font": {},
-              "layout": {},
-              "menu": {},
-              "mipmap": {},
-              "raw": {},
-              "transition": {},
-              "values": {},
-              "xml": {}
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
             },
             "javaResources": {
               "fileCount": 0
@@ -361,18 +361,18 @@ class BuildFeaturesTests {
               "fileCount": 0
             },
             "androidResources": {
-              "animator": {},
-              "anim": {},
-              "color": {},
-              "drawable": {},
-              "font": {},
-              "layout": {},
-              "menu": {},
-              "mipmap": {},
-              "raw": {},
-              "transition": {},
-              "values": {},
-              "xml": {}
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
             },
             "javaResources": {
               "fileCount": 0
@@ -423,18 +423,18 @@ class BuildFeaturesTests {
               "fileCount": 0
             },
             "androidResources": {
-              "animator": {},
-              "anim": {},
-              "color": {},
-              "drawable": {},
-              "font": {},
-              "layout": {},
-              "menu": {},
-              "mipmap": {},
-              "raw": {},
-              "transition": {},
-              "values": {},
-              "xml": {}
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
             },
             "javaResources": {
               "fileCount": 0
@@ -485,18 +485,18 @@ class BuildFeaturesTests {
               "fileCount": 0
             },
             "androidResources": {
-              "animator": {},
-              "anim": {},
-              "color": {},
-              "drawable": {},
-              "font": {},
-              "layout": {},
-              "menu": {},
-              "mipmap": {},
-              "raw": {},
-              "transition": {},
-              "values": {},
-              "xml": {}
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
             },
             "javaResources": {
               "fileCount": 0
@@ -552,18 +552,18 @@ class BuildFeaturesTests {
               "fileCount": 0
             },
             "androidResources": {
-              "animator": {},
-              "anim": {},
-              "color": {},
-              "drawable": {},
-              "font": {},
-              "layout": {},
-              "menu": {},
-              "mipmap": {},
-              "raw": {},
-              "transition": {},
-              "values": {},
-              "xml": {}
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
             },
             "javaResources": {
               "fileCount": 0
@@ -631,18 +631,18 @@ class BuildFeaturesTests {
               "fileCount": 0
             },
             "androidResources": {
-              "animator": {},
-              "anim": {},
-              "color": {},
-              "drawable": {},
-              "font": {},
-              "layout": {},
-              "menu": {},
-              "mipmap": {},
-              "raw": {},
-              "transition": {},
-              "values": {},
-              "xml": {}
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
             },
             "javaResources": {
               "fileCount": 0
@@ -735,97 +735,83 @@ class BuildFeaturesTests {
               "fileCount": 0
             },
             "androidResources": {
-              "animator": {},
-              "anim": {},
-              "color": {},
-              "drawable": {
-                "": {
-                  ".xml": 1,
-                  ".png": 0,
-                  ".9.png": 0,
-                  ".jpg": 0,
-                  ".gif": 0
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [
+                {
+                  "qualifiers": "",
+                  "extension": ".xml",
+                  "quantity": 1
                 },
-                "v24": {
-                  ".xml": 1,
-                  ".png": 0,
-                  ".9.png": 0,
-                  ".jpg": 0,
-                  ".gif": 0
+                {
+                  "qualifiers": "v24",
+                  "extension": ".xml",
+                  "quantity": 1
                 }
-              },
-              "font": {},
-              "layout": {
-                "": {
-                  ".xml": 4
+              ],
+              "font": [],
+              "layout": [
+                {
+                  "qualifiers": "",
+                  "extension": ".xml",
+                  "quantity": 4
                 }
-              },
-              "menu": {
-                "": {
-                  ".xml": 1
+              ],
+              "menu": [
+                {
+                  "qualifiers": "",
+                  "extension": ".xml",
+                  "quantity": 1
                 }
-              },
-              "mipmap": {
-                "anydpi-v26": {
-                  ".xml": 2,
-                  ".png": 0,
-                  ".9.png": 0,
-                  ".jpg": 0,
-                  ".gif": 0,
-                  ".webp": 0
+              ],
+              "mipmap": [
+                {
+                  "qualifiers": "anydpi-v26",
+                  "extension": ".xml",
+                  "quantity": 2
                 },
-                "hdpi": {
-                  ".xml": 0,
-                  ".png": 0,
-                  ".9.png": 0,
-                  ".jpg": 0,
-                  ".gif": 0,
-                  ".webp": 2
+                {
+                  "qualifiers": "hdpi",
+                  "extension": ".webp",
+                  "quantity": 2
                 },
-                "mdpi": {
-                  ".xml": 0,
-                  ".png": 0,
-                  ".9.png": 0,
-                  ".jpg": 0,
-                  ".gif": 0,
-                  ".webp": 2
+                {
+                  "qualifiers": "mdpi",
+                  "extension": ".webp",
+                  "quantity": 2
                 },
-                "xhdpi": {
-                  ".xml": 0,
-                  ".png": 0,
-                  ".9.png": 0,
-                  ".jpg": 0,
-                  ".gif": 0,
-                  ".webp": 2
+                {
+                  "qualifiers": "xhdpi",
+                  "extension": ".webp",
+                  "quantity": 2
                 },
-                "xxhdpi": {
-                  ".xml": 0,
-                  ".png": 0,
-                  ".9.png": 0,
-                  ".jpg": 0,
-                  ".gif": 0,
-                  ".webp": 2
+                {
+                  "qualifiers": "xxhdpi",
+                  "extension": ".webp",
+                  "quantity": 2
                 },
-                "xxxhdpi": {
-                  ".xml": 0,
-                  ".png": 0,
-                  ".9.png": 0,
-                  ".jpg": 0,
-                  ".gif": 0,
-                  ".webp": 2
+                {
+                  "qualifiers": "xxxhdpi",
+                  "extension": ".webp",
+                  "quantity": 2
                 }
-              },
-              "raw": {},
-              "transition": {},
-              "values": {
-                "": {
-                  ".xml": 4
+              ],
+              "raw": [],
+              "transition": [],
+              "values": [
+                {
+                  "qualifiers": "",
+                  "extension": ".xml",
+                  "quantity": 4
                 },
-                "night": {
-                  ".xml": 1
+                {
+                  "qualifiers": "night",
+                  "extension": ".xml",
+                  "quantity": 1
                 }
-              },
-              "xml": {}
+              ],
+              "xml": []
             },
             "javaResources": {
               "fileCount": 2

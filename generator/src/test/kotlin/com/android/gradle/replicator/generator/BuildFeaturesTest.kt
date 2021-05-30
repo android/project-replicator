@@ -252,17 +252,17 @@ class BuildFeaturesTest: BaseTest() {
     "fileCount": 1
   },
   "androidResources": {
-    "animator": {},
-    "anim": {},
-    "color": {},
-    "drawable": {},
-    "mipmap": {},
-    "layout": {},
-    "menu": {},
-    "raw": {},
-    "values": {},
-    "xml": {},
-    "font": {}
+    "animator": [],
+    "anim": [],
+    "color": [],
+    "drawable": [],
+    "mipmap": [],
+    "layout": [],
+    "menu": [],
+    "raw": [],
+    "values": [],
+    "xml": [],
+    "font": []
   },
   "javaResources": {
     "fileCount": 0

@@ -85,23 +85,17 @@ internal class ModuleAdapterTest {
             fileCount = 2
         }
         androidResources {
-            fileCount = AndroidResourceFolders(mutableMapOf(
-                    "mipmap" to AndroidResourceQualifiers(mutableMapOf(
-                            "" to AndroidResourceExtensions(mutableMapOf(
-                                    ".xml" to 3,
-                                    ".png" to 2
-                            )),
-                            "hidpi" to AndroidResourceExtensions(mutableMapOf(
-                                    ".xml" to 3,
-                                    ".png" to 2
-                            ))
-                    )),
-                    "values" to AndroidResourceQualifiers(mutableMapOf(
-                            "" to AndroidResourceExtensions(mutableMapOf(
-                                    ".xml" to 5
-                            ))
-                    ))
-            ))
+            fileCount = mutableMapOf(
+                    "mipmap" to mutableListOf(
+                            AndroidResourceProperties(qualifiers = "", extension = ".xml", quantity = 3),
+                            AndroidResourceProperties(qualifiers = "", extension = ".png", quantity = 2),
+                            AndroidResourceProperties(qualifiers = "hidpi", extension = ".xml", quantity = 3),
+                            AndroidResourceProperties(qualifiers = "hidpi", extension = ".png", quantity = 2)
+                    ),
+                    "values" to mutableListOf(
+                            AndroidResourceProperties(qualifiers = "", extension = ".xml", quantity = 5)
+                    )
+            )
         }
         javaResources {
             fileCount = 3
@@ -148,21 +142,35 @@ private val FULL_MODULE = """
         "fileCount": 2
       },
       "androidResources": {
-        "mipmap": {
-          "": {
-            ".xml": 3,
-            ".png": 2
+        "mipmap": [
+          {
+            "qualifiers": "",
+            "extension": ".xml",
+            "quantity": 3
           },
-          "hidpi": {
-            ".xml": 3,
-            ".png": 2
+          {
+            "qualifiers": "",
+            "extension": ".png",
+            "quantity": 2
+          },
+          {
+            "qualifiers": "hidpi",
+            "extension": ".xml",
+            "quantity": 3
+          },
+          {
+            "qualifiers": "hidpi",
+            "extension": ".png",
+            "quantity": 2
           }
-        },
-        "values": {
-          "": {
-            ".xml": 5
+        ],
+        "values": [
+          {
+            "qualifiers": "",
+            "extension": ".xml",
+            "quantity": 5
           }
-        }
+        ]
       },
       "javaResources": {
         "fileCount": 3

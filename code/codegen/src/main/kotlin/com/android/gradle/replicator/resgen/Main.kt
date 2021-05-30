@@ -79,9 +79,9 @@ class Main {
 
         val arguments = argumentsBuilder.build()
 
-        if (countResources(arguments.numberOfAndroidResources) > 0) {
+        if (countResources(arguments.androidResourcesMap) > 0) {
             generateAndroidResources(
-                    arguments.numberOfAndroidResources,
+                    arguments.androidResourcesMap,
                     arguments,
                     androidOutputFolder
             )
@@ -95,50 +95,15 @@ class Main {
         }
     }
 
-    // TODO: implement other generators
-    private fun getGenerator(random: Random, folderType: String): ResourceGenerator {
-        return when(folderType) {
-            //"animator" ->
-            //"anim" ->
-            //"color" ->
-            //"drawable" ->
-            //"font" ->
-            //"layout" ->
-            //"menu" ->
-            //"mipmap" ->
-            //"raw" ->
-            //"transition" ->
-            "values" -> ValueResourceGenerator(random)
-            //"xml" ->
-            else -> throw RuntimeException("Unsupported resource type $folderType")
-        }
-    }
-
     private fun generateAndroidResources(
             resMap: AndroidResourceMap,
             parameters: ResourceGenerationParameters,
             outputFolder: File) {
-        resMap.forEach { folder ->
+        resMap.forEach { resourceType ->
             val random = Random(parameters.seed)
-            val generator = getGenerator(random, folder.key)
-            folder.value.forEach { qualifier ->
-                // empty qualifiers means the folder is unqualified, as in "mipmap" instead of "mipmap-hidpi"
-                val qualifiedFolder =
-                        if (qualifier.key.isEmpty()) {
-                            File(outputFolder, folder.key)
-                        } else {
-                            File(outputFolder, "${folder.key}-${qualifier.key}")
-                        }
-                qualifiedFolder.mkdirs()
-
-                qualifier.value.forEach { extension ->
-                    generator.generateResource(
-                            number = extension.value,
-                            outputFolder = qualifiedFolder,
-                            resourceQualifier = qualifier.key,
-                            resourceExtension = extension.key
-                    )
-                }
+            val generator = GeneratorDriver(random)
+            resourceType.value.forEach { resourceProperties ->
+                generator.generateResources(outputFolder, resourceType.key, resourceProperties)
             }
         }
     }
@@ -171,10 +136,8 @@ class Main {
     private fun countResources(res: AndroidResourceMap): Int {
         var count = 0
         res.forEach { folder ->
-            folder.value.forEach { qualifier ->
-                qualifier.value.forEach { extension ->
-                    count += extension.value
-                }
+            folder.value.forEach { resourceType ->
+                count += resourceType.quantity
             }
         }
         return count
