@@ -133,7 +133,7 @@ abstract class GatherModuleInfoTask : DefaultTask() {
             folderConvention: Map<String, List<String>>,
             androidInputs: AndroidInfoInputs?
     ): DefaultAndroidResourcesInfo {
-        val fileCount = AndroidResourceFolders(mutableMapOf())
+        val fileCount: AndroidResourceMap = mutableMapOf()
 
         // Separate folders in res
         val projectResourceFolders = mutableSetOf<File>()
@@ -153,8 +153,8 @@ abstract class GatherModuleInfoTask : DefaultTask() {
 
         // For each folder in the android resource convention (mipmap, mipmap-hidpi, xml, etc.)
         for (conventionFolder in folderConvention) {
-            // Create the container for qualifiers for that folder
-            fileCount.folders[conventionFolder.key] = AndroidResourceQualifiers(mutableMapOf())
+            // Create container for resources
+            fileCount[conventionFolder.key] = mutableListOf()
 
             // Filter project folders by matching ones
             val folderPattern = "${conventionFolder.key}(?:-(.*))?".toRegex()
@@ -167,16 +167,18 @@ abstract class GatherModuleInfoTask : DefaultTask() {
                 // Get folder qualifier, if any, such as mipmap-(hidpi). Qualifier is "" for unqualified folders
                 val qualifierMatch = folderPattern.matchEntire(projectFolder.name)!!.groupValues[1]
 
-                // Create container for extensions for that qualifier
-                fileCount.folders[conventionFolder.key]!!.qualifiers[qualifierMatch] =
-                        AndroidResourceExtensions(mutableMapOf())
-
-                // For each accepted extension
+                // For each accepted extension, create resource data with qualifiers, extension and quantity
                 for (extension in conventionFolder.value) {
-                    fileCount.folders[conventionFolder.key]!!.qualifiers[qualifierMatch]!!.extensions[extension] =
-                    androidResourceFiles?.matching {
+                    val quantity = androidResourceFiles?.matching {
                         it.include("**/${projectFolder.name}/*${extension}")
                     }?.files?.size ?: 0
+                    if (quantity > 0) {
+                        fileCount[conventionFolder.key]!!.add(AndroidResourceProperties(
+                                qualifiers = qualifierMatch,
+                                extension = extension,
+                                quantity = quantity
+                        ))
+                    }
                 }
             }
         }

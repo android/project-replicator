@@ -66,18 +66,18 @@ class AndroidPluginTests {
                   "fileCount": 0
                 },
                 "androidResources": {
-                  "animator": {},
-                  "anim": {},
-                  "color": {},
-                  "drawable": {},
-                  "font": {},
-                  "layout": {},
-                  "menu": {},
-                  "mipmap": {},
-                  "raw": {},
-                  "transition": {},
-                  "values": {},
-                  "xml": {}
+                  "animator": [],
+                  "anim": [],
+                  "color": [],
+                  "drawable": [],
+                  "font": [],
+                  "layout": [],
+                  "menu": [],
+                  "mipmap": [],
+                  "raw": [],
+                  "transition": [],
+                  "values": [],
+                  "xml": []
                 },
                 "javaResources": {
                   "fileCount": 0
@@ -145,18 +145,18 @@ class AndroidPluginTests {
                   "fileCount": 0
                 },
                 "androidResources": {
-                  "animator": {},
-                  "anim": {},
-                  "color": {},
-                  "drawable": {},
-                  "font": {},
-                  "layout": {},
-                  "menu": {},
-                  "mipmap": {},
-                  "raw": {},
-                  "transition": {},
-                  "values": {},
-                  "xml": {}
+                  "animator": [],
+                  "anim": [],
+                  "color": [],
+                  "drawable": [],
+                  "font": [],
+                  "layout": [],
+                  "menu": [],
+                  "mipmap": [],
+                  "raw": [],
+                  "transition": [],
+                  "values": [],
+                  "xml": []
                 },
                 "javaResources": {
                   "fileCount": 0

@@ -16,9 +16,8 @@
 
 package com.android.gradle.replicator.model.internal
 
-import com.android.gradle.replicator.model.AndroidResourceExtensions
-import com.android.gradle.replicator.model.AndroidResourceFolders
-import com.android.gradle.replicator.model.AndroidResourceQualifiers
+import com.android.gradle.replicator.model.AndroidResourceProperties
+import com.android.gradle.replicator.model.AndroidResourceMap
 import com.android.gradle.replicator.model.AndroidResourcesInfo
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
@@ -40,62 +39,72 @@ val ANDROID_RESOURCE_FOLDERS = mapOf(
 )
 
 data class DefaultAndroidResourcesInfo(
-        override val fileCount: AndroidResourceFolders
-) : AndroidResourcesInfo {
-    override val asMap: MutableMap<String, MutableMap<String, MutableMap<String, Int>>> =
-        fileCount.folders.mapValues { folder ->
-                folder.value.qualifiers.mapValues { qualifier ->
-                            qualifier.value.extensions
-                } as MutableMap
-        } as MutableMap
-}
+        override val resourceMap: AndroidResourceMap
+) : AndroidResourcesInfo
 
 /* Resource folders fname-mod1, fname, fname-mod2 becomes:
  * "resources": {
- *     "fname" : {
- *         "":  {
- *             ".xml": 2
+ *     "fname" : [
+ *         {
+ *             "qualifiers": "",
+ *             "extension": ".xml",
+ *             "quantity": 2
  *         },
- *         "mod1": {
- *             ".xml": 3
+ *         {
+ *             "qualifiers": "mod1",
+ *             "extension": ".xml",
+ *             "quantity": 3
  *         },
- *         "mod2": {
- *             ".xml": 2,
- *             ".png": 1
+ *         {
+ *             "qualifiers": "mod2",
+ *             "extension": ".xml",
+ *             "quantity": 2
+ *         },
+ *         {
+ *             "qualifiers": "mod2",
+ *             "extension": ".png",
+ *             "quantity": 1
  *         }
- *     },
+ *     ],
  * ...
  * }
  */
 class AndroidResourcesAdapter: TypeAdapter<AndroidResourcesInfo>() {
     override fun write(output: JsonWriter, value: AndroidResourcesInfo) {
         output.beginObject()
-        for (folder in value.fileCount.folders) {
-            val folderObject = output.name(folder.key).beginObject()
-            for (qualifier in folder.value.qualifiers) {
-                val qualifierObject = folderObject.name(qualifier.key).beginObject()
-                for (extension in qualifier.value.extensions) {
-                    qualifierObject.name(extension.key).value(extension.value)
-                }
-                qualifierObject.endObject()
+        for (resourceType in value.resourceMap) {
+            val folderObject = output.name(resourceType.key).beginArray()
+            for (resourceProperties in resourceType.value) {
+                val resourceObject = folderObject.beginObject()
+                resourceObject.name("qualifiers").value(resourceProperties.qualifiers)
+                resourceObject.name("extension").value(resourceProperties.extension)
+                resourceObject.name("quantity").value(resourceProperties.quantity)
+                resourceObject.endObject()
             }
-            folderObject.endObject()
+            folderObject.endArray()
         }
         output.endObject()
     }
 
     override fun read(input: JsonReader): AndroidResourcesInfo {
-        val fileCount = AndroidResourceFolders(mutableMapOf())
+        val fileCount: AndroidResourceMap = mutableMapOf()
 
         // Read folder properties
         input.readObjectProperties { folderName ->
-            fileCount.folders[folderName] = AndroidResourceQualifiers(mutableMapOf())
-            // Read modifier properties
-            this.readObjectProperties { qualifierName ->
-                fileCount.folders[folderName]!!.qualifiers[qualifierName] = AndroidResourceExtensions(mutableMapOf())
-                this.readObjectProperties { extensionName ->
-                    fileCount.folders[folderName]!!.qualifiers[qualifierName]!!.extensions[extensionName] = nextInt()
+            fileCount[folderName] = mutableListOf()
+            // Read resource properties
+            this.readArray {
+                var qualifiers: String? = null
+                var extension: String? = null
+                var quantity: Int? = null
+                this.readObjectProperties { property ->
+                    when (property) {
+                        "qualifiers" -> qualifiers = this.nextString()
+                        "extension" -> extension = this.nextString()
+                        "quantity" -> quantity = this.nextInt()
+                    }
                 }
+                fileCount[folderName]!!.add(AndroidResourceProperties(qualifiers!!, extension!!, quantity!!))
             }
         }
 

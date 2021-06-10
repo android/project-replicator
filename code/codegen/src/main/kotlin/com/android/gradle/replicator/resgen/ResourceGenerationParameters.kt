@@ -16,7 +16,9 @@
  */
 package com.android.gradle.replicator.resgen
 
-typealias AndroidResourceMap = Map<String, Map<String, Map<String, Int>>>
+data class AndroidResourceProperties (val qualifiers: String, val extension: String, val quantity: Int)
+
+typealias AndroidResourceMap = Map<String, List<AndroidResourceProperties>>
 
 /**
  * Parameters for the generation for a module.
@@ -30,7 +32,7 @@ data class ResourceGenerationParameters(
         /**
          * Number of Android resource files that should be generated in this module, separated by type
          */
-        val numberOfAndroidResources: AndroidResourceMap,
+        val androidResourcesMap: AndroidResourceMap,
 
         /**
          * Number of Java resource files that should be generated in this module
@@ -51,7 +53,7 @@ data class ResourceGenerationParameters(
         fun build(): ResourceGenerationParameters =
                 ResourceGenerationParameters(
                         seed = seed,
-                        numberOfAndroidResources = nbOfAndroidResources,
+                        androidResourcesMap = nbOfAndroidResources,
                         numberOfJavaResources = nbOfJavaResources
                 )
     }
