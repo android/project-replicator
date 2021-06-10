@@ -18,12 +18,12 @@ package com.android.gradle.replicator
 
 import com.android.gradle.replicator.collectors.AndroidInfoInputs
 import com.android.gradle.replicator.collectors.DefaultAndroidCollector
-import com.android.gradle.replicator.model.DependencyType
-import com.android.gradle.replicator.model.PluginType
-import com.android.gradle.replicator.model.Serializer
+import com.android.gradle.replicator.model.*
 import com.android.gradle.replicator.model.internal.DefaultDependenciesInfo
 import com.android.gradle.replicator.model.internal.DefaultModuleInfo
+import com.android.gradle.replicator.model.internal.DefaultAndroidResourcesInfo
 import com.android.gradle.replicator.model.internal.DefaultSourceFilesInfo
+import com.android.gradle.replicator.model.internal.ANDROID_RESOURCE_FOLDERS
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -31,11 +31,14 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.file.ReproducibleFileVisitor
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
+import java.io.File
 
 abstract class GatherModuleInfoTask : DefaultTask() {
     @get:Input
@@ -55,6 +58,11 @@ abstract class GatherModuleInfoTask : DefaultTask() {
     @get:Optional
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val javaSourceSets: ConfigurableFileCollection
+
+    @get:InputFiles
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val javaResourceSets: ConfigurableFileCollection
 
     @get:OutputFile
     abstract val outputFile : RegularFileProperty
@@ -77,11 +85,28 @@ abstract class GatherModuleInfoTask : DefaultTask() {
             null
         }
 
+        val androidResources = if (pluginList.containsAndroid()) {
+            getAndroidResourceFilesInfo(
+                    ANDROID_RESOURCE_FOLDERS, androidInputs)
+        } else {
+            null
+        }
+
+        val javaResources = if (pluginList.containsJava()
+                || pluginList.containsAndroid()
+                || pluginList.containsKotlin()) {
+            getJavaResourceFilesInfo(androidInputs)
+        } else {
+            null
+        }
+
         val moduleInfo = DefaultModuleInfo(
             path = projectPath.get(),
             plugins = plugins.get(),
             javaSources = javaSources,
             kotlinSources = kotlinSources,
+            androidResources = androidResources,
+            javaResources = javaResources,
             dependencies = dependencies.get().map { it.toInfo() },
             android = androidInputs?.toInfo()
         )
@@ -100,6 +125,70 @@ abstract class GatherModuleInfoTask : DefaultTask() {
         fileCount += androidInputs?.javaFolders?.asFileTree?.matching {
             it.include(pattern)
         }?.files?.size ?: 0
+
+        return DefaultSourceFilesInfo(fileCount)
+    }
+
+    private fun getAndroidResourceFilesInfo(
+            folderConvention: Map<String, List<String>>,
+            androidInputs: AndroidInfoInputs?
+    ): DefaultAndroidResourcesInfo {
+        val fileCount: AndroidResourceMap = mutableMapOf()
+
+        // Separate folders in res
+        val projectResourceFolders = mutableSetOf<File>()
+
+        val dirVisitor = object : ReproducibleFileVisitor {
+            override fun isReproducibleFileOrder() = true
+            override fun visitFile(details: FileVisitDetails) {
+                // Do nothing.
+            }
+            override fun visitDir(fileVisitDetails: FileVisitDetails) {
+                projectResourceFolders.add(fileVisitDetails.file)
+            }
+        }
+
+        val androidResourceFiles = androidInputs?.androidResourceFolders?.asFileTree
+        androidResourceFiles?.visit(dirVisitor)
+
+        // For each folder in the android resource convention (mipmap, mipmap-hidpi, xml, etc.)
+        for (conventionFolder in folderConvention) {
+            // Create container for resources
+            fileCount[conventionFolder.key] = mutableListOf()
+
+            // Filter project folders by matching ones
+            val folderPattern = "${conventionFolder.key}(?:-(.*))?".toRegex()
+
+            val matchingFolders = projectResourceFolders.filter {
+                folderPattern.matches(it.name)
+            }
+
+            for (projectFolder in matchingFolders) {
+                // Get folder qualifier, if any, such as mipmap-(hidpi). Qualifier is "" for unqualified folders
+                val qualifierMatch = folderPattern.matchEntire(projectFolder.name)!!.groupValues[1]
+
+                // For each accepted extension, create resource data with qualifiers, extension and quantity
+                for (extension in conventionFolder.value) {
+                    val quantity = androidResourceFiles?.matching {
+                        it.include("**/${projectFolder.name}/*${extension}")
+                    }?.files?.size ?: 0
+                    if (quantity > 0) {
+                        fileCount[conventionFolder.key]!!.add(AndroidResourceProperties(
+                                qualifiers = qualifierMatch,
+                                extension = extension,
+                                quantity = quantity
+                        ))
+                    }
+                }
+            }
+        }
+        return DefaultAndroidResourcesInfo(fileCount)
+    }
+
+    private fun getJavaResourceFilesInfo(androidInputs: AndroidInfoInputs?): DefaultSourceFilesInfo {
+        var fileCount = javaResourceSets.asFileTree.files.size
+
+        fileCount += androidInputs?.javaResourceFolders?.asFileTree?.files?.size ?: 0
 
         return DefaultSourceFilesInfo(fileCount)
     }
@@ -130,13 +219,19 @@ abstract class GatherModuleInfoTask : DefaultTask() {
             if (appliedPlugins.containsJava()) {
                 val javaConvention = project.convention.findPlugin(JavaPluginConvention::class.java)
                 if (javaConvention != null) {
-                    val dirs = javaConvention.sourceSets.findByName(SourceSet.MAIN_SOURCE_SET_NAME)?.allSource?.srcDirs
-                    dirs?.let {
+                    val mainSrcSet = javaConvention.sourceSets.findByName(SourceSet.MAIN_SOURCE_SET_NAME)
+                    // Java source files
+                    mainSrcSet?.allSource?.srcDirs?.let {
                         task.javaSourceSets.from(it)
+                    }
+                    // Java resources
+                    mainSrcSet?.resources?.srcDirs?.let {
+                        task.javaResourceSets.from(it)
                     }
                 }
             }
             task.javaSourceSets.disallowChanges()
+            task.javaResourceSets.disallowChanges()
 
             // dependencies
             task.dependencies.set(project.configurations.asSequence()

@@ -63,9 +63,15 @@ class DefaultAndroidCollector : AndroidCollector {
             )
 
             // FIXME when we get to provide flavor/build type info, then we can augment this.
-            val dirs = baseExtension.sourceSets.findByName("main")?.java?.srcDirs
-            dirs?.let {
-                inputs.javaFolders.from(dirs)
+            val mainSrcSet = baseExtension.sourceSets.findByName("main")
+            mainSrcSet?.java?.srcDirs?.let {
+                inputs.javaFolders.from(it)
+            }
+            mainSrcSet?.res?.srcDirs?.let {
+                inputs.androidResourceFolders.from(it)
+            }
+            mainSrcSet?.resources?.srcDirs.let {
+                inputs.javaResourceFolders.from(it)
             }
 
             inputs
@@ -134,6 +140,14 @@ abstract class AndroidInfoInputs @Inject constructor(
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val javaFolders: ConfigurableFileCollection
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val androidResourceFolders: ConfigurableFileCollection
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val javaResourceFolders: ConfigurableFileCollection
 
     fun toInfo(): DefaultAndroidInfo {
         return DefaultAndroidInfo(compileSdkVersion, minSdkVersion, targetSdkVersion, buildFeatures.toInfo())

@@ -38,9 +38,19 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
             current.name
         }
 
+        val generateResourcesTask = project.tasks.register(
+                "generateResources",
+                GenerateResources::class.java) { task ->
+
+            task.parameters.set(project.layout.projectDirectory.file("resource-metadata.json"))
+            task.seed.set(Random.nextInt())
+            task.androidOutputDirectory.set(project.layout.projectDirectory.dir("src/res"))
+            task.javaOutputDirectory.set(project.layout.projectDirectory.dir("src/resources"))
+        }
+
         val generateTask = project.tasks.register(
                 "generateCodegenParams",
-                GenerateParamsTask::class.java) { task ->
+                GenerateCodegenParamsTask::class.java) { task ->
 
             // elements we publish to others, all of our public methods must only use types coming from these elements.
             val configApi = project.configurations.getAt("debugApiElements")
@@ -149,9 +159,7 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
             // Randomizer values should be set during project replication along the number of java and kotlin files.
             task.seed.set(Random.nextInt())
 
-            val projectMetadata = loadModuleMetadata(project)
-            task.nbOfJavaFiles.set(projectMetadata.javaSources)
-            task.nbOfKotlinFiles.set(projectMetadata.kotlinSources)
+            task.moduleMetadataJson.set(project.file("module-metadata.json"))
 
             // make sure we depend on our dependencies built artifacts so we have access to their generated classes.
             projectDependencies.forEach {
@@ -160,13 +168,14 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
                     "$it:assembleDebug"
                 } else "$it:assemble")
             }
+            task.dependsOn(generateResourcesTask)
         }
 
         val generateCodeTask = project.tasks.register(
                 "generateCode",
                 GenerateCode::class.java) { task ->
 
-            task.parameters.set(generateTask.flatMap(GenerateParamsTask::paramsFile))
+            task.parameters.set(generateTask.flatMap(GenerateCodegenParamsTask::paramsFile))
             task.outputDirectory.set(
                     project.layout.projectDirectory.dir("src/main/java")
             )

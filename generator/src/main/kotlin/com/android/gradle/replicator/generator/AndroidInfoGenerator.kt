@@ -17,18 +17,18 @@
 
 package com.android.gradle.replicator.generator
 
-import com.android.gradle.replicator.generator.resources.ResourceGenerator
+import com.android.gradle.replicator.generator.manifest.ManifestGenerator
 import com.android.gradle.replicator.generator.writer.DslWriter
 import com.android.gradle.replicator.model.AndroidInfo
 import com.android.gradle.replicator.model.BuildFeaturesInfo
 import java.io.File
 
 internal fun AndroidInfo.generate(
-    folder: File,
-    dslWriter: DslWriter,
-    resourceGenerator: ResourceGenerator,
-    gradlePath: String,
-    hasKotlin: Boolean) {
+        folder: File,
+        dslWriter: DslWriter,
+        manifestGenerator: ManifestGenerator,
+        gradlePath: String,
+        hasKotlin: Boolean) {
 
     // generate the android block
     dslWriter.block("android") {
@@ -60,7 +60,7 @@ internal fun AndroidInfo.generate(
     // add "pkg.android." prefix to package in order to guarantee at least 2 segments to the package since it's
     // by aapt
     val packageName = "pkg.android.${gradlePath.split(":").filter { it.isNotBlank() }.joinToString(".")}"
-    resourceGenerator.generateManifest(folder, packageName)
+    manifestGenerator.generateManifest(folder, packageName)
 }
 
 private fun BuildFeaturesInfo.generateBuildFeatures(dslWriter: DslWriter) {

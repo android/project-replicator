@@ -31,7 +31,7 @@ import kotlin.reflect.jvm.javaMethod
 import kotlin.reflect.jvm.jvmErasure
 
 class GeneratorDriver(
-        private val parameters: GenerationParameters,
+        private val parameters: CodeGenerationParameters,
         private val random: Random,
         private val generatorAllocator: (printer: PrettyPrintStream, listeners: List<CodeGenerationListener>) -> ClassGenerator
 ): SourceGenerator {

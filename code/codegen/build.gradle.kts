@@ -51,8 +51,10 @@ kotlin {
 dependencies {
     implementation(project(":model"))
 
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("com.google.guava:guava:30.0-jre")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")

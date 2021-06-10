@@ -40,6 +40,16 @@ interface ModuleInfo {
     val kotlinSources: SourceFilesInfo?
 
     /**
+     * Number of each android resource files.
+     */
+    val androidResources: AndroidResourcesInfo?
+
+    /**
+     * Number of each java resource files.
+     */
+    val javaResources: SourceFilesInfo?
+
+    /**
      * List of direct dependencies with their scope
      */
     val dependencies: List<DependenciesInfo>

@@ -22,12 +22,14 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 
 data class DefaultModuleInfo(
-    override val path: String,
-    override val plugins: List<PluginType>,
-    override val javaSources: SourceFilesInfo?,
-    override val kotlinSources: SourceFilesInfo?,
-    override val dependencies: List<DependenciesInfo>,
-    override val android: AndroidInfo?
+        override val path: String,
+        override val plugins: List<PluginType>,
+        override val javaSources: SourceFilesInfo?,
+        override val kotlinSources: SourceFilesInfo?,
+        override val androidResources: AndroidResourcesInfo?,
+        override val javaResources: SourceFilesInfo?,
+        override val dependencies: List<DependenciesInfo>,
+        override val android: AndroidInfo?
 ) : ModuleInfo
 
 class ModuleAdapter: TypeAdapter<DefaultModuleInfo>() {
@@ -50,6 +52,16 @@ class ModuleAdapter: TypeAdapter<DefaultModuleInfo>() {
             SourceFilesAdapter().write(output, it)
         }
 
+        value.androidResources?.let {
+            output.name("androidResources")
+            AndroidResourcesAdapter().write(output, it)
+        }
+
+        value.javaResources?.let {
+            output.name("javaResources")
+            SourceFilesAdapter().write(output, it)
+        }
+
         val adapter = DependenciesAdapter()
         value.dependencies.toJsonArray("dependencies", output) {
             adapter.write(this, it)
@@ -68,10 +80,13 @@ class ModuleAdapter: TypeAdapter<DefaultModuleInfo>() {
         var plugins: List<PluginType> = listOf()
         var javaSources: SourceFilesInfo? = null
         var kotlinSources: SourceFilesInfo? = null
+        var androidResources: AndroidResourcesInfo? = null
+        var javaResources: SourceFilesInfo? = null
         var dependencies: List<DependenciesInfo> = listOf()
         var androidInfo: AndroidInfo? = null
 
         val sourceFilesAdapter = SourceFilesAdapter()
+        val resourcesAdapter = AndroidResourcesAdapter()
 
         input.readObjectProperties {
             when (it) {
@@ -84,6 +99,8 @@ class ModuleAdapter: TypeAdapter<DefaultModuleInfo>() {
 
                 "javaSources" -> javaSources = sourceFilesAdapter.read(input)
                 "kotlinSources" -> kotlinSources = sourceFilesAdapter.read(input)
+                "androidResources" -> androidResources = resourcesAdapter.read(input)
+                "javaResources" -> javaResources = sourceFilesAdapter.read(input)
                 "dependencies" -> {
                     val dependenciesAdapter = DependenciesAdapter()
                     dependencies = input.readArrayToList {
@@ -100,6 +117,8 @@ class ModuleAdapter: TypeAdapter<DefaultModuleInfo>() {
             plugins = plugins,
             javaSources = javaSources,
             kotlinSources = kotlinSources,
+            androidResources = androidResources,
+            javaResources = javaResources,
             dependencies = dependencies,
             android = androidInfo
         )

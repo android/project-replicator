@@ -39,7 +39,7 @@ class JavaLibraryCodegenPlugin: AbstractCodeGenPlugin() {
 
         val generateTask = project.tasks.register(
                 "generateCodegenParams",
-                GenerateParamsTask::class.java) { task ->
+                GenerateCodegenParamsTask::class.java) { task ->
 
             task.paramsFile.set(project.layout.buildDirectory.file("test.params"))
 
@@ -85,16 +85,14 @@ class JavaLibraryCodegenPlugin: AbstractCodeGenPlugin() {
             // Randomizer values should be set during project replication along the number of java and kotlin files.
             task.seed.set(Random.nextInt())
 
-            val projectMetadata = loadModuleMetadata(project)
-            task.nbOfJavaFiles.set(projectMetadata.javaSources)
-            task.nbOfKotlinFiles.set(projectMetadata.kotlinSources)
+            task.moduleMetadataJson.set(project.file("module-metadata.json"))
         }
 
         val generateCodeTask = project.tasks.register(
                 "generateCode",
                 GenerateCode::class.java) { task ->
 
-            task.parameters.set(generateTask.flatMap(GenerateParamsTask::paramsFile))
+            task.parameters.set(generateTask.flatMap(GenerateCodegenParamsTask::paramsFile))
             task.outputDirectory.set(
                     project.layout.projectDirectory.dir("src/main/java")
             )

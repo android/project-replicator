@@ -16,8 +16,7 @@
 
 package com.android.gradle.replicator.model.internal
 
-import com.android.gradle.replicator.model.DependencyType
-import com.android.gradle.replicator.model.PluginType
+import com.android.gradle.replicator.model.*
 import com.android.gradle.replicator.model.internal.fixtures.module
 import com.google.common.truth.Truth
 import org.junit.Test
@@ -85,6 +84,22 @@ internal class ModuleAdapterTest {
         kotlinSources {
             fileCount = 2
         }
+        androidResources {
+            fileCount = mutableMapOf(
+                    "mipmap" to mutableListOf(
+                            AndroidResourceProperties(qualifiers = "", extension = ".xml", quantity = 3),
+                            AndroidResourceProperties(qualifiers = "", extension = ".png", quantity = 2),
+                            AndroidResourceProperties(qualifiers = "hidpi", extension = ".xml", quantity = 3),
+                            AndroidResourceProperties(qualifiers = "hidpi", extension = ".png", quantity = 2)
+                    ),
+                    "values" to mutableListOf(
+                            AndroidResourceProperties(qualifiers = "", extension = ".xml", quantity = 5)
+                    )
+            )
+        }
+        javaResources {
+            fileCount = 3
+        }
 
         dependencies = listOf(
             DefaultDependenciesInfo(DependencyType.MODULE, "module1", "api"),
@@ -125,6 +140,40 @@ private val FULL_MODULE = """
       },
       "kotlinSources": {
         "fileCount": 2
+      },
+      "androidResources": {
+        "mipmap": [
+          {
+            "qualifiers": "",
+            "extension": ".xml",
+            "quantity": 3
+          },
+          {
+            "qualifiers": "",
+            "extension": ".png",
+            "quantity": 2
+          },
+          {
+            "qualifiers": "hidpi",
+            "extension": ".xml",
+            "quantity": 3
+          },
+          {
+            "qualifiers": "hidpi",
+            "extension": ".png",
+            "quantity": 2
+          }
+        ],
+        "values": [
+          {
+            "qualifiers": "",
+            "extension": ".xml",
+            "quantity": 5
+          }
+        ]
+      },
+      "javaResources": {
+        "fileCount": 3
       },
       "dependencies": [
         {

@@ -161,6 +161,8 @@ private class PathNode(
             plugins = module.plugins,
             javaSources = module.javaSources,
             kotlinSources = module.kotlinSources,
+            javaResources = module.javaResources,
+            androidResources = module.androidResources,
             dependencies = dependencies.map {
                 if (it.type == DependencyType.EXTERNAL_LIBRARY) {
                     it

@@ -65,6 +65,23 @@ class AndroidPluginTests {
                 "javaSources": {
                   "fileCount": 0
                 },
+                "androidResources": {
+                  "animator": [],
+                  "anim": [],
+                  "color": [],
+                  "drawable": [],
+                  "font": [],
+                  "layout": [],
+                  "menu": [],
+                  "mipmap": [],
+                  "raw": [],
+                  "transition": [],
+                  "values": [],
+                  "xml": []
+                },
+                "javaResources": {
+                  "fileCount": 0
+                },
                 "dependencies": [],
                 "android": {
                   "compileSdkVersion": "android-30",
@@ -125,6 +142,23 @@ class AndroidPluginTests {
                   "fileCount": 0
                 },
                 "kotlinSources": {
+                  "fileCount": 0
+                },
+                "androidResources": {
+                  "animator": [],
+                  "anim": [],
+                  "color": [],
+                  "drawable": [],
+                  "font": [],
+                  "layout": [],
+                  "menu": [],
+                  "mipmap": [],
+                  "raw": [],
+                  "transition": [],
+                  "values": [],
+                  "xml": []
+                },
+                "javaResources": {
                   "fileCount": 0
                 },
                 "dependencies": [],

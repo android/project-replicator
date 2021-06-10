@@ -36,8 +36,6 @@ class MainTest(target: Target): BaseCodeGenTest(
         @JvmStatic
         @Parameterized.Parameters(name = "target = {0}")
         fun testParameters(): Array<Target> = arrayOf(Target.Kotlin, Target.Java)
-
-
     }
 
     @get:Rule
@@ -60,7 +58,6 @@ class MainTest(target: Target): BaseCodeGenTest(
         // generate one file.
         Main().process(
             arrayOf(
-                "-gen", target.toString(),
                 "-i", System.getProperty("parameter.file"),
                 "-o", sourceFolder.absolutePath
             )
@@ -74,7 +71,7 @@ class MainTest(target: Target): BaseCodeGenTest(
     }
 
     private val projectDir =
-            File(File(System.getProperty("parameter.file")).parentFile.parentFile, "mainTest/$target").also {
+            File(File(System.getProperty("parameter.file")).parentFile, "mainTest/$target").also {
                 it.mkdirs()
             }
 }

@@ -18,6 +18,7 @@
 package com.android.gradle.replicator
 
 import com.google.common.truth.Truth
+import java.io.File
 import kotlin.test.Test
 
 class BuildFeaturesTests {
@@ -49,6 +50,23 @@ class BuildFeaturesTests {
               "com.android.application"
             ],
             "javaSources": {
+              "fileCount": 0
+            },
+            "androidResources": {
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
+            },
+            "javaResources": {
               "fileCount": 0
             },
             "dependencies": [],
@@ -95,6 +113,23 @@ class BuildFeaturesTests {
             "javaSources": {
               "fileCount": 0
             },
+            "androidResources": {
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
+            },
+            "javaResources": {
+              "fileCount": 0
+            },
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -137,6 +172,23 @@ class BuildFeaturesTests {
               "com.android.application"
             ],
             "javaSources": {
+              "fileCount": 0
+            },
+            "androidResources": {
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
+            },
+            "javaResources": {
               "fileCount": 0
             },
             "dependencies": [],
@@ -184,6 +236,23 @@ class BuildFeaturesTests {
             "javaSources": {
               "fileCount": 0
             },
+            "androidResources": {
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
+            },
+            "javaResources": {
+              "fileCount": 0
+            },
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -227,6 +296,23 @@ class BuildFeaturesTests {
               "com.android.application"
             ],
             "javaSources": {
+              "fileCount": 0
+            },
+            "androidResources": {
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
+            },
+            "javaResources": {
               "fileCount": 0
             },
             "dependencies": [],
@@ -274,6 +360,23 @@ class BuildFeaturesTests {
             "javaSources": {
               "fileCount": 0
             },
+            "androidResources": {
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
+            },
+            "javaResources": {
+              "fileCount": 0
+            },
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -319,6 +422,23 @@ class BuildFeaturesTests {
             "javaSources": {
               "fileCount": 0
             },
+            "androidResources": {
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
+            },
+            "javaResources": {
+              "fileCount": 0
+            },
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -362,6 +482,23 @@ class BuildFeaturesTests {
               "com.android.application"
             ],
             "javaSources": {
+              "fileCount": 0
+            },
+            "androidResources": {
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
+            },
+            "javaResources": {
               "fileCount": 0
             },
             "dependencies": [
@@ -412,6 +549,23 @@ class BuildFeaturesTests {
               "com.android.application"
             ],
             "javaSources": {
+              "fileCount": 0
+            },
+            "androidResources": {
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
+            },
+            "javaResources": {
               "fileCount": 0
             },
             "dependencies": [
@@ -476,6 +630,23 @@ class BuildFeaturesTests {
             "javaSources": {
               "fileCount": 0
             },
+            "androidResources": {
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [],
+              "font": [],
+              "layout": [],
+              "menu": [],
+              "mipmap": [],
+              "raw": [],
+              "transition": [],
+              "values": [],
+              "xml": []
+            },
+            "javaResources": {
+              "fileCount": 0
+            },
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -484,6 +655,173 @@ class BuildFeaturesTests {
               "buildFeatures": {
                 "mlModelBinding": true
               }
+            }
+          },
+          "modules": []
+        }
+        """.trimIndent())
+
+    }
+
+    @Test
+    fun testResources() {
+        val projectSetup = setup()
+
+        //setup resources
+
+        val androidResourceFolder = File(projectSetup.projectDir, "src/main/res")
+        val javaResourceFolder = File(projectSetup.projectDir, "src/main/resources")
+
+        val androidResources = listOf(
+                "drawable/ic_launcher_background.xml",
+                "drawable-v24/ic_launcher_background.xml",
+                "layout/activity_main.xml",
+                "layout/content_main.xml",
+                "layout/fragment_first.xml",
+                "layout/fragment_second.xml",
+                "menu/menu_main.xml",
+                "mipmap-anydpi-v26/ic_launcher_round.xml",
+                "mipmap-anydpi-v26/ic_launcher.xml",
+                "mipmap-hdpi/ic_launcher.webp",
+                "mipmap-hdpi/ic_launcher_round.webp",
+                "mipmap-mdpi/ic_launcher.webp",
+                "mipmap-mdpi/ic_launcher_round.webp",
+                "mipmap-xhdpi/ic_launcher.webp",
+                "mipmap-xhdpi/ic_launcher_round.webp",
+                "mipmap-xxhdpi/ic_launcher.webp",
+                "mipmap-xxhdpi/ic_launcher_round.webp",
+                "mipmap-xxxhdpi/ic_launcher.webp",
+                "mipmap-xxxhdpi/ic_launcher_round.webp",
+                "navigation/nav_graph.xml",
+                "values/colors.xml",
+                "values/dimens.xml",
+                "values/strings.xml",
+                "values/themes.xml",
+                "values-night/themes.xml"
+        )
+
+        val javaResources = listOf(
+                "foo.txt",
+                "bar.json"
+        )
+
+        androidResources.forEach {
+            val resourceFile = File(androidResourceFolder, it)
+            resourceFile.parentFile.mkdirs()
+            resourceFile.createNewFile()
+        }
+
+        javaResources.forEach {
+            val resourceFile = File(javaResourceFolder, it)
+            resourceFile.parentFile.mkdirs()
+            resourceFile.createNewFile()
+        }
+
+        projectSetup.runner.build()
+
+        // Verify the result
+        Truth.assertThat(projectSetup.projectDir.resolve("build/project-structure.json").readText()).isEqualTo("""
+        {
+          "gradle": "$GRADLE_VERSION",
+          "agp": "$AGP_VERSION",
+          "kotlin": "n/a",
+          "properties": [],
+          "rootModule": {
+            "path": ":",
+            "plugins": [
+              "com.android.application"
+            ],
+            "javaSources": {
+              "fileCount": 0
+            },
+            "androidResources": {
+              "animator": [],
+              "anim": [],
+              "color": [],
+              "drawable": [
+                {
+                  "qualifiers": "",
+                  "extension": ".xml",
+                  "quantity": 1
+                },
+                {
+                  "qualifiers": "v24",
+                  "extension": ".xml",
+                  "quantity": 1
+                }
+              ],
+              "font": [],
+              "layout": [
+                {
+                  "qualifiers": "",
+                  "extension": ".xml",
+                  "quantity": 4
+                }
+              ],
+              "menu": [
+                {
+                  "qualifiers": "",
+                  "extension": ".xml",
+                  "quantity": 1
+                }
+              ],
+              "mipmap": [
+                {
+                  "qualifiers": "anydpi-v26",
+                  "extension": ".xml",
+                  "quantity": 2
+                },
+                {
+                  "qualifiers": "hdpi",
+                  "extension": ".webp",
+                  "quantity": 2
+                },
+                {
+                  "qualifiers": "mdpi",
+                  "extension": ".webp",
+                  "quantity": 2
+                },
+                {
+                  "qualifiers": "xhdpi",
+                  "extension": ".webp",
+                  "quantity": 2
+                },
+                {
+                  "qualifiers": "xxhdpi",
+                  "extension": ".webp",
+                  "quantity": 2
+                },
+                {
+                  "qualifiers": "xxxhdpi",
+                  "extension": ".webp",
+                  "quantity": 2
+                }
+              ],
+              "raw": [],
+              "transition": [],
+              "values": [
+                {
+                  "qualifiers": "",
+                  "extension": ".xml",
+                  "quantity": 4
+                },
+                {
+                  "qualifiers": "night",
+                  "extension": ".xml",
+                  "quantity": 1
+                }
+              ],
+              "xml": []
+            },
+            "javaResources": {
+              "fileCount": 2
+            },
+            "dependencies": [],
+            "android": {
+              "compileSdkVersion": "android-30",
+              "minSdkVersion": 24,
+              "targetSdkVersion": 30,
+              "buildFeatures": {}
             }
           },
           "modules": []

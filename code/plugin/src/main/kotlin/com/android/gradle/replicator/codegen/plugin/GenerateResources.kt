@@ -15,30 +15,38 @@
  */
 package com.android.gradle.replicator.codegen.plugin
 
+import com.android.gradle.replicator.resgen.Main
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
-import com.android.gradle.replicator.codegen.Main
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.*
+import kotlin.random.Random
 
-abstract class GenerateCode: DefaultTask() {
+abstract class GenerateResources: DefaultTask() {
 
     @get:InputFile
     abstract val parameters: RegularFileProperty
 
+    @get:Input
+    abstract val seed: Property<Int>
+
     @get:OutputDirectory
-    abstract val outputDirectory: DirectoryProperty
+    abstract val androidOutputDirectory: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val javaOutputDirectory: DirectoryProperty
 
     @TaskAction
     fun taskAction() {
+        val randomizer = if (seed.isPresent) Random(seed.get()) else Random
         // generate files.
         Main().process(
                 arrayOf(
-                        "--module", path.removeSuffix(":$name").removePrefix(":").replace(':', '_'),
-                        "-i", parameters.get().asFile.absolutePath,
-                        "-o", outputDirectory.get().asFile.absolutePath
+                        "--resJson", parameters.get().asFile.absolutePath,
+                        "--androidOutput", androidOutputDirectory.get().asFile.absolutePath,
+                        "--javaOutput", javaOutputDirectory.get().asFile.absolutePath,
+                        "--seed", randomizer.nextInt().toString()
                 )
         )
         println("Done with $name")

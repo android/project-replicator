@@ -50,6 +50,9 @@ class KotlinPluginTests {
                 "kotlinSources": {
                   "fileCount": 0
                 },
+                "javaResources": {
+                  "fileCount": 0
+                },
                 "dependencies": []
               },
               "modules": []
@@ -83,6 +86,9 @@ class KotlinPluginTests {
                   "fileCount": 0
                 },
                 "kotlinSources": {
+                  "fileCount": 0
+                },
+                "javaResources": {
                   "fileCount": 0
                 },
                 "dependencies": []
@@ -131,6 +137,9 @@ class KotlinPluginTests {
                 "kotlinSources": {
                   "fileCount": 0
                 },
+                "javaResources": {
+                  "fileCount": 0
+                },
                 "dependencies": []
               },
               "modules": []
@@ -170,6 +179,9 @@ class KotlinPluginTests {
                 "kotlinSources": {
                   "fileCount": 0
                 },
+                "javaResources": {
+                  "fileCount": 0
+                },
                 "dependencies": []
               },
               "modules": []
@@ -207,6 +219,9 @@ class KotlinPluginTests {
                   "fileCount": 0
                 },
                 "kotlinSources": {
+                  "fileCount": 0
+                },
+                "javaResources": {
                   "fileCount": 0
                 },
                 "dependencies": []
@@ -254,6 +269,9 @@ class KotlinPluginTests {
                   "fileCount": 0
                 },
                 "kotlinSources": {
+                  "fileCount": 0
+                },
+                "javaResources": {
                   "fileCount": 0
                 },
                 "dependencies": []
