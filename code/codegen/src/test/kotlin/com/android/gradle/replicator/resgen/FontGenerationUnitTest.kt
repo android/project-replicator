@@ -13,15 +13,15 @@ class FontGenerationUnitTest: AbstractResourceGenerationUnitTest() {
                 "font_aaa.ttf" to
                         Pair(output.root, getResourceFont("ttf", "AndroidClock.ttf")),
                 "font_aab.ttf" to
-                        Pair(output.root, getResourceFont("ttf", "NotoSansCypriot-Regular.ttf")),
+                        Pair(output.root, getResourceFont("ttf", "NanumGothic.ttf")),
                 "font_aac.otf" to
-                        Pair(output.root, getResourceFont("otf", "NotoSansHatran-Regular.otf")),
+                        Pair(output.root, getResourceFont("otf", "NotoSansBassaVah-Regular.otf")),
                 "font_aad.otf" to
-                        Pair(output.root, getResourceFont("otf", "NotoSansNewa-Regular.otf")),
+                        Pair(output.root, getResourceFont("otf", "NotoSansBhaiksuki-Regular.otf")),
                 "font_aae.ttc" to
-                        Pair(output.root, getResourceFont("ttc", "NotoSerifCJK-Regular.ttc")),
+                        Pair(output.root, getResourceFont("ttc", "NotoSansCJK-Regular.ttc")),
                 "font_aaf.ttc" to
-                        Pair(output.root, getResourceFont("ttc", "NotoSansCJK-Regular.ttc"))
+                        Pair(output.root, getResourceFont("ttc", "NotoSerifCJK-Regular.ttc"))
         )
 
         generator.generateResource(

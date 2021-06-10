@@ -19,25 +19,25 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationUnitTest() {
 
         val expectedChosenImages = mapOf(
                 "image_aaa.png" to
-                        Pair(pngFolder, getResourceImage("png", "anydpi_pizza.png")),
+                        Pair(pngFolder, getResourceImage("png", "anydpi_bootleg_android.png")),
                 "image_aab.png" to
-                        Pair(pngFolder, getResourceImage("png", "xxhdpi_pizza.png")),
+                        Pair(pngFolder, getResourceImage("png", "anydpi_pizza.png")),
                 "image_aac.jpg" to
-                        Pair(jpgFolder, getResourceImage("jpeg", "hdpi_pizza.jpg")),
+                        Pair(jpgFolder, getResourceImage("jpeg", "hdpi_bootleg_android.jpg")),
                 "image_aad.jpg" to
-                        Pair(jpgFolder, getResourceImage("jpeg", "xxhdpi_bootleg_android.jpg")),
+                        Pair(jpgFolder, getResourceImage("jpeg", "hdpi_pizza.jpg")),
                 "image_aae.9.png" to
-                        Pair(ninePatchFolder, getResourceImage("9png", "ldpi_pizza.9.png")),
+                        Pair(ninePatchFolder, getResourceImage("9png", "ldpi_bootleg_android.9.png")),
                 "image_aaf.9.png" to
-                        Pair(ninePatchFolder, getResourceImage("9png", "xhdpi_bootleg_android.9.png")),
+                        Pair(ninePatchFolder, getResourceImage("9png", "ldpi_pizza.9.png")),
                 "image_aag.gif" to
-                        Pair(gifFolder, getResourceImage("gif", "xxhdpi_pizza.gif")),
+                        Pair(gifFolder, getResourceImage("gif", "mdpi_bootleg_android.gif")),
                 "image_aah.gif" to
-                        Pair(gifFolder, getResourceImage("gif", "xxxhdpi_bootleg_android.gif")),
+                        Pair(gifFolder, getResourceImage("gif", "mdpi_pizza.gif")),
                 "image_aai.webp" to
-                        Pair(webpFolder, getResourceImage("webp", "xxhdpi_pizza.webp")),
+                        Pair(webpFolder, getResourceImage("webp", "nodpi_bootleg_android.webp")),
                 "image_aaj.webp" to
-                        Pair(webpFolder, getResourceImage("webp", "hdpi_pizza.webp")),
+                        Pair(webpFolder, getResourceImage("webp", "nodpi_pizza.webp")),
                 "image_aak.png" to
                         Pair(pngFolder, getResourceImage("png", "xxxhdpi_bootleg_android.png")),
                 "image_aal.png" to

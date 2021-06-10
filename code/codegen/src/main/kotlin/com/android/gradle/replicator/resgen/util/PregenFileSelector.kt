@@ -50,7 +50,7 @@ fun getRandomResource(random: Random, type: FileTypes, resourceQualifiers: List<
     }
 
     // If specific file does not exist, get generic one
-    return if (filteredFiles.isEmpty()) allFiles.random(random) else filteredFiles.random(random)
+    return if (filteredFiles.isEmpty()) allFiles.sorted().random(random) else filteredFiles.sorted().random(random)
 }
 
 fun copyResourceFile(resourcePath: String, output: File) {
