@@ -49,7 +49,7 @@ fun getRandomResourceFile(random: Random, type: FileTypes, resourceQualifiers: L
     }
 
     // If specific file does not exist, get generic one
-    return if (filteredFiles.isEmpty()) allFiles.random(random) else filteredFiles.random(random)
+    return if (filteredFiles.isEmpty()) allFiles.sorted().random(random) else filteredFiles.sorted().random(random)
 }
 
 fun getFileType(resourceExtension: String): FileTypes? {
