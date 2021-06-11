@@ -38,6 +38,7 @@ class GeneratorDriver (val random: Random) {
         generator.generateResource(
                 number = resourceProperties.quantity,
                 outputFolder = qualifiedFolder,
+                // resources can have more than one qualifier
                 resourceQualifiers =
                 if (resourceProperties.qualifiers.isEmpty()) listOf() else resourceProperties.qualifiers.split("-"),
                 resourceExtension = resourceProperties.extension

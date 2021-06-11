@@ -80,9 +80,9 @@ class DrawableResourceGenerator (val random: Random): ResourceGenerator {
             throw RuntimeException("unsupported file type $resourceExtension")
         }
 
-        val file = getRandomResourceFile(random, fileType, resourceQualifiers) ?: return
+        val resourcePath = getRandomResource(random, fileType, resourceQualifiers) ?: return
 
-        file.copyTo(outputFile)
+        copyResourceFile(resourcePath, outputFile)
     }
 
     private fun selectNumberOfResourceElements(qualifiers: List<String>): Int {
