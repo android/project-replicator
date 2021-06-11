@@ -11,13 +11,13 @@ class RawGenerationUnitTest: AbstractResourceGenerationUnitTest() {
 
         val expectedChosenImages = mapOf(
                 "raw_aaa.txt" to
-                        Pair(output.root, getResource("txt", "pizza_recipe.txt")),
+                        Pair(output.root, getResource("txt", "bootleg_android.txt")),
                 "raw_aab.json" to
                         Pair(output.root, getResource("json", "pizza_recipe.json")),
                 "raw_aac.png" to
-                        Pair(output.root, getResourceImage("png", "xxhdpi_pizza.png")),
+                        Pair(output.root, getResourceImage("png", "hdpi_bootleg_android.png")),
                 "raw_aad.jpg" to
-                        Pair(output.root, getResourceImage("jpeg", "tvdpi_bootleg_android.jpg"))
+                        Pair(output.root, getResourceImage("jpeg", "hdpi_pizza.jpg"))
         )
 
         generator.generateResource(

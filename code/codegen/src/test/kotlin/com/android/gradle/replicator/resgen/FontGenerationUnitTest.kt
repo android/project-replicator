@@ -11,13 +11,13 @@ class FontGenerationUnitTest: AbstractResourceGenerationUnitTest() {
 
         val expectedChosenImages = mapOf(
                 "font_aaa.ttf" to
-                        Pair(output.root, getResourceFont("ttf", "NotoSerif-Regular.ttf")),
+                        Pair(output.root, getResourceFont("ttf", "AndroidClock.ttf")),
                 "font_aab.ttf" to
                         Pair(output.root, getResourceFont("ttf", "NanumGothic.ttf")),
                 "font_aac.otf" to
-                        Pair(output.root, getResourceFont("otf", "NotoSansPalmyrene-Regular.otf")),
+                        Pair(output.root, getResourceFont("otf", "NotoSansBassaVah-Regular.otf")),
                 "font_aad.otf" to
-                        Pair(output.root, getResourceFont("otf", "NotoSansMyanmar-Regular.otf")),
+                        Pair(output.root, getResourceFont("otf", "NotoSansBhaiksuki-Regular.otf")),
                 "font_aae.ttc" to
                         Pair(output.root, getResourceFont("ttc", "NotoSansCJK-Regular.ttc")),
                 "font_aaf.ttc" to

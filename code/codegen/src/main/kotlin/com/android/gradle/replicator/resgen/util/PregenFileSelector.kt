@@ -1,17 +1,18 @@
 package com.android.gradle.replicator.resgen.util
 
+import org.reflections.Reflections
+import org.reflections.scanners.ResourcesScanner
 import java.io.File
+import java.io.FileOutputStream
 import kotlin.random.Random
 
 enum class FileTypes {
     PNG, NINE_PATCH, WEBP, JPEG, GIF, TEXT, JSON, TTF, OTF, TTC
 }
 
-private fun listResourceFiles(folder: String): List<File> {
-    val loader = Thread.currentThread().contextClassLoader
-    val url = loader.getResource(folder)!!
-    val path: String = url.path
-    return File(path).listFiles()?.asList() ?: listOf()
+private fun listResourceFiles(folder: String): List<String> {
+    val reflections = Reflections("resgen", ResourcesScanner())
+    return reflections.getResources { true }.filter { it.startsWith(folder) }
 }
 
 private fun getFolderFromType(type: FileTypes): String {
@@ -30,7 +31,7 @@ private fun getFolderFromType(type: FileTypes): String {
     return "resgen/$typeFolderName"
 }
 
-fun getRandomResourceFile(random: Random, type: FileTypes, resourceQualifiers: List<String>): File? {
+fun getRandomResource(random: Random, type: FileTypes, resourceQualifiers: List<String>): String? {
     val qualifierPrefixes = resourceQualifiers.filter {
         it.isNotEmpty()
     }
@@ -38,18 +39,24 @@ fun getRandomResourceFile(random: Random, type: FileTypes, resourceQualifiers: L
     val allFiles = listResourceFiles(getFolderFromType(type))
 
     if (allFiles.isEmpty()) {
-        println("No pre-generated file found for $resourceQualifiers")
+        System.err.println("No pre-generated $type file found")
         return null
     }
 
     val filteredFiles = allFiles.filter {
         qualifierPrefixes.any { prefix ->
-            it.name.startsWith(prefix)
+            it.split("/").last().startsWith(prefix)
         }
     }
 
     // If specific file does not exist, get generic one
     return if (filteredFiles.isEmpty()) allFiles.sorted().random(random) else filteredFiles.sorted().random(random)
+}
+
+fun copyResourceFile(resourcePath: String, output: File) {
+    println("Copying from ${resourcePath.split("/").last()}")
+    val loader = Thread.currentThread().contextClassLoader
+    loader.getResourceAsStream(resourcePath)!!.copyTo(FileOutputStream(output))
 }
 
 fun getFileType(resourceExtension: String): FileTypes? {
