@@ -10,12 +10,12 @@ class GeneratorDriver (val random: Random) {
             //"animator" ->
             //"anim" ->
             //"color" ->
-            //"drawable" ->
-            //"font" ->
+            "drawable" -> DrawableResourceGenerator(random)
+            "font" -> FontResourceGenerator(random)
             //"layout" ->
             //"menu" ->
-            //"mipmap" ->
-            //"raw" ->
+            "mipmap" -> DrawableResourceGenerator(random)
+            "raw" -> RawResourceGenerator(random)
             //"transition" ->
             "values" -> ValueResourceGenerator(random)
             //"xml" ->
@@ -38,7 +38,9 @@ class GeneratorDriver (val random: Random) {
         generator.generateResource(
                 number = resourceProperties.quantity,
                 outputFolder = qualifiedFolder,
-                resourceQualifier = resourceProperties.qualifiers,
+                // resources can have more than one qualifier
+                resourceQualifiers =
+                if (resourceProperties.qualifiers.isEmpty()) listOf() else resourceProperties.qualifiers.split("-"),
                 resourceExtension = resourceProperties.extension
         )
     }

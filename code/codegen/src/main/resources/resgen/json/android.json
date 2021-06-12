@@ -1,0 +1,10 @@
+{
+  "antenna": 2,
+  "color": "green",
+  "legs": 2,
+  "arms": 2,
+  "eyes": 2,
+  "eye_color": "white",
+  "head_shape": "semi-sphere",
+  "body_shape": "cylinder"
+}

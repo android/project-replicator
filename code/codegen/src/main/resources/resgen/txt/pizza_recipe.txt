@@ -1,0 +1,16 @@
+cheese: to taste
+flour: 7 cups
+olive_oil: 6 tbsp
+salt: 3 tsp
+sugar: 1 tsp
+tomato_sauce: 30 oz
+toppings: to taste
+yeast: 2 tsp
+water: 2 cups
+
+preparation:
+
+Join all ingredients except 1 tsp of salt, cheese and toppings and kneed till uniform, then let rest for 1-24h.
+Sprinkle flour on the dough and spread it into a circle and fold the borders.
+Add the tomato sauce with the extra salt, then cheese and toppings.
+Preheat the oven to 450F and put the pizza in it. Let it bake until the crust is golden brown.

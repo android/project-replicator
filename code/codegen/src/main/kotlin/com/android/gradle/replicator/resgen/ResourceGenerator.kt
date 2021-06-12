@@ -34,7 +34,7 @@ interface ResourceGenerator {
     fun generateResource(
             number: Int,
             outputFolder: File,
-            resourceQualifier: String,
+            resourceQualifiers: List<String>,
             resourceExtension: String
     )
 }

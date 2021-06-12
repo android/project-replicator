@@ -72,8 +72,8 @@ fun genFileNameCharacters(count: Int, minFileNameCharacters: Int = 3): String {
     var current = count
     var characters = ""
     while (current > 0 || characters.length < minFileNameCharacters) {
-        characters = 'A' + (current % 26) + characters
+        characters = 'a' + (current % 26) + characters
         current /= 26
     }
-    return characters
+    return "_$characters"
 }
