@@ -23,7 +23,8 @@ import com.android.gradle.replicator.model.internal.DefaultDependenciesInfo
 import com.android.gradle.replicator.model.internal.DefaultModuleInfo
 import com.android.gradle.replicator.model.internal.DefaultAndroidResourcesInfo
 import com.android.gradle.replicator.model.internal.DefaultSourceFilesInfo
-import com.android.gradle.replicator.model.internal.ANDROID_RESOURCE_FOLDERS
+import com.android.gradle.replicator.model.internal.resources.ANDROID_RESOURCE_FOLDER_CONVENTION
+import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -87,7 +88,7 @@ abstract class GatherModuleInfoTask : DefaultTask() {
 
         val androidResources = if (pluginList.containsAndroid()) {
             getAndroidResourceFilesInfo(
-                    ANDROID_RESOURCE_FOLDERS, androidInputs)
+                    ANDROID_RESOURCE_FOLDER_CONVENTION, androidInputs)
         } else {
             null
         }
@@ -133,7 +134,7 @@ abstract class GatherModuleInfoTask : DefaultTask() {
             folderConvention: Map<String, List<String>>,
             androidInputs: AndroidInfoInputs?
     ): DefaultAndroidResourcesInfo {
-        val fileCount: AndroidResourceMap = mutableMapOf()
+        val resourceMap: AndroidResourceMap = mutableMapOf()
 
         // Separate folders in res
         val projectResourceFolders = mutableSetOf<File>()
@@ -154,10 +155,10 @@ abstract class GatherModuleInfoTask : DefaultTask() {
         // For each folder in the android resource convention (mipmap, mipmap-hidpi, xml, etc.)
         for (conventionFolder in folderConvention) {
             // Create container for resources
-            fileCount[conventionFolder.key] = mutableListOf()
+            resourceMap[conventionFolder.key] = mutableListOf()
 
             // Filter project folders by matching ones
-            val folderPattern = "${conventionFolder.key}(?:-(.*))?".toRegex()
+            val folderPattern = "${conventionFolder}(?:-(.*))?".toRegex()
 
             val matchingFolders = projectResourceFolders.filter {
                 folderPattern.matches(it.name)
@@ -167,22 +168,24 @@ abstract class GatherModuleInfoTask : DefaultTask() {
                 // Get folder qualifier, if any, such as mipmap-(hidpi). Qualifier is "" for unqualified folders
                 val qualifierMatch = folderPattern.matchEntire(projectFolder.name)!!.groupValues[1]
 
+                // TODO: Remove supported extensions
                 // For each accepted extension, create resource data with qualifiers, extension and quantity
                 for (extension in conventionFolder.value) {
-                    val quantity = androidResourceFiles?.matching {
+                    val matchingResourceFiles = androidResourceFiles?.matching {
                         it.include("**/${projectFolder.name}/*${extension}")
-                    }?.files?.size ?: 0
-                    if (quantity > 0) {
-                        fileCount[conventionFolder.key]!!.add(AndroidResourceProperties(
+                    }?.files
+                    if (matchingResourceFiles != null && matchingResourceFiles.size > 0) {
+                        resourceMap[conventionFolder.key]!!.add(processResourceFiles(
+                                resourceType = conventionFolder.key,
                                 qualifiers = qualifierMatch,
                                 extension = extension,
-                                quantity = quantity
+                                resourceFiles = matchingResourceFiles
                         ))
                     }
                 }
             }
         }
-        return DefaultAndroidResourcesInfo(fileCount)
+        return DefaultAndroidResourcesInfo(resourceMap)
     }
 
     private fun getJavaResourceFilesInfo(androidInputs: AndroidInfoInputs?): DefaultSourceFilesInfo {

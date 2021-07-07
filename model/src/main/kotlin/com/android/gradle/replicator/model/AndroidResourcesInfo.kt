@@ -16,16 +16,7 @@
 
 package com.android.gradle.replicator.model
 
-/* Data classes to represent the hierarchy for android resources
- * Each resource folder type (values, mipmap, etc.) can have different qualified folders (hidpi, night, etc.)
- * and each of those qualified folders can have different file types in them (AKA extensions)
- * Each element in the resource map is a list of resources to generate for a given folder type, and
- * the elements in the list contain qualifiers, extension and quantity of resources of a particular subtype to generate
- */
-
-data class AndroidResourceProperties (val qualifiers: String, val extension: String, val quantity: Int)
-
-typealias AndroidResourceMap = MutableMap<String, MutableList<AndroidResourceProperties>>
+import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
 
 /**
  * Information about the number of android resource files in a [ModuleInfo]

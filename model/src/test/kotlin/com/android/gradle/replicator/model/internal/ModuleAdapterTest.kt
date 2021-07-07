@@ -18,6 +18,7 @@ package com.android.gradle.replicator.model.internal
 
 import com.android.gradle.replicator.model.*
 import com.android.gradle.replicator.model.internal.fixtures.module
+import com.android.gradle.replicator.model.internal.resources.AbstractAndroidResourceProperties
 import com.google.common.truth.Truth
 import org.junit.Test
 
@@ -87,13 +88,13 @@ internal class ModuleAdapterTest {
         androidResources {
             fileCount = mutableMapOf(
                     "mipmap" to mutableListOf(
-                            AndroidResourceProperties(qualifiers = "", extension = ".xml", quantity = 3),
-                            AndroidResourceProperties(qualifiers = "", extension = ".png", quantity = 2),
-                            AndroidResourceProperties(qualifiers = "hidpi", extension = ".xml", quantity = 3),
-                            AndroidResourceProperties(qualifiers = "hidpi", extension = ".png", quantity = 2)
+                            AbstractAndroidResourceProperties(qualifiers = "", extension = ".xml", quantity = 3),
+                            AbstractAndroidResourceProperties(qualifiers = "", extension = ".png", quantity = 2),
+                            AbstractAndroidResourceProperties(qualifiers = "hidpi", extension = ".xml", quantity = 3),
+                            AbstractAndroidResourceProperties(qualifiers = "hidpi", extension = ".png", quantity = 2)
                     ),
                     "values" to mutableListOf(
-                            AndroidResourceProperties(qualifiers = "", extension = ".xml", quantity = 5)
+                            AbstractAndroidResourceProperties(qualifiers = "", extension = ".xml", quantity = 5)
                     )
             )
         }

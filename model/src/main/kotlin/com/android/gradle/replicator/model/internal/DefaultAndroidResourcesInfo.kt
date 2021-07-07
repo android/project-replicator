@@ -16,27 +16,12 @@
 
 package com.android.gradle.replicator.model.internal
 
-import com.android.gradle.replicator.model.AndroidResourceProperties
-import com.android.gradle.replicator.model.AndroidResourceMap
+import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
 import com.android.gradle.replicator.model.AndroidResourcesInfo
+import com.android.gradle.replicator.model.internal.resources.selectResourceProperties
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-
-val ANDROID_RESOURCE_FOLDERS = mapOf(
-        "animator" to listOf(".xml"),
-        "anim" to listOf(".xml"),
-        "color" to listOf(".xml"),
-        "drawable" to listOf(".xml", ".png", ".9.png", ".jpg", ".gif", ".webp"),
-        "font" to listOf(".ttf", ".otf", ".ttc", ".xml"),
-        "layout" to listOf(".xml"),
-        "menu" to listOf(".xml"),
-        "mipmap" to listOf(".xml", ".png", ".9.png", ".jpg", ".gif", ".webp"),
-        "raw" to listOf("*"),
-        "transition" to listOf(".xml"),
-        "values" to listOf(".xml"),
-        "xml" to listOf(".xml")
-)
 
 data class DefaultAndroidResourcesInfo(
         override val resourceMap: AndroidResourceMap
@@ -97,14 +82,33 @@ class AndroidResourcesAdapter: TypeAdapter<AndroidResourcesInfo>() {
                 var qualifiers: String? = null
                 var extension: String? = null
                 var quantity: Int? = null
+                var fileSizes: MutableList<Long>? = null
+                var valueTypeCount: MutableList<Map<String, Int>>? = null
                 this.readObjectProperties { property ->
                     when (property) {
                         "qualifiers" -> qualifiers = this.nextString()
                         "extension" -> extension = this.nextString()
                         "quantity" -> quantity = this.nextInt()
+                        "fileSizes" -> {
+                            fileSizes = mutableListOf()
+                            this.readArray {
+                                fileSizes!!.add(this.nextLong())
+                            }
+                        }
+                        "valueTypeCount" -> {
+                            valueTypeCount = mutableListOf()
+                            this.readArray {
+                                val currFileCount = mutableMapOf<String, Int>()
+                                this.readObjectProperties { valueProperty ->
+                                    currFileCount[valueProperty] = this.nextInt()
+                                }
+                                valueTypeCount!!.add(currFileCount)
+                            }
+                        }
                     }
                 }
-                fileCount[folderName]!!.add(AndroidResourceProperties(qualifiers!!, extension!!, quantity!!))
+                fileCount[folderName]!!.add(selectResourceProperties(
+                        qualifiers!!, extension!!, qualifiers!!, quantity!!, fileSizes, valueTypeCount))
             }
         }
 
