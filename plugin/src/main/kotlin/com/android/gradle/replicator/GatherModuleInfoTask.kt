@@ -158,11 +158,12 @@ abstract class GatherModuleInfoTask : DefaultTask() {
             resourceMap[conventionFolder.key] = mutableListOf()
 
             // Filter project folders by matching ones
-            val folderPattern = "${conventionFolder}(?:-(.*))?".toRegex()
+            val folderPattern = "${conventionFolder.key}(?:-(.*))?".toRegex()
 
             val matchingFolders = projectResourceFolders.filter {
                 folderPattern.matches(it.name)
             }
+
 
             for (projectFolder in matchingFolders) {
                 // Get folder qualifier, if any, such as mipmap-(hidpi). Qualifier is "" for unqualified folders
@@ -176,10 +177,10 @@ abstract class GatherModuleInfoTask : DefaultTask() {
                     }?.files
                     if (matchingResourceFiles != null && matchingResourceFiles.size > 0) {
                         resourceMap[conventionFolder.key]!!.add(processResourceFiles(
-                                resourceType = conventionFolder.key,
-                                qualifiers = qualifierMatch,
-                                extension = extension,
-                                resourceFiles = matchingResourceFiles
+                            resourceType = conventionFolder.key,
+                            qualifiers = qualifierMatch,
+                            extension = extension,
+                            resourceFiles = matchingResourceFiles
                         ))
                     }
                 }

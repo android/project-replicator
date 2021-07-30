@@ -27,10 +27,17 @@ import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.ModuleInfo
 import com.android.gradle.replicator.model.PluginType
 import com.android.gradle.replicator.model.ProjectInfo
-import com.google.gson.Gson
+import com.android.gradle.replicator.model.internal.AndroidResourcesAdapter
+import com.android.gradle.replicator.model.internal.DefaultSourceFilesInfo
+import com.android.gradle.replicator.model.internal.SourceFilesAdapter
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
+import com.google.gson.stream.JsonWriter
 import java.io.File
+import java.io.FileWriter
+
+
+
 
 class GradleProjectGenerator(
     private val destinationFolder: File,
@@ -213,13 +220,20 @@ class GradleProjectGenerator(
     ) {
         val metadataFile = folder.join("resource-metadata.json")
 
-        val metadataJson = JsonObject()
-        module.androidResources?.resourceMap?.also {
-            metadataJson.add("androidResources", Gson().toJsonTree(it))
-        }
-        metadataJson.addProperty("javaResources", module.javaResources?.fileCount ?: 0)
+        with(JsonWriter(FileWriter(metadataFile))) {
+            this.setIndent("  ")
+            beginObject()
+            module.androidResources?.also {
+                name("androidResources")
+                AndroidResourcesAdapter().write(this, it)
+            }
 
-        metadataFile.writeBytes(GsonBuilder().setPrettyPrinting().create().toJson(metadataJson).toByteArray())
+            name("javaResources")
+            SourceFilesAdapter().write(this, module.javaResources ?: DefaultSourceFilesInfo(0))
+
+            endObject()
+            this.flush()
+        }
     }
 
     private fun ModuleInfo.generateDependencies() {

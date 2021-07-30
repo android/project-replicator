@@ -16,13 +16,16 @@
  */
 package com.android.gradle.replicator.resgen
 
+import com.android.gradle.replicator.model.AndroidResourcesInfo
+import com.android.gradle.replicator.model.SourceFilesInfo
+import com.android.gradle.replicator.model.internal.*
+import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
 import com.android.gradle.replicator.parsing.ArgsParser
-import com.google.gson.Gson
+import com.google.gson.stream.JsonReader
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Files
 import kotlin.random.Random
-
 
 
 @Suppress("UNUSED_PARAMETER")
@@ -123,14 +126,21 @@ class Main {
 
     // read metadata file added to each project in json format
     private fun loadModuleMetadata(resourceMetadataJson: File): ResourceMetadata {
-        val gson = Gson()
-        var resourceMetadata: ResourceMetadata
+        var androidResources: AndroidResourcesInfo = DefaultAndroidResourcesInfo(mutableMapOf())
+        var javaResources: SourceFilesInfo = DefaultSourceFilesInfo(0)
 
-        with(Files.newBufferedReader(resourceMetadataJson.toPath())) {
-            resourceMetadata = gson.fromJson(this, ResourceMetadata::class.java)
+        with(JsonReader(Files.newBufferedReader(resourceMetadataJson.toPath()))) {
+            beginObject()
+            while(hasNext()) {
+                when (nextName()) {
+                    "androidResources" -> androidResources = AndroidResourcesAdapter().read(this)
+                    "javaResources" -> javaResources = SourceFilesAdapter().read(this)
+                }
+            }
+            endObject()
         }
 
-        return resourceMetadata
+        return ResourceMetadata(androidResources.resourceMap, javaResources.fileCount)
     }
 
     private fun countResources(res: AndroidResourceMap): Int {

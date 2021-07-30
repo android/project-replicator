@@ -22,26 +22,51 @@ val ANDROID_RESOURCE_FOLDER_CONVENTION = mapOf(
  * Each element in the resource map is a list of resources to generate for a given folder type, and
  * the elements in the list contain qualifiers, extension and quantity of resources of a particular subtype to generate
  */
-abstract class AbstractAndroidResourceProperties (val qualifiers: String, val extension: String, val quantity: Int)
+abstract class AbstractAndroidResourceProperties (val qualifiers: String, val extension: String, val quantity: Int) {
+        abstract val propertyType: ResourcePropertyType
+}
+
+enum class ResourcePropertyType {
+        DEFAULT,
+        VALUES,
+        SIZE_MATTERS
+}
 
 class AndroidDefaultResourceProperties (
         qualifiers: String,
         extension: String,
-        quantity: Int): AbstractAndroidResourceProperties(qualifiers, extension, quantity)
+        quantity: Int): AbstractAndroidResourceProperties(qualifiers, extension, quantity) {
+                override val propertyType = ResourcePropertyType.DEFAULT
+}
+
+data class ValuesMap (
+        var stringCount: Int = 0,
+        var intCount: Int = 0,
+        var boolCount: Int = 0,
+        var colorCount: Int = 0,
+        var dimenCount: Int = 0,
+        var idCount: Int = 0,
+        var integerArrayCount: MutableList<Int> = mutableListOf(),
+        var arrayCount: MutableList<Int> = mutableListOf(),
+        var styleCount: MutableList<Int> = mutableListOf())
 
 // Values need to know how many of each value are in the files
 class AndroidValuesResourceProperties (
         qualifiers: String,
         extension: String,
         quantity: Int,
-        val valueTypeCount: List<Map<String, Int>>): AbstractAndroidResourceProperties(qualifiers, extension, quantity)
+        val valuesMapPerFile: List<ValuesMap>): AbstractAndroidResourceProperties(qualifiers, extension, quantity) {
+                override val propertyType = ResourcePropertyType.VALUES
+}
 
 // Images and other resources need the file sizes to properly replicate
 class AndroidSizeMattersResourceProperties (
         qualifiers: String,
         extension: String,
         quantity: Int,
-        val fileSizes: List<Long>): AbstractAndroidResourceProperties(qualifiers, extension, quantity)
+        val fileSizes: List<Long>): AbstractAndroidResourceProperties(qualifiers, extension, quantity) {
+                override val propertyType = ResourcePropertyType.SIZE_MATTERS
+}
 
 typealias AndroidResourceMap = MutableMap<String, MutableList<AbstractAndroidResourceProperties>>
 
@@ -51,9 +76,9 @@ fun selectResourceProperties(
         extension: String,
         quantity: Int,
         fileSizes: List<Long>? = null,
-        valueTypeCount: List<Map<String, Int>>? = null): AbstractAndroidResourceProperties {
+        valuesMapPerFile: List<ValuesMap>? = null): AbstractAndroidResourceProperties {
     return when (resourceType) {
-        "values" -> AndroidValuesResourceProperties(qualifiers, extension, quantity, valueTypeCount!!)
+        "values" -> AndroidValuesResourceProperties(qualifiers, extension, quantity, valuesMapPerFile!!)
         "drawable",
         "mipmap",
         "raw" -> AndroidSizeMattersResourceProperties(qualifiers, extension, quantity, fileSizes!!)

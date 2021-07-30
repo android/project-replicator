@@ -1,5 +1,6 @@
 package com.android.gradle.replicator.resgen
 
+import com.android.gradle.replicator.model.internal.resources.AbstractAndroidResourceProperties
 import java.io.File
 import kotlin.random.Random
 
@@ -23,7 +24,8 @@ class GeneratorDriver (val random: Random) {
         }
     }
 
-    fun generateResources(outputFolder: File, resourceType: String, resourceProperties: AndroidResourceProperties) {
+    fun generateResources(outputFolder: File, resourceType: String, resourceProperties: AbstractAndroidResourceProperties) {
+        // TODO: Separate resource properties by type
         val generator = getGenerator(random, resourceType)
 
         // empty qualifiers means the folder is unqualified, as in "mipmap" instead of "mipmap-hidpi"
