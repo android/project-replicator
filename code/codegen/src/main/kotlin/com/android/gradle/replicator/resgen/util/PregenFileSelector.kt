@@ -32,14 +32,12 @@ private fun getFolderFromType(type: FileTypes): String {
 }
 
 fun getRandomResource(random: Random, type: FileTypes, resourceQualifiers: List<String>): String? {
-    val qualifierPrefixes = resourceQualifiers.filter {
-        it.isNotEmpty()
-    }
+    val qualifierPrefixes = resourceQualifiers.filter(String::isNotEmpty)
 
     val allFiles = listResourceFiles(getFolderFromType(type))
 
     if (allFiles.isEmpty()) {
-        System.err.println("No pre-generated $type file found")
+        println("e: no pre-generated $type file found")
         return null
     }
 

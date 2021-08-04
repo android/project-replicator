@@ -16,6 +16,12 @@
  */
 package com.android.gradle.replicator.resgen
 
+import com.android.gradle.replicator.resgen.util.DIMENSION_UNITS
+import com.android.gradle.replicator.resgen.util.MAX_ARRAY_ELEMENTS
+import com.android.gradle.replicator.resgen.util.MAX_DIMENSION
+import com.android.gradle.replicator.resgen.util.MAX_STRING_WORD_COUNT
+import com.android.gradle.replicator.resgen.util.MAX_VALUES
+import com.android.gradle.replicator.resgen.util.POSSIBLE_COLOR_DIGITS
 import com.android.gradle.replicator.resgen.util.genFileNameCharacters
 import com.android.gradle.replicator.resgen.util.genHex
 import com.android.gradle.replicator.resgen.util.genName
@@ -28,15 +34,6 @@ class ValueResourceGenerator (val random: Random): ResourceGenerator {
 
     @set:VisibleForTesting
     var numberOfResourceElements: Int?= null
-
-    companion object {
-        private const val MAX_VALUES = 21
-        private const val MAX_ARRAY_ELEMENTS = 20
-        private const val MAX_STRING_WORD_COUNT = 20
-        private const val MAX_DIMENSION = 2048
-        private val POSSIBLE_COLOR_DIGITS = listOf(3, 4, 6, 8)
-        private val DIMENSION_UNITS = listOf("dp", "sp", "pt", "px", "mm", "in")
-    }
 
     override fun generateResource(
             number: Int,
@@ -164,7 +161,7 @@ class ValueResourceGenerator (val random: Random): ResourceGenerator {
         val size = random.nextInt(MAX_ARRAY_ELEMENTS)
         val result = mutableListOf("    <integer-array name=\"$name\">")
 
-        repeat(size) { count ->
+        repeat(size) {
             val value = random.nextInt()
             result.add("        <item>$value</item>")
         }

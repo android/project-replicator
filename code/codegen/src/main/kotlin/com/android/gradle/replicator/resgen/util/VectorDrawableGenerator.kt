@@ -45,31 +45,13 @@ class VectorDrawableGenerator (val random: Random) {
         )
     }
 
-    /* TODO: add other kinds of strokes, ex:
-     *<path android:pathData="M31,63.928c0,0 6.4,-11 12.1,-13.1c7.2,-2.6 26,-1.4 26,-1.4l38.1,38.1L107,108.928l-32,-1L31,63.928z">
-     *    <aapt:attr name="android:fillColor">
-     *        <gradient
-     *            android:endX="85.84757"
-     *            android:endY="92.4963"
-     *            android:startX="42.9492"
-     *            android:startY="49.59793"
-     *            android:type="linear">
-     *            <item
-     *                android:color="#44000000"
-     *                android:offset="0.0" />
-     *            <item
-     *                android:color="#00000000"
-     *                android:offset="1.0" />
-     *        </gradient>
-     *    </aapt:attr>
-     *</path>
-     */
+    // TODO: add nonlinear strokes
     private fun path(
             fillColor: String,
             pathData: String,
-            strokeColor: String = "",
-            strokeWidth: String = "",
-            fillAlpha: String = ""): List<String> {
+            strokeColor: String? = null,
+            strokeWidth: String? = null,
+            fillAlpha: String? = null): List<String> {
         val lines = mutableListOf<String>()
 
         lines.addAll(listOf(
@@ -77,16 +59,16 @@ class VectorDrawableGenerator (val random: Random) {
                 """        android:fillColor="#$fillColor""""
         ))
 
-        if (strokeColor.isNotEmpty()) {
-            lines.add("""        android:strokeColor="#$strokeColor"""")
+        strokeColor?.let {
+            lines.add("""        android:strokeColor="#$it"""")
         }
 
-        if (strokeWidth.isNotEmpty()) {
-            lines.add("""        android:strokeWidth="$strokeWidth"""")
+        strokeWidth?.let {
+            lines.add("""        android:strokeWidth="$it"""")
         }
 
-        if (fillAlpha.isNotEmpty()) {
-            lines.add("""        android:fillAlpha="$fillAlpha"""")
+        fillAlpha?.let {
+            lines.add("""        android:fillAlpha="$it"""")
         }
 
         lines.add("""        android:pathData="$pathData" />""")
@@ -99,8 +81,7 @@ class VectorDrawableGenerator (val random: Random) {
     }
 
     private fun genStraightLinePathData(width: Int, height: Int): String {
-        val fromVector = arrayListOf(random.nextInt(width), random.nextInt(height))
-        val toVector = arrayListOf(random.nextInt(width), random.nextInt(height))
-        return "M${fromVector[0]},${fromVector[1]}L${toVector[0]},${toVector[1]}"
+        // Line goes from xa, ya to xb, yb as such: Mxa,yaLxb,yb
+        return "M${random.nextInt(width)},${random.nextInt(height)}L${random.nextInt(width)},${random.nextInt(height)}"
     }
 }

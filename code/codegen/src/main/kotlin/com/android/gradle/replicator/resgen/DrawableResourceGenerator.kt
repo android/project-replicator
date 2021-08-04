@@ -16,18 +16,23 @@
  */
 package com.android.gradle.replicator.resgen
 
-import com.android.gradle.replicator.resgen.util.*
+import com.android.gradle.replicator.resgen.util.FileTypes
+import com.android.gradle.replicator.resgen.util.MAX_VECTOR_IMAGE_LINES_LARGE
+import com.android.gradle.replicator.resgen.util.MAX_VECTOR_IMAGE_LINES_MEDIUM
+import com.android.gradle.replicator.resgen.util.MAX_VECTOR_IMAGE_LINES_SMALL
+import com.android.gradle.replicator.resgen.util.MAX_VECTOR_IMAGE_SIZE_LARGE
+import com.android.gradle.replicator.resgen.util.MAX_VECTOR_IMAGE_SIZE_MEDIUM
+import com.android.gradle.replicator.resgen.util.MAX_VECTOR_IMAGE_SIZE_SMALL
+import com.android.gradle.replicator.resgen.util.VectorDrawableGenerator
+import com.android.gradle.replicator.resgen.util.copyResourceFile
+import com.android.gradle.replicator.resgen.util.genFileNameCharacters
+import com.android.gradle.replicator.resgen.util.getFileType
+import com.android.gradle.replicator.resgen.util.getRandomResource
 import com.google.common.annotations.VisibleForTesting
 import java.io.File
 import java.lang.RuntimeException
 import kotlin.random.Random
 
-private const val MAX_VECTOR_IMAGE_SIZE_SMALL = 100
-private const val MAX_VECTOR_IMAGE_SIZE_MEDIUM = 150
-private const val MAX_VECTOR_IMAGE_SIZE_LARGE = 200
-private const val MAX_VECTOR_IMAGE_LINES_SMALL = 50
-private const val MAX_VECTOR_IMAGE_LINES_MEDIUM = 75
-private const val MAX_VECTOR_IMAGE_LINES_LARGE = 100
 
 class DrawableResourceGenerator (val random: Random): ResourceGenerator {
 
@@ -77,7 +82,8 @@ class DrawableResourceGenerator (val random: Random): ResourceGenerator {
         val fileType = getFileType(resourceExtension)
 
         if (fileType == null || fileType !in supportedFileTypes) {
-            throw RuntimeException("unsupported file type $resourceExtension")
+            println("w: unsupported file type $resourceExtension. Skipping.")
+            return
         }
 
         val resourcePath = getRandomResource(random, fileType, resourceQualifiers) ?: return
@@ -99,10 +105,10 @@ class DrawableResourceGenerator (val random: Random): ResourceGenerator {
                 "xhdpi",
                 "xxhdpi",
                 "xxxhdpi" -> return MAX_VECTOR_IMAGE_LINES_LARGE
-                else -> if (it.endsWith("dpi")) return MAX_VECTOR_IMAGE_LINES_MEDIUM // NNNDPI
+                else -> {}
             }
         }
-        return MAX_VECTOR_IMAGE_SIZE_MEDIUM
+        return MAX_VECTOR_IMAGE_SIZE_MEDIUM // NNNDPI also ends up here
     }
 
     private fun selectMaxImageSize(qualifiers: List<String>): Int {
@@ -117,10 +123,10 @@ class DrawableResourceGenerator (val random: Random): ResourceGenerator {
                 "xhdpi",
                 "xxhdpi",
                 "xxxhdpi" -> return MAX_VECTOR_IMAGE_SIZE_LARGE
-                else -> if (it.endsWith("dpi")) return MAX_VECTOR_IMAGE_SIZE_MEDIUM // NNNDPI
+                else -> {}
             }
         }
-        return MAX_VECTOR_IMAGE_SIZE_MEDIUM
+        return MAX_VECTOR_IMAGE_SIZE_MEDIUM // NNNDPI also ends up here
     }
 
     private fun generateVectorDrawableResource(
