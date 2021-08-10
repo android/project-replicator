@@ -5,21 +5,21 @@ import kotlin.random.Random
 
 class GeneratorDriver (val random: Random) {
     // TODO: implement other generators
-    private fun getGenerator(random: Random, resourceType: String): ResourceGenerator {
+    private fun getGenerator(random: Random, resourceType: String): ResourceGenerator? {
         return when(resourceType) {
             //"animator" ->
             //"anim" ->
             //"color" ->
-            //"drawable" ->
-            //"font" ->
+            "drawable" -> DrawableResourceGenerator(random)
+            "font" -> FontResourceGenerator(random)
             //"layout" ->
             //"menu" ->
-            //"mipmap" ->
-            //"raw" ->
+            "mipmap" -> DrawableResourceGenerator(random)
+            "raw" -> RawResourceGenerator(random)
             //"transition" ->
             "values" -> ValueResourceGenerator(random)
             //"xml" ->
-            else -> throw RuntimeException("Unsupported resource type $resourceType")
+            else -> null
         }
     }
 
@@ -35,11 +35,13 @@ class GeneratorDriver (val random: Random) {
                 }
         qualifiedFolder.mkdirs()
 
-        generator.generateResource(
+        generator?.generateResource(
                 number = resourceProperties.quantity,
                 outputFolder = qualifiedFolder,
-                resourceQualifier = resourceProperties.qualifiers,
+                // resources can have more than one qualifier
+                resourceQualifiers =
+                if (resourceProperties.qualifiers.isEmpty()) listOf() else resourceProperties.qualifiers.split("-"),
                 resourceExtension = resourceProperties.extension
-        )
+        ) ?: println("w: unsupported resource type $resourceType. Skipping.")
     }
 }
