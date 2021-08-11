@@ -39,9 +39,14 @@ fun getValuesResourceData(qualifiers: String, extension: String, resourceFiles: 
             }
     )
 }
+private fun debugWrite(text: String) {
+    java.nio.file.Files.write(java.nio.file.Paths.get("/Users/jeanlucncoelho/debug.txt"), (text + "\n").toByteArray(), java.nio.file.StandardOpenOption.APPEND);
+}
+
 
 fun getSizeMattersResourceData(qualifiers: String, extension: String, resourceFiles: Set<File>):
         AndroidSizeMattersResourceProperties {
+    debugWrite("$qualifiers, $extension, $resourceFiles")
     return AndroidSizeMattersResourceProperties(
             qualifiers = qualifiers,
             extension = extension,

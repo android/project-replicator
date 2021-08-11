@@ -19,6 +19,11 @@ package com.android.gradle.replicator.model.internal
 import com.android.gradle.replicator.model.*
 import com.android.gradle.replicator.model.internal.fixtures.module
 import com.android.gradle.replicator.model.internal.resources.AbstractAndroidResourceProperties
+import com.android.gradle.replicator.model.internal.resources.AndroidDefaultResourceProperties
+import com.android.gradle.replicator.model.internal.resources.AndroidSizeMattersResourceProperties
+import com.android.gradle.replicator.model.internal.resources.AndroidValuesResourceProperties
+import com.android.gradle.replicator.model.internal.resources.ResourcePropertyType
+import com.android.gradle.replicator.model.internal.resources.ValuesMap
 import com.google.common.truth.Truth
 import org.junit.Test
 
@@ -54,7 +59,7 @@ internal class ModuleAdapterTest {
         val module = fullModuleObject()
         val loadedModule = FULL_MODULE.fromJson(ModuleAdapter())
 
-        Truth.assertThat(loadedModule).isEqualTo(module)
+        assertModuleInfoEquals(loadedModule, module)
     }
 
     @Test
@@ -87,17 +92,49 @@ internal class ModuleAdapterTest {
         }
         androidResources {
             fileCount = mutableMapOf(
-                    "mipmap" to mutableListOf(
-                            AbstractAndroidResourceProperties(qualifiers = "", extension = ".xml", quantity = 3),
-                            AbstractAndroidResourceProperties(qualifiers = "", extension = ".png", quantity = 2),
-                            AbstractAndroidResourceProperties(qualifiers = "hidpi", extension = ".xml", quantity = 3),
-                            AbstractAndroidResourceProperties(qualifiers = "hidpi", extension = ".png", quantity = 2)
+                    "mipmap" to mutableListOf<AbstractAndroidResourceProperties>(
+                            AndroidSizeMattersResourceProperties(
+                                qualifiers = "",
+                                extension = ".xml",
+                                quantity = 3,
+                                fileSizes = listOf(64, 128, 256)
+                            ),
+                            AndroidSizeMattersResourceProperties(
+                                qualifiers = "",
+                                extension = ".png",
+                                quantity = 2,
+                                fileSizes = listOf(512, 1024)
+                            ),
+                            AndroidSizeMattersResourceProperties(
+                                qualifiers = "hidpi",
+                                extension = ".xml",
+                                quantity = 3,
+                                fileSizes = listOf(2048, 4096, 8192)
+                            ),
+                            AndroidSizeMattersResourceProperties(
+                                qualifiers = "hidpi",
+                                extension = ".png",
+                                quantity = 2,
+                                fileSizes = listOf(16384, 32768)
+                            )
                     ),
-                    "values" to mutableListOf(
-                            AbstractAndroidResourceProperties(qualifiers = "", extension = ".xml", quantity = 5)
+                    "values" to mutableListOf<AbstractAndroidResourceProperties>(
+                            AndroidValuesResourceProperties(
+                                qualifiers = "",
+                                extension = ".xml",
+                                quantity = 5,
+                                valuesMapPerFile = listOf(
+                                    ValuesMap(stringCount = 5),
+                                    ValuesMap(stringCount = 2, intCount = 6),
+                                    ValuesMap(stringCount = 2, intCount = 6, colorCount = 1),
+                                    ValuesMap(stringCount = 2, intCount = 6, colorCount = 2, dimenCount = 1),
+                                    ValuesMap(stringCount = 2, intCount = 6, colorCount = 3, dimenCount = 2, idCount = 1)
+                                )
+                            )
                     )
             )
         }
+
         javaResources {
             fileCount = 3
         }
@@ -116,6 +153,45 @@ internal class ModuleAdapterTest {
             buildFeatures {
                 androidResources = true
                 compose = true
+            }
+        }
+    }
+
+    private fun assertModuleInfoEquals(subj: DefaultModuleInfo, obj: DefaultModuleInfo) {
+        Truth.assertThat(subj.path).isEqualTo(obj.path)
+        Truth.assertThat(subj.plugins).isEqualTo(obj.plugins)
+        Truth.assertThat(subj.javaSources).isEqualTo(obj.javaSources)
+        Truth.assertThat(subj.kotlinSources).isEqualTo(obj.kotlinSources)
+        Truth.assertThat(subj.javaResources).isEqualTo(obj.javaResources)
+        Truth.assertThat(subj.dependencies).isEqualTo(obj.dependencies)
+        Truth.assertThat(subj.android).isEqualTo(obj.android)
+
+        // Manually compare resources
+        subj.androidResources?.resourceMap?.forEach { subjResourceType ->
+            Truth.assertThat(obj.androidResources!!.resourceMap).containsKey(subjResourceType.key)
+            val objResourceType = obj.androidResources!!.resourceMap.get(subjResourceType.key)!!
+
+            subjResourceType.value.forEachIndexed { index, subjResourceProperties ->
+                val objResourceProperties = objResourceType[index]
+                Truth.assertThat(subjResourceProperties.propertyType).isEqualTo(objResourceProperties.propertyType)
+                Truth.assertThat(subjResourceProperties.qualifiers).isEqualTo(objResourceProperties.qualifiers)
+                Truth.assertThat(subjResourceProperties.extension).isEqualTo(objResourceProperties.extension)
+                Truth.assertThat(subjResourceProperties.quantity).isEqualTo(objResourceProperties.quantity)
+
+                when (subjResourceProperties.propertyType) {
+                    ResourcePropertyType.VALUES -> {
+                        val realSubjProperties = subjResourceProperties as AndroidValuesResourceProperties
+                        val realObjProperties = objResourceProperties as AndroidValuesResourceProperties
+
+                        Truth.assertThat(realSubjProperties.valuesMapPerFile).isEqualTo(realObjProperties.valuesMapPerFile)
+                    }
+                    ResourcePropertyType.SIZE_MATTERS -> {
+                        val realSubjProperties = subjResourceProperties as AndroidSizeMattersResourceProperties
+                        val realObjProperties = objResourceProperties as AndroidSizeMattersResourceProperties
+
+                        Truth.assertThat(realSubjProperties.fileSizes).isEqualTo(realObjProperties.fileSizes)}
+                    ResourcePropertyType.DEFAULT -> { } // Nothing more
+                }
             }
         }
     }
@@ -147,29 +223,104 @@ private val FULL_MODULE = """
           {
             "qualifiers": "",
             "extension": ".xml",
-            "quantity": 3
+            "quantity": 3,
+            "fileSizes": [
+              64,
+              128,
+              256
+            ]
           },
           {
             "qualifiers": "",
             "extension": ".png",
-            "quantity": 2
+            "quantity": 2,
+            "fileSizes": [
+              512,
+              1024
+            ]
           },
           {
             "qualifiers": "hidpi",
             "extension": ".xml",
-            "quantity": 3
+            "quantity": 3,
+            "fileSizes": [
+              2048,
+              4096,
+              8192
+            ]
           },
           {
             "qualifiers": "hidpi",
             "extension": ".png",
-            "quantity": 2
+            "quantity": 2,
+            "fileSizes": [
+              16384,
+              32768
+            ]
           }
         ],
         "values": [
           {
             "qualifiers": "",
             "extension": ".xml",
-            "quantity": 5
+            "quantity": 5,
+            "valuesFileList": [
+              {
+                "stringCount": 5,
+                "intCount": 0,
+                "boolCount": 0,
+                "colorCount": 0,
+                "dimenCount": 0,
+                "idCount": 0,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              },
+              {
+                "stringCount": 2,
+                "intCount": 6,
+                "boolCount": 0,
+                "colorCount": 0,
+                "dimenCount": 0,
+                "idCount": 0,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              },
+              {
+                "stringCount": 2,
+                "intCount": 6,
+                "boolCount": 0,
+                "colorCount": 1,
+                "dimenCount": 0,
+                "idCount": 0,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              },
+              {
+                "stringCount": 2,
+                "intCount": 6,
+                "boolCount": 0,
+                "colorCount": 2,
+                "dimenCount": 1,
+                "idCount": 0,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              },
+              {
+                "stringCount": 2,
+                "intCount": 6,
+                "boolCount": 0,
+                "colorCount": 3,
+                "dimenCount": 2,
+                "idCount": 1,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              }
+            ]
           }
         ]
       },

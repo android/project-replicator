@@ -5,8 +5,8 @@ import kotlin.random.Random
 class VectorDrawableGenerator (val random: Random) {
     fun generateImage(numberOfPathVectors: Int, maxVectorImageSize: Int): List<String> {
         val lines = mutableListOf<String>()
-        val width = random.nextInt(maxVectorImageSize)
-        val height = random.nextInt(maxVectorImageSize)
+        val width = random.nextInt(1, maxVectorImageSize)
+        val height = random.nextInt(1, maxVectorImageSize)
         val viewportWidth = random.nextInt(width)
         val viewportHeight = random.nextInt(height)
         val hasBackground = random.nextBoolean()

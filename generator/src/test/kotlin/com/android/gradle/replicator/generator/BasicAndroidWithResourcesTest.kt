@@ -58,12 +58,18 @@ class BasicAndroidWithResourcesTest: BaseTest() {
           {
             "qualifiers": "",
             "extension": ".xml",
-            "quantity": 1
+            "quantity": 1,
+            "fileSizes": [
+              64
+            ]
           },
           {
             "qualifiers": "v24",
             "extension": ".xml",
-            "quantity": 1
+            "quantity": 1,
+            "fileSizes": [
+              128
+            ]
           }
         ],
         "font": [],
@@ -85,32 +91,56 @@ class BasicAndroidWithResourcesTest: BaseTest() {
           {
             "qualifiers": "anydpi-v26",
             "extension": ".xml",
-            "quantity": 2
+            "quantity": 2,
+            "fileSizes": [
+              256,
+              512
+            ]
           },
           {
             "qualifiers": "hdpi",
             "extension": ".webp",
-            "quantity": 2
+            "quantity": 2,
+            "fileSizes": [
+              1024,
+              2048
+            ]
           },
           {
             "qualifiers": "mdpi",
             "extension": ".webp",
-            "quantity": 2
+            "quantity": 2,
+            "fileSizes": [
+              4096,
+              8192
+            ]
           },
           {
             "qualifiers": "xhdpi",
             "extension": ".webp",
-            "quantity": 2
+            "quantity": 2,
+            "fileSizes": [
+              16384,
+              32768
+            ]
           },
           {
             "qualifiers": "xxhdpi",
             "extension": ".webp",
-            "quantity": 2
+            "quantity": 2,
+            "fileSizes": [
+              65536,
+              131072
+            ]
           },
           {
             "qualifiers": "xxxhdpi",
             "extension": ".webp",
-            "quantity": 2
+            "quantity": 2,
+            "fileSizes": [
+              262144,
+              524288
+            ]
           }
         ],
         "raw": [],
@@ -119,12 +149,104 @@ class BasicAndroidWithResourcesTest: BaseTest() {
           {
             "qualifiers": "",
             "extension": ".xml",
-            "quantity": 4
+            "quantity": 4,
+            "valuesFileList": [
+              {
+                "stringCount": 5,
+                "intCount": 0,
+                "boolCount": 0,
+                "colorCount": 0,
+                "dimenCount": 0,
+                "idCount": 0,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              },
+              {
+                "stringCount": 2,
+                "intCount": 6,
+                "boolCount": 0,
+                "colorCount": 0,
+                "dimenCount": 0,
+                "idCount": 0,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              },
+              {
+                "stringCount": 2,
+                "intCount": 6,
+                "boolCount": 0,
+                "colorCount": 1,
+                "dimenCount": 0,
+                "idCount": 0,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              },
+              {
+                "stringCount": 2,
+                "intCount": 6,
+                "boolCount": 0,
+                "colorCount": 2,
+                "dimenCount": 1,
+                "idCount": 0,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              }
+            ]
           },
           {
             "qualifiers": "night",
             "extension": ".xml",
-            "quantity": 4
+            "quantity": 4,
+            "valuesFileList": [
+              {
+                "stringCount": 5,
+                "intCount": 0,
+                "boolCount": 0,
+                "colorCount": 0,
+                "dimenCount": 0,
+                "idCount": 2,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              },
+              {
+                "stringCount": 2,
+                "intCount": 6,
+                "boolCount": 0,
+                "colorCount": 0,
+                "dimenCount": 0,
+                "idCount": 2,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              },
+              {
+                "stringCount": 2,
+                "intCount": 6,
+                "boolCount": 0,
+                "colorCount": 1,
+                "dimenCount": 0,
+                "idCount": 2,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              },
+              {
+                "stringCount": 2,
+                "intCount": 6,
+                "boolCount": 0,
+                "colorCount": 2,
+                "dimenCount": 1,
+                "idCount": 2,
+                "integerArrayCount": [],
+                "arrayCount": [],
+                "styleCount": []
+              }
+            ]
           }
         ],
         "xml": []
@@ -163,12 +285,18 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                       {
                                         "qualifiers": "",
                                         "extension": ".xml",
-                                        "quantity": 1
+                                        "quantity": 1,
+                                        "fileSizes": [
+                                          64
+                                        ]
                                       },
                                       {
                                         "qualifiers": "v24",
                                         "extension": ".xml",
-                                        "quantity": 1
+                                        "quantity": 1,
+                                        "fileSizes": [
+                                          128
+                                        ]
                                       }
                                     ],
                                     "font": [],
@@ -190,32 +318,56 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                       {
                                         "qualifiers": "anydpi-v26",
                                         "extension": ".xml",
-                                        "quantity": 2
+                                        "quantity": 2,
+                                        "fileSizes": [
+                                          256,
+                                          512
+                                        ]
                                       },
                                       {
                                         "qualifiers": "hdpi",
                                         "extension": ".webp",
-                                        "quantity": 2
+                                        "quantity": 2,
+                                        "fileSizes": [
+                                          1024,
+                                          2048
+                                        ]
                                       },
                                       {
                                         "qualifiers": "mdpi",
                                         "extension": ".webp",
-                                        "quantity": 2
+                                        "quantity": 2,
+                                        "fileSizes": [
+                                          4096,
+                                          8192
+                                        ]
                                       },
                                       {
                                         "qualifiers": "xhdpi",
                                         "extension": ".webp",
-                                        "quantity": 2
+                                        "quantity": 2,
+                                        "fileSizes": [
+                                          16384,
+                                          32768
+                                        ]
                                       },
                                       {
                                         "qualifiers": "xxhdpi",
                                         "extension": ".webp",
-                                        "quantity": 2
+                                        "quantity": 2,
+                                        "fileSizes": [
+                                          65536,
+                                          131072
+                                        ]
                                       },
                                       {
                                         "qualifiers": "xxxhdpi",
                                         "extension": ".webp",
-                                        "quantity": 2
+                                        "quantity": 2,
+                                        "fileSizes": [
+                                          262144,
+                                          524288
+                                        ]
                                       }
                                     ],
                                     "raw": [],
@@ -224,17 +376,111 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                       {
                                         "qualifiers": "",
                                         "extension": ".xml",
-                                        "quantity": 4
+                                        "quantity": 4,
+                                        "valuesFileList": [
+                                          {
+                                            "stringCount": 5,
+                                            "intCount": 0,
+                                            "boolCount": 0,
+                                            "colorCount": 0,
+                                            "dimenCount": 0,
+                                            "idCount": 0,
+                                            "integerArrayCount": [],
+                                            "arrayCount": [],
+                                            "styleCount": []
+                                          },
+                                          {
+                                            "stringCount": 2,
+                                            "intCount": 6,
+                                            "boolCount": 0,
+                                            "colorCount": 0,
+                                            "dimenCount": 0,
+                                            "idCount": 0,
+                                            "integerArrayCount": [],
+                                            "arrayCount": [],
+                                            "styleCount": []
+                                          },
+                                          {
+                                            "stringCount": 2,
+                                            "intCount": 6,
+                                            "boolCount": 0,
+                                            "colorCount": 1,
+                                            "dimenCount": 0,
+                                            "idCount": 0,
+                                            "integerArrayCount": [],
+                                            "arrayCount": [],
+                                            "styleCount": []
+                                          },
+                                          {
+                                            "stringCount": 2,
+                                            "intCount": 6,
+                                            "boolCount": 0,
+                                            "colorCount": 2,
+                                            "dimenCount": 1,
+                                            "idCount": 0,
+                                            "integerArrayCount": [],
+                                            "arrayCount": [],
+                                            "styleCount": []
+                                          }
+                                        ]
                                       },
                                       {
                                         "qualifiers": "night",
                                         "extension": ".xml",
-                                        "quantity": 4
+                                        "quantity": 4,
+                                        "valuesFileList": [
+                                          {
+                                            "stringCount": 5,
+                                            "intCount": 0,
+                                            "boolCount": 0,
+                                            "colorCount": 0,
+                                            "dimenCount": 0,
+                                            "idCount": 2,
+                                            "integerArrayCount": [],
+                                            "arrayCount": [],
+                                            "styleCount": []
+                                          },
+                                          {
+                                            "stringCount": 2,
+                                            "intCount": 6,
+                                            "boolCount": 0,
+                                            "colorCount": 0,
+                                            "dimenCount": 0,
+                                            "idCount": 2,
+                                            "integerArrayCount": [],
+                                            "arrayCount": [],
+                                            "styleCount": []
+                                          },
+                                          {
+                                            "stringCount": 2,
+                                            "intCount": 6,
+                                            "boolCount": 0,
+                                            "colorCount": 1,
+                                            "dimenCount": 0,
+                                            "idCount": 2,
+                                            "integerArrayCount": [],
+                                            "arrayCount": [],
+                                            "styleCount": []
+                                          },
+                                          {
+                                            "stringCount": 2,
+                                            "intCount": 6,
+                                            "boolCount": 0,
+                                            "colorCount": 2,
+                                            "dimenCount": 1,
+                                            "idCount": 2,
+                                            "integerArrayCount": [],
+                                            "arrayCount": [],
+                                            "styleCount": []
+                                          }
+                                        ]
                                       }
                                     ],
                                     "xml": []
                                   },
-                                  "javaResources": 2
+                                  "javaResources": {
+                                    "fileCount": 2
+                                  }
                                 }
                         """.trimIndent()
         )
