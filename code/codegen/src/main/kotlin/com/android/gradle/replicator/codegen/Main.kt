@@ -116,7 +116,8 @@ class Main {
             outputFolder: File) {
         val generator = generatorType.initialize(parameters)
         repeat(numberOfSources) { count ->
-            val className = "Class" + ('A'+ count/(26*26)) + ('A'+ (count/26)%26) + ('A'+ count%26)
+            val suffix = if (generatorType == GeneratorType.Java) "Java" else ""
+            val className = "Class" + ('A'+ count/(26*26)) + ('A'+ (count/26)%26) + ('A'+ count%26) + suffix
             val sourceFolder = File(outputFolder, "com/android/example/$moduleName")
             sourceFolder.mkdirs()
             val outputFile = File(sourceFolder, generatorType.classNameToSourceFileName(className))

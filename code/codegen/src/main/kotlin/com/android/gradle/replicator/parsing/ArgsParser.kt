@@ -127,7 +127,7 @@ class ArgsParser {
         }
         // Post-parse sanity check
         argsFileOpts.forEach { opt ->
-            if (opt.value.isPresent && opt.value.argv.size != UNLIMITED_ARGC && opt.value.argv.size != opt.value.argc) {
+            if (opt.value.isPresent && opt.value.argc != UNLIMITED_ARGC && opt.value.argv.size != opt.value.argc) {
                 throw java.lang.IllegalArgumentException("wrong # of args for ${opt.key}. Expected ${opt.value.argc} but got ${opt.value.argv.size}")
             }
         }

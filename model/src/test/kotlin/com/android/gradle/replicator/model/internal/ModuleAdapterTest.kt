@@ -19,9 +19,8 @@ package com.android.gradle.replicator.model.internal
 import com.android.gradle.replicator.model.*
 import com.android.gradle.replicator.model.internal.fixtures.module
 import com.android.gradle.replicator.model.internal.resources.AbstractAndroidResourceProperties
-import com.android.gradle.replicator.model.internal.resources.AndroidDefaultResourceProperties
-import com.android.gradle.replicator.model.internal.resources.AndroidSizeMattersResourceProperties
-import com.android.gradle.replicator.model.internal.resources.AndroidValuesResourceProperties
+import com.android.gradle.replicator.model.internal.resources.SizeMattersAndroidResourceProperties
+import com.android.gradle.replicator.model.internal.resources.ValuesAndroidResourceProperties
 import com.android.gradle.replicator.model.internal.resources.ResourcePropertyType
 import com.android.gradle.replicator.model.internal.resources.ValuesMap
 import com.google.common.truth.Truth
@@ -93,25 +92,25 @@ internal class ModuleAdapterTest {
         androidResources {
             fileCount = mutableMapOf(
                     "mipmap" to mutableListOf<AbstractAndroidResourceProperties>(
-                            AndroidSizeMattersResourceProperties(
+                            SizeMattersAndroidResourceProperties(
                                 qualifiers = "",
                                 extension = ".xml",
                                 quantity = 3,
                                 fileSizes = listOf(64, 128, 256)
                             ),
-                            AndroidSizeMattersResourceProperties(
+                            SizeMattersAndroidResourceProperties(
                                 qualifiers = "",
                                 extension = ".png",
                                 quantity = 2,
                                 fileSizes = listOf(512, 1024)
                             ),
-                            AndroidSizeMattersResourceProperties(
+                            SizeMattersAndroidResourceProperties(
                                 qualifiers = "hidpi",
                                 extension = ".xml",
                                 quantity = 3,
                                 fileSizes = listOf(2048, 4096, 8192)
                             ),
-                            AndroidSizeMattersResourceProperties(
+                            SizeMattersAndroidResourceProperties(
                                 qualifiers = "hidpi",
                                 extension = ".png",
                                 quantity = 2,
@@ -119,7 +118,7 @@ internal class ModuleAdapterTest {
                             )
                     ),
                     "values" to mutableListOf<AbstractAndroidResourceProperties>(
-                            AndroidValuesResourceProperties(
+                            ValuesAndroidResourceProperties(
                                 qualifiers = "",
                                 extension = ".xml",
                                 quantity = 5,
@@ -180,14 +179,14 @@ internal class ModuleAdapterTest {
 
                 when (subjResourceProperties.propertyType) {
                     ResourcePropertyType.VALUES -> {
-                        val realSubjProperties = subjResourceProperties as AndroidValuesResourceProperties
-                        val realObjProperties = objResourceProperties as AndroidValuesResourceProperties
+                        val realSubjProperties = subjResourceProperties as ValuesAndroidResourceProperties
+                        val realObjProperties = objResourceProperties as ValuesAndroidResourceProperties
 
                         Truth.assertThat(realSubjProperties.valuesMapPerFile).isEqualTo(realObjProperties.valuesMapPerFile)
                     }
                     ResourcePropertyType.SIZE_MATTERS -> {
-                        val realSubjProperties = subjResourceProperties as AndroidSizeMattersResourceProperties
-                        val realObjProperties = objResourceProperties as AndroidSizeMattersResourceProperties
+                        val realSubjProperties = subjResourceProperties as SizeMattersAndroidResourceProperties
+                        val realObjProperties = objResourceProperties as SizeMattersAndroidResourceProperties
 
                         Truth.assertThat(realSubjProperties.fileSizes).isEqualTo(realObjProperties.fileSizes)}
                     ResourcePropertyType.DEFAULT -> { } // Nothing more

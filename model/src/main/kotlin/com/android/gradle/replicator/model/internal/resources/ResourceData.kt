@@ -1,5 +1,11 @@
 package com.android.gradle.replicator.model.internal.resources
 
+import com.android.gradle.replicator.model.internal.readArray
+import com.android.gradle.replicator.model.internal.readObjectProperties
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
+
 // Supported file types of each resource. Not exhaustive.
 val ANDROID_RESOURCE_FOLDER_CONVENTION = mapOf(
         "animator" to listOf(".xml"),
@@ -32,7 +38,7 @@ enum class ResourcePropertyType {
         SIZE_MATTERS
 }
 
-class AndroidDefaultResourceProperties (
+class DefaultAndroidResourceProperties (
         qualifiers: String,
         extension: String,
         quantity: Int): AbstractAndroidResourceProperties(qualifiers, extension, quantity) {
@@ -51,7 +57,7 @@ data class ValuesMap (
         var styleCount: MutableList<Int> = mutableListOf())
 
 // Values need to know how many of each value are in the files
-class AndroidValuesResourceProperties (
+class ValuesAndroidResourceProperties (
         qualifiers: String,
         extension: String,
         quantity: Int,
@@ -60,7 +66,7 @@ class AndroidValuesResourceProperties (
 }
 
 // Images and other resources need the file sizes to properly replicate
-class AndroidSizeMattersResourceProperties (
+class SizeMattersAndroidResourceProperties (
         qualifiers: String,
         extension: String,
         quantity: Int,
@@ -78,10 +84,131 @@ fun selectResourceProperties(
         fileSizes: List<Long>? = null,
         valuesMapPerFile: List<ValuesMap>? = null): AbstractAndroidResourceProperties {
     return when (resourceType) {
-        "values" -> AndroidValuesResourceProperties(qualifiers, extension, quantity, valuesMapPerFile!!)
+        "values" -> ValuesAndroidResourceProperties(qualifiers, extension, quantity, valuesMapPerFile!!)
         "drawable",
         "mipmap",
-        "raw" -> AndroidSizeMattersResourceProperties(qualifiers, extension, quantity, fileSizes!!)
-        else -> AndroidDefaultResourceProperties(qualifiers, extension, quantity)
+        "raw" -> SizeMattersAndroidResourceProperties(qualifiers, extension, quantity, fileSizes!!)
+        else -> DefaultAndroidResourceProperties(qualifiers, extension, quantity)
+    }
+}
+
+class AndroidResourcePropertiesAdapter(private val resourceType: String? = null):
+    TypeAdapter<AbstractAndroidResourceProperties>() {
+    override fun write(output: JsonWriter, value: AbstractAndroidResourceProperties) {
+        output.beginObject()
+        output.name("qualifiers").value(value.qualifiers)
+        output.name("extension").value(value.extension)
+        output.name("quantity").value(value.quantity)
+        when (value.propertyType) {
+            ResourcePropertyType.VALUES -> {
+                writeValuesSpecializedData(output, value as ValuesAndroidResourceProperties)
+            }
+            ResourcePropertyType.SIZE_MATTERS -> {
+                writeSizeMattersSpecializedData(output, value as SizeMattersAndroidResourceProperties)
+            }
+            ResourcePropertyType.DEFAULT -> {} // No additional information
+        }
+        output.endObject()
+    }
+
+    override fun read(input: JsonReader): AbstractAndroidResourceProperties {
+        var qualifiers: String? = null
+        var extension: String? = null
+        var quantity: Int? = null
+        var fileSizes: MutableList<Long>? = null
+        var valuesMapPerFile: MutableList<ValuesMap>? = null
+        input.readObjectProperties { property ->
+            when (property) {
+                "qualifiers" -> qualifiers = this.nextString()
+                "extension" -> extension = this.nextString()
+                "quantity" -> quantity = this.nextInt()
+                "fileSizes" -> {
+                        fileSizes = mutableListOf()
+                        this.readArray {
+                                fileSizes!!.add(this.nextLong())
+                        }
+                }
+                "valuesFileList" -> {
+                    valuesMapPerFile = mutableListOf()
+                    this.readArray {
+                        val valuesMap = ValuesMap()
+                        this.readObjectProperties { valueProperty ->
+                            when (valueProperty) {
+                                "stringCount" -> { valuesMap.stringCount = this.nextInt() }
+                                "intCount" -> { valuesMap.intCount = this.nextInt() }
+                                "boolCount" -> { valuesMap.boolCount = this.nextInt()  }
+                                "colorCount" -> { valuesMap.colorCount = this.nextInt()  }
+                                "dimenCount" -> { valuesMap.dimenCount = this.nextInt()  }
+                                "idCount" -> { valuesMap.idCount = this.nextInt() }
+                                "integerArrayCount" -> {
+                                    this.readArray {
+                                        valuesMap.integerArrayCount.add(this.nextInt())
+                                    }
+                                }
+                                "arrayCount" -> {
+                                    this.readArray {
+                                        valuesMap.arrayCount.add(this.nextInt())
+                                    }
+                                }
+                                "styleCount" -> {
+                                    this.readArray {
+                                        valuesMap.styleCount.add(this.nextInt())
+                                    }
+                                }
+                            }
+                        }
+                        valuesMapPerFile!!.add(valuesMap)
+                    }
+                }
+            }
+        }
+        return selectResourceProperties(
+                resourceType = resourceType!!,
+                qualifiers = qualifiers!!,
+                extension = extension!!,
+                quantity = quantity!!,
+                fileSizes = fileSizes,
+                valuesMapPerFile = valuesMapPerFile)
+    }
+
+    private fun writeValuesSpecializedData(output: JsonWriter, value: ValuesAndroidResourceProperties) {
+        output.name("valuesFileList").beginArray()
+        value.valuesMapPerFile.forEach { resourceFile ->
+            output.beginObject()
+            output.name("stringCount").value(resourceFile.stringCount)
+            output.name("intCount").value(resourceFile.intCount)
+            output.name("boolCount").value(resourceFile.boolCount)
+            output.name("colorCount").value(resourceFile.colorCount)
+            output.name("dimenCount").value(resourceFile.dimenCount)
+            output.name("idCount").value(resourceFile.idCount)
+
+            output.name("integerArrayCount").beginArray()
+            resourceFile.integerArrayCount.forEach {
+                output.value(it)
+            }
+            output.endArray()
+
+            output.name("arrayCount").beginArray()
+            resourceFile.arrayCount.forEach {
+                output.value(it)
+            }
+            output.endArray()
+
+            output.name("styleCount").beginArray()
+            resourceFile.styleCount.forEach {
+                output.value(it)
+            }
+            output.endArray()
+
+            output.endObject()
+        }
+        output.endArray()
+    }
+    private fun writeSizeMattersSpecializedData(output: JsonWriter, value: SizeMattersAndroidResourceProperties) {
+        output.name("fileSizes").beginArray()
+        value.fileSizes.forEach { resourceFile ->
+            output.value(resourceFile)
+        }
+        output.endArray()
     }
 }

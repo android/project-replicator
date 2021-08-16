@@ -36,9 +36,6 @@ import com.google.gson.stream.JsonWriter
 import java.io.File
 import java.io.FileWriter
 
-
-
-
 class GradleProjectGenerator(
     private val destinationFolder: File,
     private val libraryFilter: Map<String, String>,
@@ -223,7 +220,7 @@ class GradleProjectGenerator(
         with(JsonWriter(FileWriter(metadataFile))) {
             this.setIndent("  ")
             beginObject()
-            module.androidResources?.also {
+            module.androidResources?.let {
                 name("androidResources")
                 AndroidResourcesAdapter().write(this, it)
             }

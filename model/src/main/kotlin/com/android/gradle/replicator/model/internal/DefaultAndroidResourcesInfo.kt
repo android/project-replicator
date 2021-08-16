@@ -18,11 +18,7 @@ package com.android.gradle.replicator.model.internal
 
 import com.android.gradle.replicator.model.AndroidResourcesInfo
 import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
-import com.android.gradle.replicator.model.internal.resources.ResourcePropertyType
-import com.android.gradle.replicator.model.internal.resources.AndroidValuesResourceProperties
-import com.android.gradle.replicator.model.internal.resources.AndroidSizeMattersResourceProperties
-import com.android.gradle.replicator.model.internal.resources.ValuesMap
-import com.android.gradle.replicator.model.internal.resources.selectResourceProperties
+import com.android.gradle.replicator.model.internal.resources.AndroidResourcePropertiesAdapter
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
@@ -77,57 +73,11 @@ data class DefaultAndroidResourcesInfo(
 class AndroidResourcesAdapter: TypeAdapter<AndroidResourcesInfo>() {
     override fun write(output: JsonWriter, value: AndroidResourcesInfo) {
         output.beginObject()
+        val resourcePropertiesWriter = AndroidResourcePropertiesAdapter()
         for (resourceType in value.resourceMap) {
             output.name(resourceType.key).beginArray()
             for (resourceProperties in resourceType.value) {
-                output.beginObject()
-                output.name("qualifiers").value(resourceProperties.qualifiers)
-                output.name("extension").value(resourceProperties.extension)
-                output.name("quantity").value(resourceProperties.quantity)
-                when (resourceProperties.propertyType) {
-                    ResourcePropertyType.VALUES -> {
-                        output.name("valuesFileList").beginArray()
-                        (resourceProperties as AndroidValuesResourceProperties).valuesMapPerFile.forEach { resourceFile ->
-                            output.beginObject()
-                            output.name("stringCount").value(resourceFile.stringCount)
-                            output.name("intCount").value(resourceFile.intCount)
-                            output.name("boolCount").value(resourceFile.boolCount)
-                            output.name("colorCount").value(resourceFile.colorCount)
-                            output.name("dimenCount").value(resourceFile.dimenCount)
-                            output.name("idCount").value(resourceFile.idCount)
-
-                            output.name("integerArrayCount").beginArray()
-                            resourceFile.integerArrayCount.forEach {
-                                output.value(it)
-                            }
-                            output.endArray()
-
-                            output.name("arrayCount").beginArray()
-                            resourceFile.arrayCount.forEach {
-                                output.value(it)
-                            }
-                            output.endArray()
-
-                            output.name("styleCount").beginArray()
-                            resourceFile.styleCount.forEach {
-                                output.value(it)
-                            }
-                            output.endArray()
-
-                            output.endObject()
-                        }
-                        output.endArray()
-                    }
-                    ResourcePropertyType.SIZE_MATTERS -> {
-                        output.name("fileSizes").beginArray()
-                        (resourceProperties as AndroidSizeMattersResourceProperties).fileSizes.forEach { resourceFile ->
-                            output.value(resourceFile)
-                        }
-                        output.endArray()
-                    }
-                    ResourcePropertyType.DEFAULT -> {} // No additional information
-                }
-                output.endObject()
+                resourcePropertiesWriter.write(output, resourceProperties)
             }
             output.endArray()
         }
@@ -136,69 +86,13 @@ class AndroidResourcesAdapter: TypeAdapter<AndroidResourcesInfo>() {
 
     override fun read(input: JsonReader): AndroidResourcesInfo {
         val fileCount: AndroidResourceMap = mutableMapOf()
-
         // Read folder properties
         input.readObjectProperties { resourceType ->
+            val resourcePropertiesReader = AndroidResourcePropertiesAdapter(resourceType)
             fileCount[resourceType] = mutableListOf()
             // Read resource properties
             this.readArray {
-                var qualifiers: String? = null
-                var extension: String? = null
-                var quantity: Int? = null
-                var fileSizes: MutableList<Long>? = null
-                var valuesMapPerFile: MutableList<ValuesMap>? = null
-                this.readObjectProperties { property ->
-                    when (property) {
-                        "qualifiers" -> qualifiers = this.nextString()
-                        "extension" -> extension = this.nextString()
-                        "quantity" -> quantity = this.nextInt()
-                        "fileSizes" -> {
-                            fileSizes = mutableListOf()
-                            this.readArray {
-                                fileSizes!!.add(this.nextLong())
-                            }
-                        }
-                        "valuesFileList" -> {
-                            valuesMapPerFile = mutableListOf()
-                            this.readArray {
-                                val valuesMap = ValuesMap()
-                                this.readObjectProperties { valueProperty ->
-                                    when (valueProperty) {
-                                        "stringCount" -> { valuesMap.stringCount = this.nextInt() }
-                                        "intCount" -> { valuesMap.intCount = this.nextInt() }
-                                        "boolCount" -> { valuesMap.boolCount = this.nextInt()  }
-                                        "colorCount" -> { valuesMap.colorCount = this.nextInt()  }
-                                        "dimenCount" -> { valuesMap.dimenCount = this.nextInt()  }
-                                        "idCount" -> { valuesMap.idCount = this.nextInt() }
-                                        "integerArrayCount" -> {
-                                            this.readArray {
-                                                valuesMap.integerArrayCount.add(this.nextInt())
-                                            }
-                                        }
-                                        "arrayCount" -> {
-                                            this.readArray {
-                                                valuesMap.arrayCount.add(this.nextInt())
-                                            }
-                                        }
-                                        "styleCount" -> {
-                                            this.readArray {
-                                                valuesMap.styleCount.add(this.nextInt())
-                                            }
-                                        }
-                                    }
-                                }
-                                valuesMapPerFile!!.add(valuesMap)
-                            }
-                        }
-                    }
-                }
-                fileCount[resourceType]!!.add(selectResourceProperties(
-                    resourceType = resourceType,
-                    qualifiers = qualifiers!!,
-                    extension = extension!!,
-                    quantity = quantity!!,
-                    fileSizes = fileSizes,
-                    valuesMapPerFile = valuesMapPerFile))
+                fileCount[resourceType]!!.add(resourcePropertiesReader.read(this))
             }
         }
 

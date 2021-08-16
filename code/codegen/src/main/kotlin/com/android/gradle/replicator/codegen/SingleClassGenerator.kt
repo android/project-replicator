@@ -132,7 +132,9 @@ class SingleClassGenerator(
                 classGenerator.allocateValue(random, false, allocatableType)
         )
         classGenerator.indent()
-        addMethodCall(variableName, allocatableType.callableMethods.random(random))
+        if (allocatableType.callableMethods.isNotEmpty()) {
+            addMethodCall(variableName, allocatableType.callableMethods.random(random))
+        }
         classGenerator.println()
     }
 

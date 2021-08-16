@@ -5,6 +5,7 @@ import com.android.utils.XmlUtils
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.Locator
+import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
 import java.io.File
 import java.io.StringReader
@@ -27,8 +28,8 @@ fun processResourceFiles(resourceType: String, qualifiers: String, extension: St
 
 // Methods to parse specific resource types
 // Parses values xml files and counts each type of value
-fun getValuesResourceData(qualifiers: String, extension: String, resourceFiles: Set<File>): AndroidValuesResourceProperties {
-    return AndroidValuesResourceProperties(
+fun getValuesResourceData(qualifiers: String, extension: String, resourceFiles: Set<File>): ValuesAndroidResourceProperties {
+    return ValuesAndroidResourceProperties(
             qualifiers = qualifiers,
             extension = extension,
             quantity = resourceFiles.size,
@@ -39,15 +40,11 @@ fun getValuesResourceData(qualifiers: String, extension: String, resourceFiles: 
             }
     )
 }
-private fun debugWrite(text: String) {
-    java.nio.file.Files.write(java.nio.file.Paths.get("/Users/jeanlucncoelho/debug.txt"), (text + "\n").toByteArray(), java.nio.file.StandardOpenOption.APPEND);
-}
 
 
 fun getSizeMattersResourceData(qualifiers: String, extension: String, resourceFiles: Set<File>):
-        AndroidSizeMattersResourceProperties {
-    debugWrite("$qualifiers, $extension, $resourceFiles")
-    return AndroidSizeMattersResourceProperties(
+        SizeMattersAndroidResourceProperties {
+    return SizeMattersAndroidResourceProperties(
             qualifiers = qualifiers,
             extension = extension,
             quantity = resourceFiles.size,
@@ -60,7 +57,7 @@ fun getSizeMattersResourceData(qualifiers: String, extension: String, resourceFi
 }
 
 fun getDefaultResourceData(qualifiers: String, extension: String, resourceFiles: Set<File>): AbstractAndroidResourceProperties {
-    return AndroidDefaultResourceProperties(
+    return DefaultAndroidResourceProperties(
             qualifiers = qualifiers,
             extension = extension,
             quantity = resourceFiles.size
@@ -128,7 +125,16 @@ fun parseValuesFile(valuesFile: File): ValuesMap {
     // Parse the input
     XmlUtils.configureSaxFactory(factory, false, false)
     val saxParser = XmlUtils.createSaxParser(factory)
-    saxParser.parse(InputSource(StringReader(valuesFile.readText())), handler)
+    try {
+        saxParser.parse(InputSource(StringReader(valuesFile.readText())), handler)
+    } catch (e: SAXParseException) {
+        println("e: Invalid xml file $valuesFile")
+        println("   line ${e.lineNumber}; column ${e.columnNumber}: ${e.message}")
+        println("   ${valuesFile.readLines()[e.lineNumber-1]}")
+        println("   ${" ".repeat(e.columnNumber-1)}↑")
+        println(    "Skipping file parsing")
+        return ValuesMap() // Return empty map
+    }
 
     return valuesMap
 }
