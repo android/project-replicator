@@ -34,4 +34,10 @@ jobs:
       # Runs a single command using the runners shell
       - name: run checks
         run: ./gradlew check --stacktrace
+
+      - name: Archive test logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: gradle-test-logs
+          path: **/build/reports/tests
         
