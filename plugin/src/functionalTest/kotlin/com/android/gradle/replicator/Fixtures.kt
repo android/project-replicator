@@ -137,6 +137,9 @@ fun setupProject(
 ): ProjectSetup {
     // Setup the test build
     val projectDir = File("build/functionalTest/${getName(traceOffset)}")
+    if (projectDir.exists()) {
+        projectDir.deleteRecursively()
+    }
     projectDir.mkdirs()
     projectDir.resolve(type.settingsFile()).writeText("")
     val buildFile = projectDir.resolve(type.buidFile())

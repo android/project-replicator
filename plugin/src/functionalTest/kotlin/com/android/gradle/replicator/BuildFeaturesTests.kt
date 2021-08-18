@@ -754,7 +754,7 @@ class BuildFeaturesTests {
                   "extension": ".xml",
                   "quantity": 1,
                   "fileSizes": [
-                    321
+                    0
                   ]
                 },
                 {
@@ -762,7 +762,7 @@ class BuildFeaturesTests {
                   "extension": ".xml",
                   "quantity": 1,
                   "fileSizes": [
-                    321
+                    0
                   ]
                 }
               ],
@@ -787,8 +787,8 @@ class BuildFeaturesTests {
                   "extension": ".xml",
                   "quantity": 2,
                   "fileSizes": [
-                    321,
-                    321
+                    0,
+                    0
                   ]
                 },
                 {
@@ -926,7 +926,6 @@ class BuildFeaturesTests {
           "modules": []
         }
         """.trimIndent())
-
     }
 
     private fun setup(): ProjectSetup {
