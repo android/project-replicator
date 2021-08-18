@@ -37,7 +37,8 @@ jobs:
 
       - name: Archive test logs
         uses: actions/upload-artifact@v2
+        if: failure()
         with:
           name: gradle-test-logs
-          path: **/build/reports/tests
+          path: ./**/build/reports/tests
         
