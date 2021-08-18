@@ -33,5 +33,5 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: run checks
-        run: ./gradlew check
+        run: ./gradlew check --stacktrace
         
