@@ -1,13 +1,15 @@
 package com.android.gradle.replicator.resgen
 
+import com.android.gradle.replicator.resgen.util.ResgenConstants
 import com.google.common.truth.Truth
+import org.intellij.lang.annotations.Language
 import org.junit.Test
 import java.io.File
 
 class DrawableGenerationUnitTest: AbstractResourceGenerationUnitTest() {
     @Test
     fun testDrawableGeneration() {
-        val generator = DrawableResourceGenerator(random)
+        val generator = DrawableResourceGenerator(random, ResgenConstants())
         generator.numberOfResourceElements = 3
 
         val pngFolder = output.newFolder("png")
@@ -112,6 +114,7 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationUnitTest() {
             Truth.assertThat(File(it.value.first, it.key).readBytes()).isEqualTo(it.value.second.readBytes())
         }
 
+        @Language("xml")
         val expectedXmlAAA = """
             <?xml version="1.0" encoding="utf-8"?>
             <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -143,6 +146,7 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationUnitTest() {
             </vector>
         """.trimIndent()
 
+        @Language("xml")
         val expectedXmlAAB = """
             <?xml version="1.0" encoding="utf-8"?>
             <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -171,6 +175,7 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationUnitTest() {
             </vector>
         """.trimIndent()
 
+        @Language("xml")
         val expectedXmlAAC = """
             <?xml version="1.0" encoding="utf-8"?>
             <vector xmlns:android="http://schemas.android.com/apk/res/android"

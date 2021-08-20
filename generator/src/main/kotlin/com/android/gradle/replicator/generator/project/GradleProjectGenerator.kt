@@ -34,6 +34,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonWriter
 import java.io.File
+import java.io.FileOutputStream
 import java.io.FileWriter
 
 class GradleProjectGenerator(
@@ -119,6 +120,9 @@ class GradleProjectGenerator(
         // create module metadata files
         generateModuleMetadata(destinationFolder, project.rootModule)
         generateModuleResourceMetadata(destinationFolder, project.rootModule)
+
+        // create generation constants file
+        generateResgenDefaultConstants(destinationFolder)
     }
 
     private fun PluginType.useNewDsl(info: ProjectInfo): Boolean {
@@ -231,6 +235,13 @@ class GradleProjectGenerator(
             endObject()
             this.flush()
         }
+    }
+
+    private fun generateResgenDefaultConstants(folder: File) {
+        val generationPropertyFile = folder.join("generation.properties")
+
+        val loader = Thread.currentThread().contextClassLoader
+        loader.getResourceAsStream("project/resourceGeneratorConstants.properties")!!.copyTo(FileOutputStream(generationPropertyFile))
     }
 
     private fun ModuleInfo.generateDependencies() {

@@ -1,32 +1,38 @@
 package com.android.gradle.replicator.resgen
 
 import com.android.gradle.replicator.model.internal.resources.AbstractAndroidResourceProperties
+import com.android.gradle.replicator.resgen.util.ResgenConstants
 import java.io.File
 import kotlin.random.Random
 
 class GeneratorDriver (val random: Random) {
     // TODO: implement other generators
-    private fun getGenerator(random: Random, resourceType: String): ResourceGenerator? {
+    private fun getGenerator(random: Random, resourceType: String, constants: ResgenConstants): ResourceGenerator? {
         return when(resourceType) {
             //"animator" ->
             //"anim" ->
             //"color" ->
-            "drawable" -> DrawableResourceGenerator(random)
+            "drawable" -> DrawableResourceGenerator(random, constants)
             "font" -> FontResourceGenerator(random)
             //"layout" ->
             //"menu" ->
-            "mipmap" -> DrawableResourceGenerator(random)
+            "mipmap" -> DrawableResourceGenerator(random, constants)
             "raw" -> RawResourceGenerator(random)
             //"transition" ->
-            "values" -> ValueResourceGenerator(random)
+            "values" -> ValueResourceGenerator(random, constants)
             //"xml" ->
             else -> null
         }
     }
 
-    fun generateResources(outputFolder: File, resourceType: String, resourceProperties: AbstractAndroidResourceProperties) {
+    fun generateResources(
+        outputFolder: File,
+        resourceType: String,
+        resourceProperties: AbstractAndroidResourceProperties,
+        resgenConstants: ResgenConstants) {
+
         // TODO: Separate resource properties by type
-        val generator = getGenerator(random, resourceType)
+        val generator = getGenerator(random, resourceType, resgenConstants)
 
         // empty qualifiers means the folder is unqualified, as in "mipmap" instead of "mipmap-hidpi"
         val qualifiedFolder =

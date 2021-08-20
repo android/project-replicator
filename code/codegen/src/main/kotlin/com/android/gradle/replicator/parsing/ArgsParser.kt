@@ -123,6 +123,7 @@ class ArgsParser {
                 arg.value?.toString()?.split(",")?.let {
                     currentOption.argv.addAll(it)
                 }
+                currentOption.isPresent = true
             }
         }
         // Post-parse sanity check

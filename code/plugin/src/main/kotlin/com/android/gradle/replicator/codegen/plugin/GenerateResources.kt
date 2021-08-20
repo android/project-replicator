@@ -20,7 +20,10 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 import kotlin.random.Random
 
 abstract class GenerateResources: DefaultTask() {
@@ -30,6 +33,9 @@ abstract class GenerateResources: DefaultTask() {
 
     @get:Input
     abstract val seed: Property<Int>
+
+    @get:InputFile
+    abstract val generationProperties: RegularFileProperty
 
     @get:OutputDirectory
     abstract val androidOutputDirectory: DirectoryProperty
@@ -46,6 +52,7 @@ abstract class GenerateResources: DefaultTask() {
                         "--resJson", parameters.get().asFile.absolutePath,
                         "--androidOutput", androidOutputDirectory.get().asFile.absolutePath,
                         "--javaOutput", javaOutputDirectory.get().asFile.absolutePath,
+                        "--generationProperties", generationProperties.get().asFile.absolutePath,
                         "--seed", randomizer.nextInt().toString()
                 )
         )

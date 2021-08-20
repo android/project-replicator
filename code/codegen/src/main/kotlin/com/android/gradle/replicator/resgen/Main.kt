@@ -21,6 +21,7 @@ import com.android.gradle.replicator.model.SourceFilesInfo
 import com.android.gradle.replicator.model.internal.*
 import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
 import com.android.gradle.replicator.parsing.ArgsParser
+import com.android.gradle.replicator.resgen.util.ResgenConstants
 import com.google.gson.stream.JsonReader
 import java.io.File
 import java.io.FileNotFoundException
@@ -50,6 +51,7 @@ class Main {
         val androidOutputFolderOption = parser.option(longName = "androidOutput", shortName = "ao", argc = 1)
         val javaOutputFolderOption = parser.option(longName = "javaOutput", shortName = "jo", argc = 1)
         val resJsonOption = parser.option(longName = "resJson", shortName = "rj", argc = 1)
+        val resgenConstantsFile = parser.option(longName = "generationProperties", shortName = "gp", argc = 1)
         val seedOption = parser.option(longName = "seed", shortName = "s", argc = 1)
 
         parser.parseArgs(args)
@@ -82,11 +84,14 @@ class Main {
 
         val arguments = argumentsBuilder.build()
 
+        val resgenConstants = ResgenConstants(resgenConstantsFile.orNull?.first?.let { File(it) })
+
         if (countResources(arguments.androidResourcesMap) > 0) {
             generateAndroidResources(
                     arguments.androidResourcesMap,
                     arguments,
-                    androidOutputFolder
+                    androidOutputFolder,
+                    resgenConstants
             )
         }
         if (arguments.numberOfJavaResources > 0) {
@@ -101,12 +106,13 @@ class Main {
     private fun generateAndroidResources(
             resMap: AndroidResourceMap,
             parameters: ResourceGenerationParameters,
-            outputFolder: File) {
+            outputFolder: File,
+            resgenConstants: ResgenConstants) {
         resMap.forEach { resourceType ->
             val random = Random(parameters.seed)
             val generator = GeneratorDriver(random)
             resourceType.value.forEach { resourceProperties ->
-                generator.generateResources(outputFolder, resourceType.key, resourceProperties)
+                generator.generateResources(outputFolder, resourceType.key, resourceProperties, resgenConstants)
             }
         }
     }
@@ -115,8 +121,7 @@ class Main {
             numberOfResources: Int,
             parameters: ResourceGenerationParameters,
             outputFolder: File) {
-        repeat(numberOfResources) { count ->
-        }
+        // To be implemented
         return
     }
 
@@ -159,5 +164,6 @@ class Main {
         println("\t-rj/--resJson : classpath for all private (implementation) libraries, each element is a .jar file")
         println("\t-ao/--androidOutput : android resources output folder")
         println("\t-jo/--javaOutput : java resources output folder")
+        println("\t-gp/--generationProperties : resource generation properties file")
     }
 }
