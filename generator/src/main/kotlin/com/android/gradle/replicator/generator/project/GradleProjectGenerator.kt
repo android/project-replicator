@@ -27,10 +27,15 @@ import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.ModuleInfo
 import com.android.gradle.replicator.model.PluginType
 import com.android.gradle.replicator.model.ProjectInfo
-import com.google.gson.Gson
+import com.android.gradle.replicator.model.internal.AndroidResourcesAdapter
+import com.android.gradle.replicator.model.internal.DefaultSourceFilesInfo
+import com.android.gradle.replicator.model.internal.SourceFilesAdapter
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
+import com.google.gson.stream.JsonWriter
 import java.io.File
+import java.io.FileOutputStream
+import java.io.FileWriter
 
 class GradleProjectGenerator(
     private val destinationFolder: File,
@@ -115,6 +120,9 @@ class GradleProjectGenerator(
         // create module metadata files
         generateModuleMetadata(destinationFolder, project.rootModule)
         generateModuleResourceMetadata(destinationFolder, project.rootModule)
+
+        // create generation constants file
+        generateResgenDefaultConstants(destinationFolder)
     }
 
     private fun PluginType.useNewDsl(info: ProjectInfo): Boolean {
@@ -213,13 +221,27 @@ class GradleProjectGenerator(
     ) {
         val metadataFile = folder.join("resource-metadata.json")
 
-        val metadataJson = JsonObject()
-        module.androidResources?.resourceMap?.also {
-            metadataJson.add("androidResources", Gson().toJsonTree(it))
-        }
-        metadataJson.addProperty("javaResources", module.javaResources?.fileCount ?: 0)
+        with(JsonWriter(FileWriter(metadataFile))) {
+            this.setIndent("  ")
+            beginObject()
+            module.androidResources?.let {
+                name("androidResources")
+                AndroidResourcesAdapter().write(this, it)
+            }
 
-        metadataFile.writeBytes(GsonBuilder().setPrettyPrinting().create().toJson(metadataJson).toByteArray())
+            name("javaResources")
+            SourceFilesAdapter().write(this, module.javaResources ?: DefaultSourceFilesInfo(0))
+
+            endObject()
+            this.flush()
+        }
+    }
+
+    private fun generateResgenDefaultConstants(folder: File) {
+        val generationPropertyFile = folder.join("generation.properties")
+
+        val loader = Thread.currentThread().contextClassLoader
+        loader.getResourceAsStream("project/resourceGeneratorConstants.properties")!!.copyTo(FileOutputStream(generationPropertyFile))
     }
 
     private fun ModuleInfo.generateDependencies() {

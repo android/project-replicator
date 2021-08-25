@@ -46,6 +46,7 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
             task.seed.set(Random.nextInt())
             task.androidOutputDirectory.set(project.layout.projectDirectory.dir("src/res"))
             task.javaOutputDirectory.set(project.layout.projectDirectory.dir("src/resources"))
+            task.generationProperties.set(project.rootProject.layout.projectDirectory.file("generation.properties"))
         }
 
         val generateTask = project.tasks.register(

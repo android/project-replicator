@@ -692,12 +692,15 @@ class BuildFeaturesTests {
                 "mipmap-xxhdpi/ic_launcher_round.webp",
                 "mipmap-xxxhdpi/ic_launcher.webp",
                 "mipmap-xxxhdpi/ic_launcher_round.webp",
-                "navigation/nav_graph.xml",
-                "values/colors.xml",
-                "values/dimens.xml",
-                "values/strings.xml",
-                "values/themes.xml",
-                "values-night/themes.xml"
+                "navigation/nav_graph.xml"
+        )
+
+        val valuesResources = listOf(
+            "values/colors.xml",
+            "values/dimens.xml",
+            "values/strings.xml",
+            "values/themes.xml",
+            "values-night/themes.xml"
         )
 
         val javaResources = listOf(
@@ -709,6 +712,13 @@ class BuildFeaturesTests {
             val resourceFile = File(androidResourceFolder, it)
             resourceFile.parentFile.mkdirs()
             resourceFile.createNewFile()
+        }
+
+        valuesResources.forEach {
+            val resourceFile = File(androidResourceFolder, it)
+            resourceFile.parentFile.mkdirs()
+            resourceFile.createNewFile()
+            resourceFile.writeText("<resources>\n</resources>")
         }
 
         javaResources.forEach {
@@ -742,12 +752,18 @@ class BuildFeaturesTests {
                 {
                   "qualifiers": "",
                   "extension": ".xml",
-                  "quantity": 1
+                  "quantity": 1,
+                  "fileSizes": [
+                    0
+                  ]
                 },
                 {
                   "qualifiers": "v24",
                   "extension": ".xml",
-                  "quantity": 1
+                  "quantity": 1,
+                  "fileSizes": [
+                    0
+                  ]
                 }
               ],
               "font": [],
@@ -769,32 +785,56 @@ class BuildFeaturesTests {
                 {
                   "qualifiers": "anydpi-v26",
                   "extension": ".xml",
-                  "quantity": 2
+                  "quantity": 2,
+                  "fileSizes": [
+                    0,
+                    0
+                  ]
                 },
                 {
                   "qualifiers": "hdpi",
                   "extension": ".webp",
-                  "quantity": 2
+                  "quantity": 2,
+                  "fileSizes": [
+                    0,
+                    0
+                  ]
                 },
                 {
                   "qualifiers": "mdpi",
                   "extension": ".webp",
-                  "quantity": 2
+                  "quantity": 2,
+                  "fileSizes": [
+                    0,
+                    0
+                  ]
                 },
                 {
                   "qualifiers": "xhdpi",
                   "extension": ".webp",
-                  "quantity": 2
+                  "quantity": 2,
+                  "fileSizes": [
+                    0,
+                    0
+                  ]
                 },
                 {
                   "qualifiers": "xxhdpi",
                   "extension": ".webp",
-                  "quantity": 2
+                  "quantity": 2,
+                  "fileSizes": [
+                    0,
+                    0
+                  ]
                 },
                 {
                   "qualifiers": "xxxhdpi",
                   "extension": ".webp",
-                  "quantity": 2
+                  "quantity": 2,
+                  "fileSizes": [
+                    0,
+                    0
+                  ]
                 }
               ],
               "raw": [],
@@ -803,12 +843,71 @@ class BuildFeaturesTests {
                 {
                   "qualifiers": "",
                   "extension": ".xml",
-                  "quantity": 4
+                  "quantity": 4,
+                  "valuesFileList": [
+                    {
+                      "stringCount": 0,
+                      "intCount": 0,
+                      "boolCount": 0,
+                      "colorCount": 0,
+                      "dimenCount": 0,
+                      "idCount": 0,
+                      "integerArrayCount": [],
+                      "arrayCount": [],
+                      "styleCount": []
+                    },
+                    {
+                      "stringCount": 0,
+                      "intCount": 0,
+                      "boolCount": 0,
+                      "colorCount": 0,
+                      "dimenCount": 0,
+                      "idCount": 0,
+                      "integerArrayCount": [],
+                      "arrayCount": [],
+                      "styleCount": []
+                    },
+                    {
+                      "stringCount": 0,
+                      "intCount": 0,
+                      "boolCount": 0,
+                      "colorCount": 0,
+                      "dimenCount": 0,
+                      "idCount": 0,
+                      "integerArrayCount": [],
+                      "arrayCount": [],
+                      "styleCount": []
+                    },
+                    {
+                      "stringCount": 0,
+                      "intCount": 0,
+                      "boolCount": 0,
+                      "colorCount": 0,
+                      "dimenCount": 0,
+                      "idCount": 0,
+                      "integerArrayCount": [],
+                      "arrayCount": [],
+                      "styleCount": []
+                    }
+                  ]
                 },
                 {
                   "qualifiers": "night",
                   "extension": ".xml",
-                  "quantity": 1
+                  "quantity": 1,
+                  "valuesFileList": [
+                    {
+                      "stringCount": 0,
+                      "intCount": 0,
+                      "boolCount": 0,
+                      "colorCount": 0,
+                      "dimenCount": 0,
+                      "idCount": 0,
+                      "integerArrayCount": [],
+                      "arrayCount": [],
+                      "styleCount": []
+                    }
+                  ]
                 }
               ],
               "xml": []
@@ -827,7 +926,6 @@ class BuildFeaturesTests {
           "modules": []
         }
         """.trimIndent())
-
     }
 
     private fun setup(): ProjectSetup {

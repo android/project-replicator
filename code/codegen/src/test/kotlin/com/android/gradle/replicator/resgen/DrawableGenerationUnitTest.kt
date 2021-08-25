@@ -1,13 +1,15 @@
 package com.android.gradle.replicator.resgen
 
+import com.android.gradle.replicator.resgen.util.ResgenConstants
 import com.google.common.truth.Truth
+import org.intellij.lang.annotations.Language
 import org.junit.Test
 import java.io.File
 
 class DrawableGenerationUnitTest: AbstractResourceGenerationUnitTest() {
     @Test
     fun testDrawableGeneration() {
-        val generator = DrawableResourceGenerator(random)
+        val generator = DrawableResourceGenerator(random, ResgenConstants())
         generator.numberOfResourceElements = 3
 
         val pngFolder = output.newFolder("png")
@@ -112,93 +114,96 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationUnitTest() {
             Truth.assertThat(File(it.value.first, it.key).readBytes()).isEqualTo(it.value.second.readBytes())
         }
 
+        @Language("xml")
         val expectedXmlAAA = """
             <?xml version="1.0" encoding="utf-8"?>
             <vector xmlns:android="http://schemas.android.com/apk/res/android"
-                android:width="12dp"
-                android:height="13dp"
-                android:viewportWidth="2"
-                android:viewportHeight="2">
+                android:width="13dp"
+                android:height="14dp"
+                android:viewportWidth="1"
+                android:viewportHeight="1">
                 <path
                     android:fillColor="#00010203"
-                    android:pathData="M0,0h12v13h-12z" />
+                    android:pathData="M0,0h13v14h-13z" />
                 <path
                     android:fillColor="#04050607"
                     android:strokeColor="#08090a0b"
                     android:strokeWidth="0.02"
                     android:fillAlpha="0.021"
-                    android:pathData="M4,4L6,6" />
+                    android:pathData="M3,3L5,5" />
                 <path
                     android:fillColor="#0c0d0e0f"
                     android:strokeColor="#10111213"
                     android:strokeWidth="0.026"
                     android:fillAlpha="0.027"
-                    android:pathData="M10,10L0,12" />
+                    android:pathData="M9,9L11,11" />
                 <path
                     android:fillColor="#14151617"
                     android:strokeColor="#18191a1b"
                     android:strokeWidth="0.032"
                     android:fillAlpha="0.033"
-                    android:pathData="M4,3L6,5" />
+                    android:pathData="M2,1L4,3" />
             </vector>
         """.trimIndent()
 
+        @Language("xml")
         val expectedXmlAAB = """
             <?xml version="1.0" encoding="utf-8"?>
             <vector xmlns:android="http://schemas.android.com/apk/res/android"
-                android:width="34dp"
-                android:height="35dp"
-                android:viewportWidth="2"
-                android:viewportHeight="2">
+                android:width="35dp"
+                android:height="36dp"
+                android:viewportWidth="1"
+                android:viewportHeight="1">
                 <path
                     android:fillColor="#1c1d1e1f"
                     android:strokeColor="#20212223"
                     android:strokeWidth="0.042"
                     android:fillAlpha="0.043"
-                    android:pathData="M4,4L6,6" />
+                    android:pathData="M3,3L5,5" />
                 <path
                     android:fillColor="#24252627"
                     android:strokeColor="#28292a2b"
                     android:strokeWidth="0.048"
                     android:fillAlpha="0.049"
-                    android:pathData="M10,10L12,12" />
+                    android:pathData="M9,9L11,11" />
                 <path
                     android:fillColor="#2c2d2e2f"
                     android:strokeColor="#30313233"
                     android:strokeWidth="0.054"
                     android:fillAlpha="0.055"
-                    android:pathData="M16,16L18,18" />
+                    android:pathData="M15,15L17,17" />
             </vector>
         """.trimIndent()
 
+        @Language("xml")
         val expectedXmlAAC = """
             <?xml version="1.0" encoding="utf-8"?>
             <vector xmlns:android="http://schemas.android.com/apk/res/android"
-                android:width="56dp"
-                android:height="57dp"
-                android:viewportWidth="2"
-                android:viewportHeight="2">
+                android:width="57dp"
+                android:height="58dp"
+                android:viewportWidth="1"
+                android:viewportHeight="1">
                 <path
                     android:fillColor="#34353637"
-                    android:pathData="M0,0h56v57h-56z" />
+                    android:pathData="M0,0h57v58h-57z" />
                 <path
                     android:fillColor="#38393a3b"
                     android:strokeColor="#3c3d3e3f"
                     android:strokeWidth="0.064"
                     android:fillAlpha="0.065"
-                    android:pathData="M4,4L6,6" />
+                    android:pathData="M3,3L5,5" />
                 <path
                     android:fillColor="#40414243"
                     android:strokeColor="#44454647"
                     android:strokeWidth="0.07"
                     android:fillAlpha="0.071"
-                    android:pathData="M10,10L12,12" />
+                    android:pathData="M9,9L11,11" />
                 <path
                     android:fillColor="#48494a4b"
                     android:strokeColor="#4c4d4e4f"
                     android:strokeWidth="0.076"
                     android:fillAlpha="0.077"
-                    android:pathData="M16,16L18,18" />
+                    android:pathData="M15,15L17,17" />
             </vector>
         """.trimIndent()
 

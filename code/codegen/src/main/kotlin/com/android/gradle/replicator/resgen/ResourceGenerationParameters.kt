@@ -16,9 +16,7 @@
  */
 package com.android.gradle.replicator.resgen
 
-data class AndroidResourceProperties (val qualifiers: String, val extension: String, val quantity: Int)
-
-typealias AndroidResourceMap = Map<String, List<AndroidResourceProperties>>
+import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
 
 /**
  * Parameters for the generation for a module.
@@ -41,7 +39,7 @@ data class ResourceGenerationParameters(
 ) {
     class Builder {
         private var seed = 1
-        private var nbOfAndroidResources: AndroidResourceMap = mapOf()
+        private var nbOfAndroidResources: AndroidResourceMap = mutableMapOf()
         private var nbOfJavaResources = 0
 
         fun setSeed(seed: Int) { this.seed = seed }
