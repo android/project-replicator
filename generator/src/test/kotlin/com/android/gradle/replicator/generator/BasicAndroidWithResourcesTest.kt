@@ -252,7 +252,20 @@ class BasicAndroidWithResourcesTest: BaseTest() {
         "xml": []
       },
       "javaResources": {
-        "fileCount": 2
+        "json": [
+          200,
+          300
+        ]
+      },
+      "assets": {
+        "png": [
+          400,
+          500
+        ],
+        "stl": [
+          600,
+          700
+        ]
       },
       "dependencies": [],
       "android": {
@@ -479,7 +492,20 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                     "xml": []
                                   },
                                   "javaResources": {
-                                    "fileCount": 2
+                                    "json": [
+                                      200,
+                                      300
+                                    ]
+                                  },
+                                  "assets": {
+                                    "png": [
+                                      400,
+                                      500
+                                    ],
+                                    "stl": [
+                                      600,
+                                      700
+                                    ]
                                   }
                                 }
                         """.trimIndent()

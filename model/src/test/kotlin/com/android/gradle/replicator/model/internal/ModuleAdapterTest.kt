@@ -90,7 +90,7 @@ internal class ModuleAdapterTest {
             fileCount = 2
         }
         androidResources {
-            fileCount = mutableMapOf(
+            resourceMap = mutableMapOf(
                     "mipmap" to mutableListOf<AbstractAndroidResourceProperties>(
                             SizeMattersAndroidResourceProperties(
                                 qualifiers = "",
@@ -135,7 +135,10 @@ internal class ModuleAdapterTest {
         }
 
         javaResources {
-            fileCount = 3
+            fileData = mapOf("json" to listOf<Long>(3, 4, 5))
+        }
+        assets {
+            fileData = mapOf("png" to listOf<Long>(3, 4, 5))
         }
 
         dependencies = listOf(
@@ -324,7 +327,18 @@ private val FULL_MODULE = """
         ]
       },
       "javaResources": {
-        "fileCount": 3
+        "json": [
+          3,
+          4,
+          5
+        ]
+      },
+      "assets": {
+        "png": [
+          3,
+          4,
+          5
+        ]
       },
       "dependencies": [
         {

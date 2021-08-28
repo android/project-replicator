@@ -5,7 +5,7 @@ import com.android.gradle.replicator.model.AndroidResourcesInfo
 import com.android.gradle.replicator.model.internal.DefaultAndroidResourcesInfo
 
 class AndroidResourcesBuilder {
-    var fileCount: AndroidResourceMap = mutableMapOf()
+    var resourceMap: AndroidResourceMap = mutableMapOf()
 
-    fun toInfo(): AndroidResourcesInfo = DefaultAndroidResourcesInfo(fileCount)
+    fun toInfo(): AndroidResourcesInfo = DefaultAndroidResourcesInfo(resourceMap)
 }

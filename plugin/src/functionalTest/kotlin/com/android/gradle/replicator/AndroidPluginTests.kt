@@ -79,9 +79,8 @@ class AndroidPluginTests {
                   "values": [],
                   "xml": []
                 },
-                "javaResources": {
-                  "fileCount": 0
-                },
+                "javaResources": {},
+                "assets": {},
                 "dependencies": [],
                 "android": {
                   "compileSdkVersion": "android-30",
@@ -158,9 +157,8 @@ class AndroidPluginTests {
                   "values": [],
                   "xml": []
                 },
-                "javaResources": {
-                  "fileCount": 0
-                },
+                "javaResources": {},
+                "assets": {},
                 "dependencies": [],
                 "android": {
                   "compileSdkVersion": "android-30",

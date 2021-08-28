@@ -66,9 +66,8 @@ class BuildFeaturesTests {
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -127,9 +126,8 @@ class BuildFeaturesTests {
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -188,9 +186,8 @@ class BuildFeaturesTests {
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -250,9 +247,8 @@ class BuildFeaturesTests {
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -312,9 +308,8 @@ class BuildFeaturesTests {
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -374,9 +369,8 @@ class BuildFeaturesTests {
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -436,9 +430,8 @@ class BuildFeaturesTests {
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -498,9 +491,8 @@ class BuildFeaturesTests {
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [
               {
                 "library": "com.android.databinding:viewbinding:$AGP_VERSION",
@@ -565,9 +557,8 @@ class BuildFeaturesTests {
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [
               {
                 "library": "androidx.databinding:databinding-compiler:$AGP_VERSION",
@@ -644,9 +635,8 @@ class BuildFeaturesTests {
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -913,8 +903,14 @@ class BuildFeaturesTests {
               "xml": []
             },
             "javaResources": {
-              "fileCount": 2
+              "json": [
+                0
+              ],
+              "txt": [
+                0
+              ]
             },
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",

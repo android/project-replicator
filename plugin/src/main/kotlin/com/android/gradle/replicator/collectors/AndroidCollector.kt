@@ -70,8 +70,11 @@ class DefaultAndroidCollector : AndroidCollector {
             mainSrcSet?.res?.srcDirs?.let {
                 inputs.androidResourceFolders.from(it)
             }
-            mainSrcSet?.resources?.srcDirs.let {
+            mainSrcSet?.resources?.srcDirs?.let {
                 inputs.javaResourceFolders.from(it)
+            }
+            mainSrcSet?.assets?.srcDirs?.let {
+                inputs.assetFolders.from(it)
             }
 
             inputs
@@ -148,6 +151,10 @@ abstract class AndroidInfoInputs @Inject constructor(
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val javaResourceFolders: ConfigurableFileCollection
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val assetFolders: ConfigurableFileCollection
 
     fun toInfo(): DefaultAndroidInfo {
         return DefaultAndroidInfo(compileSdkVersion, minSdkVersion, targetSdkVersion, buildFeatures.toInfo())

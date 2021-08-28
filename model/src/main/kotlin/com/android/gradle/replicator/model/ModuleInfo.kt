@@ -45,9 +45,14 @@ interface ModuleInfo {
     val androidResources: AndroidResourcesInfo?
 
     /**
-     * Number of each java resource files.
+     * Number, extension and file size of each java resource files.
      */
-    val javaResources: SourceFilesInfo?
+    val javaResources: FilesWithSizeMetadataInfo?
+
+    /**
+     * Number, extension and file size of each asset files.
+     */
+    val assets: FilesWithSizeMetadataInfo?
 
     /**
      * List of direct dependencies with their scope

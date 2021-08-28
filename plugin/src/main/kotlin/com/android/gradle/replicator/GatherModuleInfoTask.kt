@@ -22,6 +22,7 @@ import com.android.gradle.replicator.model.*
 import com.android.gradle.replicator.model.internal.DefaultDependenciesInfo
 import com.android.gradle.replicator.model.internal.DefaultModuleInfo
 import com.android.gradle.replicator.model.internal.DefaultAndroidResourcesInfo
+import com.android.gradle.replicator.model.internal.DefaultFilesWithSizeMetadataInfo
 import com.android.gradle.replicator.model.internal.DefaultSourceFilesInfo
 import com.android.gradle.replicator.model.internal.resources.ANDROID_RESOURCE_FOLDER_CONVENTION
 import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
@@ -101,6 +102,12 @@ abstract class GatherModuleInfoTask : DefaultTask() {
             null
         }
 
+        val assets = if (pluginList.containsAndroid()) {
+            getAssetFilesInfo(androidInputs)
+        } else {
+            null
+        }
+
         val moduleInfo = DefaultModuleInfo(
             path = projectPath.get(),
             plugins = plugins.get(),
@@ -108,6 +115,7 @@ abstract class GatherModuleInfoTask : DefaultTask() {
             kotlinSources = kotlinSources,
             androidResources = androidResources,
             javaResources = javaResources,
+            assets = assets,
             dependencies = dependencies.get().map { it.toInfo() },
             android = androidInputs?.toInfo()
         )
@@ -189,12 +197,38 @@ abstract class GatherModuleInfoTask : DefaultTask() {
         return DefaultAndroidResourcesInfo(resourceMap)
     }
 
-    private fun getJavaResourceFilesInfo(androidInputs: AndroidInfoInputs?): DefaultSourceFilesInfo {
-        var fileCount = javaResourceSets.asFileTree.files.size
+    private fun getJavaResourceFilesInfo(androidInputs: AndroidInfoInputs?): DefaultFilesWithSizeMetadataInfo {
+        val resourceFiles = mutableSetOf<File>()
 
-        fileCount += androidInputs?.javaResourceFolders?.asFileTree?.files?.size ?: 0
+        resourceFiles.addAll(javaResourceSets.asFileTree.files)
 
-        return DefaultSourceFilesInfo(fileCount)
+        androidInputs?.javaResourceFolders?.asFileTree?.files?.let {
+            resourceFiles.addAll(it)
+        }
+
+        return getFileInfoWithSizeMetadata(resourceFiles)
+    }
+
+    private fun getAssetFilesInfo(androidInputs: AndroidInfoInputs?): DefaultFilesWithSizeMetadataInfo {
+        val assetFiles = mutableSetOf<File>()
+
+        androidInputs?.assetFolders?.asFileTree?.files?.let {
+            assetFiles.addAll(it)
+        }
+
+        return getFileInfoWithSizeMetadata(assetFiles)
+    }
+
+    private fun getFileInfoWithSizeMetadata(files: Set<File>): DefaultFilesWithSizeMetadataInfo {
+        val fileData = mutableMapOf<String, MutableList<Long>>()
+
+        for (file in files) {
+            if (file.extension !in fileData) {
+                fileData[file.extension] = mutableListOf()
+            }
+            fileData[file.extension]!!.add(file.length())
+        }
+        return DefaultFilesWithSizeMetadataInfo(fileData)
     }
 
     @Suppress("UnstableApiUsage")

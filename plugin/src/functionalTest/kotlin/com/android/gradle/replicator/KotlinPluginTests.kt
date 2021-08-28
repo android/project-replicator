@@ -50,9 +50,7 @@ class KotlinPluginTests {
                 "kotlinSources": {
                   "fileCount": 0
                 },
-                "javaResources": {
-                  "fileCount": 0
-                },
+                "javaResources": {},
                 "dependencies": []
               },
               "modules": []
@@ -88,9 +86,7 @@ class KotlinPluginTests {
                 "kotlinSources": {
                   "fileCount": 0
                 },
-                "javaResources": {
-                  "fileCount": 0
-                },
+                "javaResources": {},
                 "dependencies": []
               },
               "modules": []
@@ -137,9 +133,7 @@ class KotlinPluginTests {
                 "kotlinSources": {
                   "fileCount": 0
                 },
-                "javaResources": {
-                  "fileCount": 0
-                },
+                "javaResources": {},
                 "dependencies": []
               },
               "modules": []
@@ -179,9 +173,7 @@ class KotlinPluginTests {
                 "kotlinSources": {
                   "fileCount": 0
                 },
-                "javaResources": {
-                  "fileCount": 0
-                },
+                "javaResources": {},
                 "dependencies": []
               },
               "modules": []
@@ -221,9 +213,7 @@ class KotlinPluginTests {
                 "kotlinSources": {
                   "fileCount": 0
                 },
-                "javaResources": {
-                  "fileCount": 0
-                },
+                "javaResources": {},
                 "dependencies": []
               },
               "modules": []
@@ -271,9 +261,7 @@ class KotlinPluginTests {
                 "kotlinSources": {
                   "fileCount": 0
                 },
-                "javaResources": {
-                  "fileCount": 0
-                },
+                "javaResources": {},
                 "dependencies": []
               },
               "modules": []

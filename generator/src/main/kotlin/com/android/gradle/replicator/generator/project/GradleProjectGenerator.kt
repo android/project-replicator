@@ -28,7 +28,9 @@ import com.android.gradle.replicator.model.ModuleInfo
 import com.android.gradle.replicator.model.PluginType
 import com.android.gradle.replicator.model.ProjectInfo
 import com.android.gradle.replicator.model.internal.AndroidResourcesAdapter
+import com.android.gradle.replicator.model.internal.DefaultFilesWithSizeMetadataInfo
 import com.android.gradle.replicator.model.internal.DefaultSourceFilesInfo
+import com.android.gradle.replicator.model.internal.FilesWithSizeMetadataAdapter
 import com.android.gradle.replicator.model.internal.SourceFilesAdapter
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -229,8 +231,15 @@ class GradleProjectGenerator(
                 AndroidResourcesAdapter().write(this, it)
             }
 
-            name("javaResources")
-            SourceFilesAdapter().write(this, module.javaResources ?: DefaultSourceFilesInfo(0))
+            module.javaResources?.let {
+                name("javaResources")
+                FilesWithSizeMetadataAdapter().write(this, module.javaResources!!)
+            }
+
+            module.assets?.let {
+                name("assets")
+                FilesWithSizeMetadataAdapter().write(this, module.assets!!)
+            }
 
             endObject()
             this.flush()

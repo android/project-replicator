@@ -27,7 +27,8 @@ data class DefaultModuleInfo(
         override val javaSources: SourceFilesInfo?,
         override val kotlinSources: SourceFilesInfo?,
         override val androidResources: AndroidResourcesInfo?,
-        override val javaResources: SourceFilesInfo?,
+        override val javaResources: FilesWithSizeMetadataInfo?,
+        override val assets: FilesWithSizeMetadataInfo?,
         override val dependencies: List<DependenciesInfo>,
         override val android: AndroidInfo?
 ) : ModuleInfo
@@ -59,7 +60,12 @@ class ModuleAdapter: TypeAdapter<DefaultModuleInfo>() {
 
         value.javaResources?.let {
             output.name("javaResources")
-            SourceFilesAdapter().write(output, it)
+            FilesWithSizeMetadataAdapter().write(output, it)
+        }
+
+        value.assets?.let {
+            output.name("assets")
+            FilesWithSizeMetadataAdapter().write(output, it)
         }
 
         val adapter = DependenciesAdapter()
@@ -81,11 +87,13 @@ class ModuleAdapter: TypeAdapter<DefaultModuleInfo>() {
         var javaSources: SourceFilesInfo? = null
         var kotlinSources: SourceFilesInfo? = null
         var androidResources: AndroidResourcesInfo? = null
-        var javaResources: SourceFilesInfo? = null
+        var javaResources: FilesWithSizeMetadataInfo? = null
+        var assets: FilesWithSizeMetadataInfo? = null
         var dependencies: List<DependenciesInfo> = listOf()
         var androidInfo: AndroidInfo? = null
 
         val sourceFilesAdapter = SourceFilesAdapter()
+        val filesWithSizeMetadataAdapter = FilesWithSizeMetadataAdapter()
         val resourcesAdapter = AndroidResourcesAdapter()
 
         input.readObjectProperties {
@@ -100,7 +108,8 @@ class ModuleAdapter: TypeAdapter<DefaultModuleInfo>() {
                 "javaSources" -> javaSources = sourceFilesAdapter.read(input)
                 "kotlinSources" -> kotlinSources = sourceFilesAdapter.read(input)
                 "androidResources" -> androidResources = resourcesAdapter.read(input)
-                "javaResources" -> javaResources = sourceFilesAdapter.read(input)
+                "javaResources" -> javaResources = filesWithSizeMetadataAdapter.read(input)
+                "assets" -> assets = filesWithSizeMetadataAdapter.read(input)
                 "dependencies" -> {
                     val dependenciesAdapter = DependenciesAdapter()
                     dependencies = input.readArrayToList {
@@ -119,6 +128,7 @@ class ModuleAdapter: TypeAdapter<DefaultModuleInfo>() {
             kotlinSources = kotlinSources,
             androidResources = androidResources,
             javaResources = javaResources,
+            assets = assets,
             dependencies = dependencies,
             android = androidInfo
         )
