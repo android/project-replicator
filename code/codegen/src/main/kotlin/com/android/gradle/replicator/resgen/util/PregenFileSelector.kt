@@ -59,16 +59,16 @@ fun copyResourceFile(resourcePath: String, output: File) {
 
 fun getFileType(resourceExtension: String): FileTypes? {
     return when (resourceExtension) {
-        ".png" -> FileTypes.PNG
-        ".9.png" -> FileTypes.NINE_PATCH
-        ".gif" -> FileTypes.GIF
-        ".jpg" -> FileTypes.JPEG
-        ".webp" -> FileTypes.WEBP
-        ".txt" -> FileTypes.TEXT
-        ".json" -> FileTypes.JSON
-        ".ttf" -> FileTypes.TTF
-        ".otf" -> FileTypes.OTF
-        ".ttc" -> FileTypes.TTC
+        "png" -> FileTypes.PNG
+        "9.png" -> FileTypes.NINE_PATCH
+        "gif" -> FileTypes.GIF
+        "jpg" -> FileTypes.JPEG
+        "webp" -> FileTypes.WEBP
+        "txt" -> FileTypes.TEXT
+        "json" -> FileTypes.JSON
+        "ttf" -> FileTypes.TTF
+        "otf" -> FileTypes.OTF
+        "ttc" -> FileTypes.TTC
         else -> null
     }
 }

@@ -17,7 +17,7 @@ class ValueGenerationUnitTest: AbstractResourceGenerationUnitTest() {
                 number = 2,
                 outputFolder = output.root,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".xml"
+                resourceExtension = "xml"
         )
 
         val generatedValues1 = File(output.root, "values_aaa.xml").readText()

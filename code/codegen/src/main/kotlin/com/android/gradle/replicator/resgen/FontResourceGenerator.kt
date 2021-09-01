@@ -22,14 +22,14 @@ class FontResourceGenerator(val random: Random): ResourceGenerator {
         }
         repeat(number) {
             when (resourceExtension) {
-                ".xml" ->  {
-                    val outputFile = File(outputFolder, "font${genFileNameCharacters(files)}${resourceExtension}")
+                "xml" ->  {
+                    val outputFile = File(outputFolder, "font${genFileNameCharacters(files)}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateFontReferenceResource(outputFile, resourceQualifiers)
                     files++
                 }
                 else -> {
-                    val outputFile = File(outputFolder, "font${genFileNameCharacters(files)}${resourceExtension}")
+                    val outputFile = File(outputFolder, "font${genFileNameCharacters(files)}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateFontResource(outputFile, resourceQualifiers, resourceExtension)
                     files++

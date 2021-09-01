@@ -1,4 +1,4 @@
-package com.android.gradle.replicator.model.internal.resources
+package com.android.gradle.replicator.model.internal.filedata
 
 import com.android.gradle.replicator.model.internal.readArray
 import com.android.gradle.replicator.model.internal.readObjectProperties
@@ -75,6 +75,7 @@ class SizeMattersAndroidResourceProperties (
 }
 
 typealias AndroidResourceMap = MutableMap<String, MutableList<AbstractAndroidResourceProperties>>
+typealias FilesWithSizeMap = Map<String, List<Long>>
 
 fun selectResourceProperties(
         resourceType: String,

@@ -741,7 +741,7 @@ class BuildFeaturesTests {
               "drawable": [
                 {
                   "qualifiers": "",
-                  "extension": ".xml",
+                  "extension": "xml",
                   "quantity": 1,
                   "fileSizes": [
                     0
@@ -749,7 +749,7 @@ class BuildFeaturesTests {
                 },
                 {
                   "qualifiers": "v24",
-                  "extension": ".xml",
+                  "extension": "xml",
                   "quantity": 1,
                   "fileSizes": [
                     0
@@ -760,21 +760,21 @@ class BuildFeaturesTests {
               "layout": [
                 {
                   "qualifiers": "",
-                  "extension": ".xml",
+                  "extension": "xml",
                   "quantity": 4
                 }
               ],
               "menu": [
                 {
                   "qualifiers": "",
-                  "extension": ".xml",
+                  "extension": "xml",
                   "quantity": 1
                 }
               ],
               "mipmap": [
                 {
                   "qualifiers": "anydpi-v26",
-                  "extension": ".xml",
+                  "extension": "xml",
                   "quantity": 2,
                   "fileSizes": [
                     0,
@@ -783,7 +783,7 @@ class BuildFeaturesTests {
                 },
                 {
                   "qualifiers": "hdpi",
-                  "extension": ".webp",
+                  "extension": "webp",
                   "quantity": 2,
                   "fileSizes": [
                     0,
@@ -792,7 +792,7 @@ class BuildFeaturesTests {
                 },
                 {
                   "qualifiers": "mdpi",
-                  "extension": ".webp",
+                  "extension": "webp",
                   "quantity": 2,
                   "fileSizes": [
                     0,
@@ -801,7 +801,7 @@ class BuildFeaturesTests {
                 },
                 {
                   "qualifiers": "xhdpi",
-                  "extension": ".webp",
+                  "extension": "webp",
                   "quantity": 2,
                   "fileSizes": [
                     0,
@@ -810,7 +810,7 @@ class BuildFeaturesTests {
                 },
                 {
                   "qualifiers": "xxhdpi",
-                  "extension": ".webp",
+                  "extension": "webp",
                   "quantity": 2,
                   "fileSizes": [
                     0,
@@ -819,7 +819,7 @@ class BuildFeaturesTests {
                 },
                 {
                   "qualifiers": "xxxhdpi",
-                  "extension": ".webp",
+                  "extension": "webp",
                   "quantity": 2,
                   "fileSizes": [
                     0,
@@ -832,7 +832,7 @@ class BuildFeaturesTests {
               "values": [
                 {
                   "qualifiers": "",
-                  "extension": ".xml",
+                  "extension": "xml",
                   "quantity": 4,
                   "valuesFileList": [
                     {
@@ -883,7 +883,7 @@ class BuildFeaturesTests {
                 },
                 {
                   "qualifiers": "night",
-                  "extension": ".xml",
+                  "extension": "xml",
                   "quantity": 1,
                   "valuesFileList": [
                     {

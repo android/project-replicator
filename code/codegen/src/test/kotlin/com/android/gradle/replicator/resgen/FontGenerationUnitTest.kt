@@ -28,21 +28,21 @@ class FontGenerationUnitTest: AbstractResourceGenerationUnitTest() {
                 number = 2,
                 outputFolder = output.root,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".ttf"
+                resourceExtension = "ttf"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = output.root,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".otf"
+                resourceExtension = "otf"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = output.root,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".ttc"
+                resourceExtension = "ttc"
         )
 
         Truth.assertThat(output.root.listFiles()!!.asList().map { it.name }).containsExactly(

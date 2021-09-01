@@ -17,8 +17,8 @@
 package com.android.gradle.replicator.model.internal
 
 import com.android.gradle.replicator.model.AndroidResourcesInfo
-import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
-import com.android.gradle.replicator.model.internal.resources.AndroidResourcePropertiesAdapter
+import com.android.gradle.replicator.model.internal.filedata.AndroidResourceMap
+import com.android.gradle.replicator.model.internal.filedata.AndroidResourcePropertiesAdapter
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter

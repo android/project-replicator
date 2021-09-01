@@ -1,6 +1,6 @@
 package com.android.gradle.replicator
 
-import com.android.gradle.replicator.model.internal.resources.*
+import com.android.gradle.replicator.model.internal.filedata.*
 import com.android.utils.XmlUtils
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource

@@ -51,14 +51,14 @@ class DrawableResourceGenerator (val random: Random, val constants: ResgenConsta
     ) {
         repeat(number) {
             when (resourceExtension) {
-                ".xml" ->  {
-                    val outputFile = File(outputFolder, "xml${genFileNameCharacters(xmlFiles)}${resourceExtension}")
+                "xml" ->  {
+                    val outputFile = File(outputFolder, "xml${genFileNameCharacters(xmlFiles)}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateVectorDrawableResource(outputFile, resourceQualifiers)
                     xmlFiles++
                 }
                 else -> {
-                    val outputFile = File(outputFolder, "image${genFileNameCharacters(imageFiles)}${resourceExtension}")
+                    val outputFile = File(outputFolder, "image${genFileNameCharacters(imageFiles)}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateImageResource(outputFile, resourceQualifiers, resourceExtension)
                     imageFiles++

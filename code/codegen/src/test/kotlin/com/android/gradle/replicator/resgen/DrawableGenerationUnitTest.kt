@@ -50,56 +50,56 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationUnitTest() {
                 number = 2,
                 outputFolder = pngFolder,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".png"
+                resourceExtension = "png"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = jpgFolder,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".jpg"
+                resourceExtension = "jpg"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = ninePatchFolder,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".9.png"
+                resourceExtension = "9.png"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = gifFolder,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".gif"
+                resourceExtension = "gif"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = webpFolder,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".webp"
+                resourceExtension = "webp"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = pngFolder,
                 resourceQualifiers = listOf("xxxhdpi"),
-                resourceExtension = ".png"
+                resourceExtension = "png"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = xmlFolder,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".xml"
+                resourceExtension = "xml"
         )
 
         generator.generateResource(
                 number = 1,
                 outputFolder = xmlFolder,
                 resourceQualifiers = listOf("hidpi-v24"),
-                resourceExtension = ".xml"
+                resourceExtension = "xml"
         )
 
         Truth.assertThat(pngFolder.listFiles()!!.asList().map{it.name}).containsExactly(

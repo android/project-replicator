@@ -17,9 +17,10 @@
 package com.android.gradle.replicator.resgen
 
 import com.android.gradle.replicator.model.AndroidResourcesInfo
-import com.android.gradle.replicator.model.SourceFilesInfo
+import com.android.gradle.replicator.model.FilesWithSizeMetadataInfo
 import com.android.gradle.replicator.model.internal.*
-import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
+import com.android.gradle.replicator.model.internal.filedata.AndroidResourceMap
+import com.android.gradle.replicator.model.internal.filedata.FilesWithSizeMap
 import com.android.gradle.replicator.parsing.ArgsParser
 import com.android.gradle.replicator.resgen.util.ResgenConstants
 import com.google.gson.stream.JsonReader
@@ -64,8 +65,9 @@ class Main {
                     throw FileNotFoundException(it.toString())
                 }
                 val metadata = loadModuleMetadata(it)
-                argumentsBuilder.setNumberOfAndroidResources(metadata.androidResources)
-                argumentsBuilder.setNumberOfJavaResources(metadata.javaResources)
+                argumentsBuilder.setAndroidResourcesMap(metadata.androidResources)
+                argumentsBuilder.setJavaResourcesMap(metadata.javaResources)
+                argumentsBuilder.setAssetsMap(metadata.assets)
             }
         }
         seedOption.orNull?.first?.let {
@@ -94,11 +96,18 @@ class Main {
                     resgenConstants
             )
         }
-        if (arguments.numberOfJavaResources > 0) {
+        if (countFilesWithSizeMetadata(arguments.javaResourcesMap) > 0) {
             generateJavaResources(
-                    arguments.numberOfJavaResources,
+                    arguments.javaResourcesMap,
                     arguments,
                     javaOutputFolder
+            )
+        }
+        if (countFilesWithSizeMetadata(arguments.assetsMap) > 0) {
+            generateAssets(
+                arguments.assetsMap,
+                arguments,
+                javaOutputFolder
             )
         }
     }
@@ -118,34 +127,46 @@ class Main {
     }
 
     private fun generateJavaResources(
-            numberOfResources: Int,
-            parameters: ResourceGenerationParameters,
-            outputFolder: File) {
+        resourceMap: FilesWithSizeMap,
+        parameters: ResourceGenerationParameters,
+        outputFolder: File) {
+        // To be implemented
+        return
+    }
+
+    private fun generateAssets(
+        resourceMap: FilesWithSizeMap,
+        parameters: ResourceGenerationParameters,
+        outputFolder: File) {
         // To be implemented
         return
     }
 
     private data class ResourceMetadata (
-            val androidResources: AndroidResourceMap,
-            val javaResources: Int)
+        val androidResources: AndroidResourceMap,
+        val javaResources: FilesWithSizeMap,
+        val assets: FilesWithSizeMap
+    )
 
     // read metadata file added to each project in json format
     private fun loadModuleMetadata(resourceMetadataJson: File): ResourceMetadata {
         var androidResources: AndroidResourcesInfo = DefaultAndroidResourcesInfo(mutableMapOf())
-        var javaResources: SourceFilesInfo = DefaultSourceFilesInfo(0)
+        var javaResources: FilesWithSizeMetadataInfo = DefaultFilesWithSizeMetadataInfo(mapOf())
+        var assets: FilesWithSizeMetadataInfo = DefaultFilesWithSizeMetadataInfo(mapOf())
 
         with(JsonReader(Files.newBufferedReader(resourceMetadataJson.toPath()))) {
             beginObject()
             while(hasNext()) {
                 when (nextName()) {
                     "androidResources" -> androidResources = AndroidResourcesAdapter().read(this)
-                    "javaResources" -> javaResources = SourceFilesAdapter().read(this)
+                    "javaResources" -> javaResources = FilesWithSizeMetadataAdapter().read(this)
+                    "assets" -> assets = FilesWithSizeMetadataAdapter().read(this)
                 }
             }
             endObject()
         }
 
-        return ResourceMetadata(androidResources.resourceMap, javaResources.fileCount)
+        return ResourceMetadata(androidResources.resourceMap, javaResources.fileData, assets.fileData)
     }
 
     private fun countResources(res: AndroidResourceMap): Int {
@@ -154,6 +175,14 @@ class Main {
             folder.value.forEach { resourceType ->
                 count += resourceType.quantity
             }
+        }
+        return count
+    }
+
+    private fun countFilesWithSizeMetadata(files: FilesWithSizeMap): Int {
+        var count = 0
+        files.forEach { extension ->
+            count += extension.value.size
         }
         return count
     }

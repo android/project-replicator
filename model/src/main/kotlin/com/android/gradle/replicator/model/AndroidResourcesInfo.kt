@@ -16,7 +16,7 @@
 
 package com.android.gradle.replicator.model
 
-import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
+import com.android.gradle.replicator.model.internal.filedata.AndroidResourceMap
 
 /**
  * Information about the number of android resource files in a [ModuleInfo]

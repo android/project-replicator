@@ -24,28 +24,28 @@ class RawGenerationUnitTest: AbstractResourceGenerationUnitTest() {
                 number = 1,
                 outputFolder = output.root,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".txt"
+                resourceExtension = "txt"
         )
 
         generator.generateResource(
                 number = 1,
                 outputFolder = output.root,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".json"
+                resourceExtension = "json"
         )
 
         generator.generateResource(
                 number = 1,
                 outputFolder = output.root,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".png"
+                resourceExtension = "png"
         )
 
         generator.generateResource(
                 number = 1,
                 outputFolder = output.root,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".jpg"
+                resourceExtension = "jpg"
         )
 
         Truth.assertThat(output.root.listFiles()!!.asList().map { it.name }).containsExactly(

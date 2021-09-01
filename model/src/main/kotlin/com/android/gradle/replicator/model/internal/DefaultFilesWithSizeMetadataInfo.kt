@@ -1,12 +1,13 @@
 package com.android.gradle.replicator.model.internal
 
 import com.android.gradle.replicator.model.FilesWithSizeMetadataInfo
+import com.android.gradle.replicator.model.internal.filedata.FilesWithSizeMap
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 
 data class DefaultFilesWithSizeMetadataInfo(
-    override val fileData: Map<String, List<Long>>
+    override val fileData: FilesWithSizeMap
 ): FilesWithSizeMetadataInfo
 
 /* Information about file sizes is separated by extension as such:

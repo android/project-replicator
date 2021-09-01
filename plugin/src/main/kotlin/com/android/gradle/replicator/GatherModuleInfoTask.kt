@@ -24,8 +24,8 @@ import com.android.gradle.replicator.model.internal.DefaultModuleInfo
 import com.android.gradle.replicator.model.internal.DefaultAndroidResourcesInfo
 import com.android.gradle.replicator.model.internal.DefaultFilesWithSizeMetadataInfo
 import com.android.gradle.replicator.model.internal.DefaultSourceFilesInfo
-import com.android.gradle.replicator.model.internal.resources.ANDROID_RESOURCE_FOLDER_CONVENTION
-import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
+import com.android.gradle.replicator.model.internal.filedata.ANDROID_RESOURCE_FOLDER_CONVENTION
+import com.android.gradle.replicator.model.internal.filedata.AndroidResourceMap
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -177,21 +177,45 @@ abstract class GatherModuleInfoTask : DefaultTask() {
                 // Get folder qualifier, if any, such as mipmap-(hidpi). Qualifier is "" for unqualified folders
                 val qualifierMatch = folderPattern.matchEntire(projectFolder.name)!!.groupValues[1]
 
-                // TODO: Remove supported extensions
-                // For each accepted extension, create resource data with qualifiers, extension and quantity
-                for (extension in conventionFolder.value) {
-                    val matchingResourceFiles = androidResourceFiles?.matching {
-                        it.include("**/${projectFolder.name}/*${extension}")
-                    }?.files
-                    if (matchingResourceFiles != null && matchingResourceFiles.size > 0) {
-                        resourceMap[conventionFolder.key]!!.add(processResourceFiles(
-                            resourceType = conventionFolder.key,
-                            qualifiers = qualifierMatch,
-                            extension = extension,
-                            resourceFiles = matchingResourceFiles
-                        ))
+                // Gather files in the resource folder
+                val matchingResourceFiles = androidResourceFiles?.matching {
+                    it.include("**/${projectFolder.name}/*")
+                }?.files
+                val extensionMap = mutableMapOf<String, MutableSet<File>>()
+
+                // Separate files by extension
+                matchingResourceFiles?.let {
+                    for (resourceFile in it) {
+                        val extensionSplit = resourceFile.name.split(".")
+
+                        // 9-patch files are an exception to file extension rules
+                        val extension =
+                            if (extensionSplit.size >= 2
+                                && extensionSplit.reversed()[0] == "png"
+                                && extensionSplit.reversed()[1] == "9") "9.png"
+                            else extensionSplit.last()
+
+                        if (extension !in extensionMap) {
+                            extensionMap[extension] = mutableSetOf()
+                        }
+                        extensionMap[extension]!!.add(resourceFile)
                     }
                 }
+
+                // Process files by extension and type
+                for (extension in extensionMap) {
+                    if (matchingResourceFiles != null && matchingResourceFiles.size > 0) {
+                        resourceMap[conventionFolder.key]!!.add(
+                            processResourceFiles(
+                                resourceType = conventionFolder.key,
+                                qualifiers = qualifierMatch,
+                                extension = extension.key,
+                                resourceFiles = extension.value
+                            )
+                        )
+                    }
+                }
+
             }
         }
         return DefaultAndroidResourcesInfo(resourceMap)

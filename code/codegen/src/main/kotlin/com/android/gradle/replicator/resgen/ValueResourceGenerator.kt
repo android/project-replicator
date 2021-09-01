@@ -44,13 +44,13 @@ class ValueResourceGenerator (val random: Random, val constants: ResgenConstants
             val type = ResourceType.VALUES
             when (type) {
                 ResourceType.THEME ->  {
-                    val outputFile = File(outputFolder, "themes${genFileNameCharacters(themesFiles)}${resourceExtension}")
+                    val outputFile = File(outputFolder, "themes${genFileNameCharacters(themesFiles)}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateThemeResource(outputFile, resourceQualifiers)
                     themesFiles++
                 }
                 ResourceType.VALUES -> {
-                    val outputFile = File(outputFolder, "values${genFileNameCharacters(valuesFiles)}${resourceExtension}")
+                    val outputFile = File(outputFolder, "values${genFileNameCharacters(valuesFiles)}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateXmlValueResource(outputFile)
                     valuesFiles++

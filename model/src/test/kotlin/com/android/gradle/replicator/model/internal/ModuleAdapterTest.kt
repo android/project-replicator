@@ -18,11 +18,11 @@ package com.android.gradle.replicator.model.internal
 
 import com.android.gradle.replicator.model.*
 import com.android.gradle.replicator.model.internal.fixtures.module
-import com.android.gradle.replicator.model.internal.resources.AbstractAndroidResourceProperties
-import com.android.gradle.replicator.model.internal.resources.SizeMattersAndroidResourceProperties
-import com.android.gradle.replicator.model.internal.resources.ValuesAndroidResourceProperties
-import com.android.gradle.replicator.model.internal.resources.ResourcePropertyType
-import com.android.gradle.replicator.model.internal.resources.ValuesMap
+import com.android.gradle.replicator.model.internal.filedata.AbstractAndroidResourceProperties
+import com.android.gradle.replicator.model.internal.filedata.SizeMattersAndroidResourceProperties
+import com.android.gradle.replicator.model.internal.filedata.ValuesAndroidResourceProperties
+import com.android.gradle.replicator.model.internal.filedata.ResourcePropertyType
+import com.android.gradle.replicator.model.internal.filedata.ValuesMap
 import com.google.common.truth.Truth
 import org.junit.Test
 
