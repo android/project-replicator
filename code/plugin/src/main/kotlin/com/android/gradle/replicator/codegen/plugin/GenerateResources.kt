@@ -43,6 +43,9 @@ abstract class GenerateResources: DefaultTask() {
     @get:OutputDirectory
     abstract val javaOutputDirectory: DirectoryProperty
 
+    @get:OutputDirectory
+    abstract val assetOutputDirectory: DirectoryProperty
+
     @TaskAction
     fun taskAction() {
         val randomizer = if (seed.isPresent) Random(seed.get()) else Random
@@ -52,6 +55,7 @@ abstract class GenerateResources: DefaultTask() {
                         "--resJson", parameters.get().asFile.absolutePath,
                         "--androidOutput", androidOutputDirectory.get().asFile.absolutePath,
                         "--javaOutput", javaOutputDirectory.get().asFile.absolutePath,
+                        "--assetOutput", assetOutputDirectory.get().asFile.absolutePath,
                         "--generationProperties", generationProperties.get().asFile.absolutePath,
                         "--seed", randomizer.nextInt().toString()
                 )

@@ -6,18 +6,18 @@ import org.intellij.lang.annotations.Language
 import org.junit.Test
 import java.io.File
 
-class DrawableGenerationUnitTest: AbstractResourceGenerationUnitTest() {
+class DrawableGenerationUnitTest: AbstractResourceGenerationTest() {
     @Test
     fun testDrawableGeneration() {
         val generator = DrawableResourceGenerator(random, ResgenConstants())
         generator.numberOfResourceElements = 3
 
-        val pngFolder = output.newFolder("png")
-        val jpgFolder = output.newFolder("jpg")
-        val ninePatchFolder = output.newFolder("9png")
-        val gifFolder = output.newFolder("gif")
-        val webpFolder = output.newFolder("webp")
-        val xmlFolder = output.newFolder("xml")
+        val pngFolder = testFolder.newFolder("png")
+        val jpgFolder = testFolder.newFolder("jpg")
+        val ninePatchFolder = testFolder.newFolder("9png")
+        val gifFolder = testFolder.newFolder("gif")
+        val webpFolder = testFolder.newFolder("webp")
+        val xmlFolder = testFolder.newFolder("xml")
 
         val expectedChosenImages = mapOf(
                 "image_aaa.png" to

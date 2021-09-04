@@ -51,6 +51,7 @@ class Main {
 
         val androidOutputFolderOption = parser.option(longName = "androidOutput", shortName = "ao", argc = 1)
         val javaOutputFolderOption = parser.option(longName = "javaOutput", shortName = "jo", argc = 1)
+        val assetOutputFolderOption = parser.option(longName = "assetOutput", shortName = "so", argc = 1)
         val resJsonOption = parser.option(longName = "resJson", shortName = "rj", argc = 1)
         val resgenConstantsFile = parser.option(longName = "generationProperties", shortName = "gp", argc = 1)
         val seedOption = parser.option(longName = "seed", shortName = "s", argc = 1)
@@ -84,6 +85,11 @@ class Main {
         javaOutputFolder.mkdirs()
         println("Generating java resources in $javaOutputFolder")
 
+        val assetOutputFolder = File(checkNotNull(assetOutputFolderOption.orNull?.first))
+        assetOutputFolder.deleteRecursively()
+        assetOutputFolder.mkdirs()
+        println("Generating java resources in $assetOutputFolder")
+
         val arguments = argumentsBuilder.build()
 
         val resgenConstants = ResgenConstants(resgenConstantsFile.orNull?.first?.let { File(it) })
@@ -107,7 +113,7 @@ class Main {
             generateAssets(
                 arguments.assetsMap,
                 arguments,
-                javaOutputFolder
+                assetOutputFolder
             )
         }
     }

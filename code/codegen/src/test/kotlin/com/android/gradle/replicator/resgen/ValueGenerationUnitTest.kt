@@ -6,7 +6,7 @@ import org.intellij.lang.annotations.Language
 import org.junit.Test
 import java.io.File
 
-class ValueGenerationUnitTest: AbstractResourceGenerationUnitTest() {
+class ValueGenerationUnitTest: AbstractResourceGenerationTest() {
     @Test
     fun testValueGeneration() {
         val generator = ValueResourceGenerator(random, ResgenConstants())
@@ -15,13 +15,13 @@ class ValueGenerationUnitTest: AbstractResourceGenerationUnitTest() {
 
         generator.generateResource(
                 number = 2,
-                outputFolder = output.root,
+                outputFolder = testFolder.root,
                 resourceQualifiers = listOf(),
                 resourceExtension = "xml"
         )
 
-        val generatedValues1 = File(output.root, "values_aaa.xml").readText()
-        val generatedValues2 = File(output.root, "values_aab.xml").readText()
+        val generatedValues1 = File(testFolder.root, "values_aaa.xml").readText()
+        val generatedValues2 = File(testFolder.root, "values_aab.xml").readText()
 
         @Language("xml")
         val expectedValues1 = """
