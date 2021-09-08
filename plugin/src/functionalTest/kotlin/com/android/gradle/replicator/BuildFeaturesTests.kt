@@ -61,6 +61,7 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
@@ -121,6 +122,7 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
@@ -181,6 +183,7 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
@@ -242,6 +245,7 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
@@ -303,6 +307,7 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
@@ -364,6 +369,7 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
@@ -425,6 +431,7 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
@@ -486,6 +493,7 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
@@ -552,6 +560,7 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
@@ -630,6 +639,7 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
@@ -825,6 +835,13 @@ class BuildFeaturesTests {
                     0,
                     0
                   ]
+                }
+              ],
+              "navigation": [
+                {
+                  "qualifiers": "",
+                  "extension": "xml",
+                  "quantity": 1
                 }
               ],
               "raw": [],
