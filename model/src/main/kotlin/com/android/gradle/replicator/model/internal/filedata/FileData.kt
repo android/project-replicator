@@ -8,18 +8,19 @@ import com.google.gson.stream.JsonWriter
 
 // Supported file types of each resource. Not exhaustive.
 val ANDROID_RESOURCE_FOLDER_CONVENTION = mapOf(
-        "animator" to listOf(".xml"),
-        "anim" to listOf(".xml"),
-        "color" to listOf(".xml"),
-        "drawable" to listOf(".xml", ".png", ".9.png", ".jpg", ".gif", ".webp"),
-        "font" to listOf(".ttf", ".otf", ".ttc", ".xml"),
-        "layout" to listOf(".xml"),
-        "menu" to listOf(".xml"),
-        "mipmap" to listOf(".xml", ".png", ".9.png", ".jpg", ".gif", ".webp"),
+        "animator" to listOf("xml"),
+        "anim" to listOf("xml"),
+        "color" to listOf("xml"),
+        "drawable" to listOf("xml", "png", "9.png", "jpg", "gif", "webp"),
+        "font" to listOf("ttf", "otf", "ttc", "xml"),
+        "layout" to listOf("xml"),
+        "menu" to listOf("xml"),
+        "mipmap" to listOf("xml", "png", "9.png", "jpg", "gif", "webp"),
+        "navigation" to listOf("xml"),
         "raw" to listOf("*"),
-        "transition" to listOf(".xml"),
-        "values" to listOf(".xml"),
-        "xml" to listOf(".xml")
+        "transition" to listOf("xml"),
+        "values" to listOf("xml"),
+        "xml" to listOf("xml")
 )
 
 /* Data classes to represent the hierarchy for android resources
