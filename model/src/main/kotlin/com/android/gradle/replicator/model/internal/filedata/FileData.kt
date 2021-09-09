@@ -34,16 +34,8 @@ abstract class AbstractAndroidResourceProperties (val qualifiers: String, val ex
 }
 
 enum class ResourcePropertyType {
-        DEFAULT,
         VALUES,
-        SIZE_MATTERS
-}
-
-class DefaultAndroidResourceProperties (
-        qualifiers: String,
-        extension: String,
-        quantity: Int): AbstractAndroidResourceProperties(qualifiers, extension, quantity) {
-                override val propertyType = ResourcePropertyType.DEFAULT
+        DEFAULT
 }
 
 data class ValuesMap (
@@ -66,13 +58,13 @@ class ValuesAndroidResourceProperties (
                 override val propertyType = ResourcePropertyType.VALUES
 }
 
-// Images and other resources need the file sizes to properly replicate
-class SizeMattersAndroidResourceProperties (
+// Images and other resources need the file sizes and XML files need the number of lines to properly replicate
+class DefaultAndroidResourceProperties (
         qualifiers: String,
         extension: String,
         quantity: Int,
-        val fileSizes: List<Long>): AbstractAndroidResourceProperties(qualifiers, extension, quantity) {
-                override val propertyType = ResourcePropertyType.SIZE_MATTERS
+        val fileData: List<Long>): AbstractAndroidResourceProperties(qualifiers, extension, quantity) {
+                override val propertyType = ResourcePropertyType.DEFAULT
 }
 
 typealias AndroidResourceMap = MutableMap<String, MutableList<AbstractAndroidResourceProperties>>
@@ -83,14 +75,11 @@ fun selectResourceProperties(
         qualifiers: String,
         extension: String,
         quantity: Int,
-        fileSizes: List<Long>? = null,
+        fileData: List<Long>? = null,
         valuesMapPerFile: List<ValuesMap>? = null): AbstractAndroidResourceProperties {
     return when (resourceType) {
         "values" -> ValuesAndroidResourceProperties(qualifiers, extension, quantity, valuesMapPerFile!!)
-        "drawable",
-        "mipmap",
-        "raw" -> SizeMattersAndroidResourceProperties(qualifiers, extension, quantity, fileSizes!!)
-        else -> DefaultAndroidResourceProperties(qualifiers, extension, quantity)
+        else -> DefaultAndroidResourceProperties(qualifiers, extension, quantity, fileData!!)
     }
 }
 
@@ -105,10 +94,9 @@ class AndroidResourcePropertiesAdapter(private val resourceType: String? = null)
             ResourcePropertyType.VALUES -> {
                 writeValuesSpecializedData(output, value as ValuesAndroidResourceProperties)
             }
-            ResourcePropertyType.SIZE_MATTERS -> {
-                writeSizeMattersSpecializedData(output, value as SizeMattersAndroidResourceProperties)
+            ResourcePropertyType.DEFAULT -> {
+                writeDefaultSpecializedData(output, value as DefaultAndroidResourceProperties)
             }
-            ResourcePropertyType.DEFAULT -> {} // No additional information
         }
         output.endObject()
     }
@@ -117,17 +105,17 @@ class AndroidResourcePropertiesAdapter(private val resourceType: String? = null)
         var qualifiers: String? = null
         var extension: String? = null
         var quantity: Int? = null
-        var fileSizes: MutableList<Long>? = null
+        var fileData: MutableList<Long>? = null
         var valuesMapPerFile: MutableList<ValuesMap>? = null
         input.readObjectProperties { property ->
             when (property) {
                 "qualifiers" -> qualifiers = this.nextString()
                 "extension" -> extension = this.nextString()
                 "quantity" -> quantity = this.nextInt()
-                "fileSizes" -> {
-                        fileSizes = mutableListOf()
+                "fileData" -> {
+                        fileData = mutableListOf()
                         this.readArray {
-                                fileSizes!!.add(this.nextLong())
+                                fileData!!.add(this.nextLong())
                         }
                 }
                 "valuesFileList" -> {
@@ -169,7 +157,7 @@ class AndroidResourcePropertiesAdapter(private val resourceType: String? = null)
                 qualifiers = qualifiers!!,
                 extension = extension!!,
                 quantity = quantity!!,
-                fileSizes = fileSizes,
+                fileData = fileData,
                 valuesMapPerFile = valuesMapPerFile)
     }
 
@@ -206,9 +194,9 @@ class AndroidResourcePropertiesAdapter(private val resourceType: String? = null)
         }
         output.endArray()
     }
-    private fun writeSizeMattersSpecializedData(output: JsonWriter, value: SizeMattersAndroidResourceProperties) {
-        output.name("fileSizes").beginArray()
-        value.fileSizes.forEach { resourceFile ->
+    private fun writeDefaultSpecializedData(output: JsonWriter, value: DefaultAndroidResourceProperties) {
+        output.name("fileData").beginArray()
+        value.fileData.forEach { resourceFile ->
             output.value(resourceFile)
         }
         output.endArray()

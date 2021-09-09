@@ -34,7 +34,7 @@ data class DefaultAndroidResourcesInfo(
  *             "qualifiers": "",
  *             "extension": ".xml",
  *             "quantity": 2,
- *             "fileSizes": [
+ *             "fileData": [
  *               5606,
  *               1702
  *             ]
@@ -43,7 +43,7 @@ data class DefaultAndroidResourcesInfo(
  *             "qualifiers": "mod1",
  *             "extension": ".xml",
  *             "quantity": 3,
- *             "fileSizes": [
+ *             "fileData": [
  *               5606,
  *               2293,
  *               1702
@@ -53,7 +53,7 @@ data class DefaultAndroidResourcesInfo(
  *             "qualifiers": "mod2",
  *             "extension": ".xml",
  *             "quantity": 2,
- *             "fileSizes": [
+ *             "fileData": [
  *               5606,
  *               1702
  *             ]
@@ -62,7 +62,7 @@ data class DefaultAndroidResourcesInfo(
  *             "qualifiers": "mod2",
  *             "extension": ".png",
  *             "quantity": 1,
- *             "fileSizes": [
+ *             "fileData": [
  *               5606
  *             ]
  *         }

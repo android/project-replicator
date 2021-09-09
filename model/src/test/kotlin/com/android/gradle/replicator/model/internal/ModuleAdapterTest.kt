@@ -19,7 +19,7 @@ package com.android.gradle.replicator.model.internal
 import com.android.gradle.replicator.model.*
 import com.android.gradle.replicator.model.internal.fixtures.module
 import com.android.gradle.replicator.model.internal.filedata.AbstractAndroidResourceProperties
-import com.android.gradle.replicator.model.internal.filedata.SizeMattersAndroidResourceProperties
+import com.android.gradle.replicator.model.internal.filedata.DefaultAndroidResourceProperties
 import com.android.gradle.replicator.model.internal.filedata.ValuesAndroidResourceProperties
 import com.android.gradle.replicator.model.internal.filedata.ResourcePropertyType
 import com.android.gradle.replicator.model.internal.filedata.ValuesMap
@@ -92,29 +92,29 @@ internal class ModuleAdapterTest {
         androidResources {
             resourceMap = mutableMapOf(
                     "mipmap" to mutableListOf<AbstractAndroidResourceProperties>(
-                            SizeMattersAndroidResourceProperties(
+                            DefaultAndroidResourceProperties(
                                 qualifiers = "",
                                 extension = ".xml",
                                 quantity = 3,
-                                fileSizes = listOf(64, 128, 256)
+                                fileData = listOf(64, 128, 256)
                             ),
-                            SizeMattersAndroidResourceProperties(
+                            DefaultAndroidResourceProperties(
                                 qualifiers = "",
                                 extension = ".png",
                                 quantity = 2,
-                                fileSizes = listOf(512, 1024)
+                                fileData = listOf(512, 1024)
                             ),
-                            SizeMattersAndroidResourceProperties(
+                            DefaultAndroidResourceProperties(
                                 qualifiers = "hidpi",
                                 extension = ".xml",
                                 quantity = 3,
-                                fileSizes = listOf(2048, 4096, 8192)
+                                fileData = listOf(2048, 4096, 8192)
                             ),
-                            SizeMattersAndroidResourceProperties(
+                            DefaultAndroidResourceProperties(
                                 qualifiers = "hidpi",
                                 extension = ".png",
                                 quantity = 2,
-                                fileSizes = listOf(16384, 32768)
+                                fileData = listOf(16384, 32768)
                             )
                     ),
                     "values" to mutableListOf<AbstractAndroidResourceProperties>(
@@ -187,12 +187,12 @@ internal class ModuleAdapterTest {
 
                         Truth.assertThat(realSubjProperties.valuesMapPerFile).isEqualTo(realObjProperties.valuesMapPerFile)
                     }
-                    ResourcePropertyType.SIZE_MATTERS -> {
-                        val realSubjProperties = subjResourceProperties as SizeMattersAndroidResourceProperties
-                        val realObjProperties = objResourceProperties as SizeMattersAndroidResourceProperties
+                    ResourcePropertyType.DEFAULT -> {
+                        val realSubjProperties = subjResourceProperties as DefaultAndroidResourceProperties
+                        val realObjProperties = objResourceProperties as DefaultAndroidResourceProperties
 
-                        Truth.assertThat(realSubjProperties.fileSizes).isEqualTo(realObjProperties.fileSizes)}
-                    ResourcePropertyType.DEFAULT -> { } // Nothing more
+                        Truth.assertThat(realSubjProperties.fileData).isEqualTo(realObjProperties.fileData)
+                    }
                 }
             }
         }
@@ -226,7 +226,7 @@ private val FULL_MODULE = """
             "qualifiers": "",
             "extension": ".xml",
             "quantity": 3,
-            "fileSizes": [
+            "fileData": [
               64,
               128,
               256
@@ -236,7 +236,7 @@ private val FULL_MODULE = """
             "qualifiers": "",
             "extension": ".png",
             "quantity": 2,
-            "fileSizes": [
+            "fileData": [
               512,
               1024
             ]
@@ -245,7 +245,7 @@ private val FULL_MODULE = """
             "qualifiers": "hidpi",
             "extension": ".xml",
             "quantity": 3,
-            "fileSizes": [
+            "fileData": [
               2048,
               4096,
               8192
@@ -255,7 +255,7 @@ private val FULL_MODULE = """
             "qualifiers": "hidpi",
             "extension": ".png",
             "quantity": 2,
-            "fileSizes": [
+            "fileData": [
               16384,
               32768
             ]

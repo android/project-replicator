@@ -753,7 +753,7 @@ class BuildFeaturesTests {
                   "qualifiers": "",
                   "extension": "xml",
                   "quantity": 1,
-                  "fileSizes": [
+                  "fileData": [
                     0
                   ]
                 },
@@ -761,7 +761,7 @@ class BuildFeaturesTests {
                   "qualifiers": "v24",
                   "extension": "xml",
                   "quantity": 1,
-                  "fileSizes": [
+                  "fileData": [
                     0
                   ]
                 }
@@ -771,14 +771,23 @@ class BuildFeaturesTests {
                 {
                   "qualifiers": "",
                   "extension": "xml",
-                  "quantity": 4
+                  "quantity": 4,
+                  "fileData": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
                 }
               ],
               "menu": [
                 {
                   "qualifiers": "",
                   "extension": "xml",
-                  "quantity": 1
+                  "quantity": 1,
+                  "fileData": [
+                    0
+                  ]
                 }
               ],
               "mipmap": [
@@ -786,7 +795,7 @@ class BuildFeaturesTests {
                   "qualifiers": "anydpi-v26",
                   "extension": "xml",
                   "quantity": 2,
-                  "fileSizes": [
+                  "fileData": [
                     0,
                     0
                   ]
@@ -795,7 +804,7 @@ class BuildFeaturesTests {
                   "qualifiers": "hdpi",
                   "extension": "webp",
                   "quantity": 2,
-                  "fileSizes": [
+                  "fileData": [
                     0,
                     0
                   ]
@@ -804,7 +813,7 @@ class BuildFeaturesTests {
                   "qualifiers": "mdpi",
                   "extension": "webp",
                   "quantity": 2,
-                  "fileSizes": [
+                  "fileData": [
                     0,
                     0
                   ]
@@ -813,7 +822,7 @@ class BuildFeaturesTests {
                   "qualifiers": "xhdpi",
                   "extension": "webp",
                   "quantity": 2,
-                  "fileSizes": [
+                  "fileData": [
                     0,
                     0
                   ]
@@ -822,7 +831,7 @@ class BuildFeaturesTests {
                   "qualifiers": "xxhdpi",
                   "extension": "webp",
                   "quantity": 2,
-                  "fileSizes": [
+                  "fileData": [
                     0,
                     0
                   ]
@@ -831,7 +840,7 @@ class BuildFeaturesTests {
                   "qualifiers": "xxxhdpi",
                   "extension": "webp",
                   "quantity": 2,
-                  "fileSizes": [
+                  "fileData": [
                     0,
                     0
                   ]
@@ -841,7 +850,10 @@ class BuildFeaturesTests {
                 {
                   "qualifiers": "",
                   "extension": "xml",
-                  "quantity": 1
+                  "quantity": 1,
+                  "fileData": [
+                    0
+                  ]
                 }
               ],
               "raw": [],

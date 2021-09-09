@@ -46,7 +46,7 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
             task.seed.set(Random.nextInt())
             task.androidOutputDirectory.set(project.layout.projectDirectory.dir("src/main/res"))
             task.javaOutputDirectory.set(project.layout.projectDirectory.dir("src/main/resources"))
-            task.javaOutputDirectory.set(project.layout.projectDirectory.dir("src/main/assets"))
+            task.assetOutputDirectory.set(project.layout.projectDirectory.dir("src/main/assets"))
             task.generationProperties.set(project.rootProject.layout.projectDirectory.file("generation.properties"))
         }
 

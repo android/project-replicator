@@ -82,7 +82,7 @@ private const val MODEL_FILE = """
         "qualifiers": "",
         "extension": "xml",
         "quantity": 5,
-        "fileSizes": [
+        "fileData": [
           320,
           1320,
           2293,
@@ -94,7 +94,7 @@ private const val MODEL_FILE = """
         "qualifiers": "v24",
         "extension": "xml",
         "quantity": 1,
-        "fileSizes": [
+        "fileData": [
           1702
         ]
       }
@@ -104,14 +104,23 @@ private const val MODEL_FILE = """
       {
         "qualifiers": "",
         "extension": "xml",
-        "quantity": 4
+        "quantity": 4,
+        "fileData": [
+          1234,
+          2345,
+          3456,
+          4567
+        ]
       }
     ],
     "menu": [
       {
         "qualifiers": "",
         "extension": "xml",
-        "quantity": 1
+        "quantity": 1,
+        "fileData": [
+          9876
+        ]
       }
     ],
     "mipmap": [
@@ -119,7 +128,7 @@ private const val MODEL_FILE = """
         "qualifiers": "anydpi-v26",
         "extension": "xml",
         "quantity": 2,
-        "fileSizes": [
+        "fileData": [
           272,
           272
         ]
@@ -128,7 +137,7 @@ private const val MODEL_FILE = """
         "qualifiers": "hdpi",
         "extension": "webp",
         "quantity": 2,
-        "fileSizes": [
+        "fileData": [
           1404,
           2898
         ]
@@ -137,7 +146,7 @@ private const val MODEL_FILE = """
         "qualifiers": "hdpi",
         "extension": "nonstandard_format",
         "quantity": 1,
-        "fileSizes": [
+        "fileData": [
           28
         ]
       },
@@ -145,7 +154,7 @@ private const val MODEL_FILE = """
         "qualifiers": "mdpi",
         "extension": "webp",
         "quantity": 2,
-        "fileSizes": [
+        "fileData": [
           982,
           1772
         ]
@@ -154,7 +163,7 @@ private const val MODEL_FILE = """
         "qualifiers": "xhdpi",
         "extension": "webp",
         "quantity": 2,
-        "fileSizes": [
+        "fileData": [
           1900,
           3918
         ]
@@ -163,7 +172,7 @@ private const val MODEL_FILE = """
         "qualifiers": "xxhdpi",
         "extension": "webp",
         "quantity": 2,
-        "fileSizes": [
+        "fileData": [
           2884,
           5914
         ]
@@ -172,7 +181,7 @@ private const val MODEL_FILE = """
         "qualifiers": "xxxhdpi",
         "extension": "webp",
         "quantity": 2,
-        "fileSizes": [
+        "fileData": [
           3844,
           7778
         ]
