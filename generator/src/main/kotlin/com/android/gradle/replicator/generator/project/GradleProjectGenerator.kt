@@ -250,7 +250,9 @@ class GradleProjectGenerator(
         val generationPropertyFile = folder.join("generation.properties")
 
         val loader = Thread.currentThread().contextClassLoader
-        loader.getResourceAsStream("project/resource-generator-constants.properties")!!.copyTo(FileOutputStream(generationPropertyFile))
+        loader.getResourceAsStream("project/resource-generator-constants.properties")!!.use {
+            it.copyTo(FileOutputStream(generationPropertyFile))
+        }
     }
 
     private fun ModuleInfo.generateDependencies() {

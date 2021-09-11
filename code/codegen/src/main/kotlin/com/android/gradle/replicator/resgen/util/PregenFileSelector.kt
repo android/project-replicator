@@ -54,7 +54,7 @@ fun getRandomResource(random: Random, type: FileTypes, resourceQualifiers: List<
 fun copyResourceFile(resourcePath: String, output: File) {
     println("Copying from ${resourcePath.split("/").last()}")
     val loader = Thread.currentThread().contextClassLoader
-    loader.getResourceAsStream(resourcePath)!!.copyTo(FileOutputStream(output))
+    loader.getResourceAsStream(resourcePath)!!.use { it.copyTo(FileOutputStream(output)) }
 }
 
 fun getFileType(resourceExtension: String): FileTypes? {
