@@ -17,8 +17,8 @@
 package com.android.gradle.replicator.model.internal
 
 import com.android.gradle.replicator.model.AndroidResourcesInfo
-import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
-import com.android.gradle.replicator.model.internal.resources.AndroidResourcePropertiesAdapter
+import com.android.gradle.replicator.model.internal.filedata.AndroidResourceMap
+import com.android.gradle.replicator.model.internal.filedata.AndroidResourcePropertiesAdapter
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
@@ -34,7 +34,7 @@ data class DefaultAndroidResourcesInfo(
  *             "qualifiers": "",
  *             "extension": ".xml",
  *             "quantity": 2,
- *             "fileSizes": [
+ *             "fileData": [
  *               5606,
  *               1702
  *             ]
@@ -43,7 +43,7 @@ data class DefaultAndroidResourcesInfo(
  *             "qualifiers": "mod1",
  *             "extension": ".xml",
  *             "quantity": 3,
- *             "fileSizes": [
+ *             "fileData": [
  *               5606,
  *               2293,
  *               1702
@@ -53,7 +53,7 @@ data class DefaultAndroidResourcesInfo(
  *             "qualifiers": "mod2",
  *             "extension": ".xml",
  *             "quantity": 2,
- *             "fileSizes": [
+ *             "fileData": [
  *               5606,
  *               1702
  *             ]
@@ -62,7 +62,7 @@ data class DefaultAndroidResourcesInfo(
  *             "qualifiers": "mod2",
  *             "extension": ".png",
  *             "quantity": 1,
- *             "fileSizes": [
+ *             "fileData": [
  *               5606
  *             ]
  *         }

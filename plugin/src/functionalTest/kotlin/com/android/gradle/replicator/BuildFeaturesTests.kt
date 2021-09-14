@@ -61,14 +61,14 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -122,14 +122,14 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -183,14 +183,14 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -245,14 +245,14 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -307,14 +307,14 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -369,14 +369,14 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -431,14 +431,14 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -493,14 +493,14 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [
               {
                 "library": "com.android.databinding:viewbinding:$AGP_VERSION",
@@ -560,14 +560,14 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [
               {
                 "library": "androidx.databinding:databinding-compiler:$AGP_VERSION",
@@ -639,14 +639,14 @@ class BuildFeaturesTests {
               "layout": [],
               "menu": [],
               "mipmap": [],
+              "navigation": [],
               "raw": [],
               "transition": [],
               "values": [],
               "xml": []
             },
-            "javaResources": {
-              "fileCount": 0
-            },
+            "javaResources": {},
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",
@@ -751,17 +751,17 @@ class BuildFeaturesTests {
               "drawable": [
                 {
                   "qualifiers": "",
-                  "extension": ".xml",
+                  "extension": "xml",
                   "quantity": 1,
-                  "fileSizes": [
+                  "fileData": [
                     0
                   ]
                 },
                 {
                   "qualifiers": "v24",
-                  "extension": ".xml",
+                  "extension": "xml",
                   "quantity": 1,
-                  "fileSizes": [
+                  "fileData": [
                     0
                   ]
                 }
@@ -770,69 +770,88 @@ class BuildFeaturesTests {
               "layout": [
                 {
                   "qualifiers": "",
-                  "extension": ".xml",
-                  "quantity": 4
+                  "extension": "xml",
+                  "quantity": 4,
+                  "fileData": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
                 }
               ],
               "menu": [
                 {
                   "qualifiers": "",
-                  "extension": ".xml",
-                  "quantity": 1
+                  "extension": "xml",
+                  "quantity": 1,
+                  "fileData": [
+                    0
+                  ]
                 }
               ],
               "mipmap": [
                 {
                   "qualifiers": "anydpi-v26",
-                  "extension": ".xml",
+                  "extension": "xml",
                   "quantity": 2,
-                  "fileSizes": [
+                  "fileData": [
                     0,
                     0
                   ]
                 },
                 {
                   "qualifiers": "hdpi",
-                  "extension": ".webp",
+                  "extension": "webp",
                   "quantity": 2,
-                  "fileSizes": [
+                  "fileData": [
                     0,
                     0
                   ]
                 },
                 {
                   "qualifiers": "mdpi",
-                  "extension": ".webp",
+                  "extension": "webp",
                   "quantity": 2,
-                  "fileSizes": [
+                  "fileData": [
                     0,
                     0
                   ]
                 },
                 {
                   "qualifiers": "xhdpi",
-                  "extension": ".webp",
+                  "extension": "webp",
                   "quantity": 2,
-                  "fileSizes": [
+                  "fileData": [
                     0,
                     0
                   ]
                 },
                 {
                   "qualifiers": "xxhdpi",
-                  "extension": ".webp",
+                  "extension": "webp",
                   "quantity": 2,
-                  "fileSizes": [
+                  "fileData": [
                     0,
                     0
                   ]
                 },
                 {
                   "qualifiers": "xxxhdpi",
-                  "extension": ".webp",
+                  "extension": "webp",
                   "quantity": 2,
-                  "fileSizes": [
+                  "fileData": [
                     0,
+                    0
+                  ]
+                }
+              ],
+              "navigation": [
+                {
+                  "qualifiers": "",
+                  "extension": "xml",
+                  "quantity": 1,
+                  "fileData": [
                     0
                   ]
                 }
@@ -842,7 +861,7 @@ class BuildFeaturesTests {
               "values": [
                 {
                   "qualifiers": "",
-                  "extension": ".xml",
+                  "extension": "xml",
                   "quantity": 4,
                   "valuesFileList": [
                     {
@@ -893,7 +912,7 @@ class BuildFeaturesTests {
                 },
                 {
                   "qualifiers": "night",
-                  "extension": ".xml",
+                  "extension": "xml",
                   "quantity": 1,
                   "valuesFileList": [
                     {
@@ -913,8 +932,14 @@ class BuildFeaturesTests {
               "xml": []
             },
             "javaResources": {
-              "fileCount": 2
+              "json": [
+                0
+              ],
+              "txt": [
+                0
+              ]
             },
+            "assets": {},
             "dependencies": [],
             "android": {
               "compileSdkVersion": "android-30",

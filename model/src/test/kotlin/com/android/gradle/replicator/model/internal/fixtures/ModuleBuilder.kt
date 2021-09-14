@@ -25,7 +25,8 @@ class ModuleBuilder(var path: String = "") {
     var javaSources: SourceFilesBuilder? = null
     var kotlinSources: SourceFilesBuilder? = null
     var androidResources: AndroidResourcesBuilder? = null
-    var javaResources: SourceFilesBuilder? = null
+    var javaResources: FileWithSizeMetadataBuilder? = null
+    var assets: FileWithSizeMetadataBuilder? = null
     var dependencies: List<DependenciesInfo> = listOf()
     var android: AndroidBuilder? = null
 
@@ -41,8 +42,12 @@ class ModuleBuilder(var path: String = "") {
         action(androidResources ?: AndroidResourcesBuilder().also { androidResources = it })
     }
 
-    fun javaResources(action: SourceFilesBuilder.() -> Unit) {
-        action(javaResources ?: SourceFilesBuilder().also { javaResources = it })
+    fun javaResources(action: FileWithSizeMetadataBuilder.() -> Unit) {
+        action(javaResources ?: FileWithSizeMetadataBuilder().also { javaResources = it })
+    }
+
+    fun assets(action: FileWithSizeMetadataBuilder.() -> Unit) {
+        action(assets ?: FileWithSizeMetadataBuilder().also { assets = it })
     }
 
     fun android(action: AndroidBuilder.() -> Unit) {
@@ -56,6 +61,7 @@ class ModuleBuilder(var path: String = "") {
         kotlinSources?.toInfo(),
         androidResources?.toInfo(),
         javaResources?.toInfo(),
+        assets?.toInfo(),
         dependencies,
         android?.toInfo()
     )

@@ -16,12 +16,11 @@
 
 package com.android.gradle.replicator.model
 
-import com.android.gradle.replicator.model.internal.filedata.AndroidResourceMap
+import com.android.gradle.replicator.model.internal.filedata.FilesWithSizeMap
 
 /**
- * Information about the number of android resource files in a [ModuleInfo]
- * Divided by folder name, qualifiers and  such as mipmap-hidpi
+ * Information about amount, size and extension of files in a [ModuleInfo]
  */
-interface AndroidResourcesInfo {
-    val resourceMap: AndroidResourceMap
+interface FilesWithSizeMetadataInfo {
+    val fileData: FilesWithSizeMap
 }

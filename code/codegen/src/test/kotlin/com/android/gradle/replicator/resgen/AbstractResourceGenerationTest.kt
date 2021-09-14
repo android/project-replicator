@@ -28,13 +28,13 @@ import org.mockito.invocation.InvocationOnMock
 import java.io.File
 import kotlin.random.Random
 
-abstract class AbstractResourceGenerationUnitTest {
+abstract class AbstractResourceGenerationTest {
 
     @Mock
     lateinit var random: Random
 
     @get:Rule
-    val output = TemporaryFolder()
+    val testFolder = TemporaryFolder()
 
     @Before
     fun setup() {

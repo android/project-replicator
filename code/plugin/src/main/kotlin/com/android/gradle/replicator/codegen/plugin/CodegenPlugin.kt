@@ -44,8 +44,9 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
 
             task.parameters.set(project.layout.projectDirectory.file("resource-metadata.json"))
             task.seed.set(Random.nextInt())
-            task.androidOutputDirectory.set(project.layout.projectDirectory.dir("src/res"))
-            task.javaOutputDirectory.set(project.layout.projectDirectory.dir("src/resources"))
+            task.androidOutputDirectory.set(project.layout.projectDirectory.dir("src/main/res"))
+            task.javaOutputDirectory.set(project.layout.projectDirectory.dir("src/main/resources"))
+            task.assetOutputDirectory.set(project.layout.projectDirectory.dir("src/main/assets"))
             task.generationProperties.set(project.rootProject.layout.projectDirectory.file("generation.properties"))
         }
 

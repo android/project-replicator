@@ -1,6 +1,6 @@
 package com.android.gradle.replicator
 
-import com.android.gradle.replicator.model.internal.resources.*
+import com.android.gradle.replicator.model.internal.filedata.*
 import com.android.utils.XmlUtils
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
@@ -15,15 +15,10 @@ import javax.xml.parsers.SAXParserFactory
 fun processResourceFiles(resourceType: String, qualifiers: String, extension: String, resourceFiles: Set<File>):
         AbstractAndroidResourceProperties {
 
-    val ret =  when(resourceType) {
+    return when (resourceType) {
         "values" -> getValuesResourceData(qualifiers, extension, resourceFiles)
-        "drawable",
-        "mipmap",
-        "raw" -> getSizeMattersResourceData(qualifiers, extension, resourceFiles)
         else -> getDefaultResourceData(qualifiers, extension, resourceFiles)
     }
-
-    return ret
 }
 
 // Methods to parse specific resource types
@@ -41,26 +36,24 @@ fun getValuesResourceData(qualifiers: String, extension: String, resourceFiles: 
     )
 }
 
-
-fun getSizeMattersResourceData(qualifiers: String, extension: String, resourceFiles: Set<File>):
-        SizeMattersAndroidResourceProperties {
-    return SizeMattersAndroidResourceProperties(
-            qualifiers = qualifiers,
-            extension = extension,
-            quantity = resourceFiles.size,
-            fileSizes = mutableListOf<Long>().apply {
+fun getDefaultResourceData(qualifiers: String, extension: String, resourceFiles: Set<File>):
+        DefaultAndroidResourceProperties {
+    return DefaultAndroidResourceProperties(
+        qualifiers = qualifiers,
+        extension = extension,
+        quantity = resourceFiles.size,
+        fileData = mutableListOf<Long>().apply {
+            // XML files want lines instead of bytes
+            if (extension == "xml") {
+                resourceFiles.forEach {
+                    this.add(it.readLines().size.toLong())
+                }
+            } else {
                 resourceFiles.forEach {
                     this.add(it.length())
                 }
             }
-    )
-}
-
-fun getDefaultResourceData(qualifiers: String, extension: String, resourceFiles: Set<File>): AbstractAndroidResourceProperties {
-    return DefaultAndroidResourceProperties(
-            qualifiers = qualifiers,
-            extension = extension,
-            quantity = resourceFiles.size
+        }
     )
 }
 

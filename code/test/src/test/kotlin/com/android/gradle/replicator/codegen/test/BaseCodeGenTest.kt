@@ -43,7 +43,9 @@ open class BaseCodeGenTest(
                         PrintStream(File(projectDir, "build.gradle")).use {
                             GradleJavaBuildFileGenerator().generate(dependencies, PrettyPrintStream((it)))
                         }
-
+                    }
+                    Target.Mixed -> {
+                        // TODO: Implement this
                     }
                 }
                 PrintStream(File(projectDir, "settings.gradle")).use {

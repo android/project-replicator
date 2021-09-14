@@ -264,9 +264,8 @@ class BuildFeaturesTest: BaseTest() {
     "xml": [],
     "font": []
   },
-  "javaResources": {
-    "fileCount": 0
-  },
+  "javaResources": {},
+  "assets": {},
   "dependencies": [],
   "android": {
     "compileSdkVersion": "android-30",

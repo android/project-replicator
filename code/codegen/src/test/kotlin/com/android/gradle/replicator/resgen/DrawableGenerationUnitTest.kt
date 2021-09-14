@@ -6,18 +6,18 @@ import org.intellij.lang.annotations.Language
 import org.junit.Test
 import java.io.File
 
-class DrawableGenerationUnitTest: AbstractResourceGenerationUnitTest() {
+class DrawableGenerationUnitTest: AbstractResourceGenerationTest() {
     @Test
     fun testDrawableGeneration() {
         val generator = DrawableResourceGenerator(random, ResgenConstants())
         generator.numberOfResourceElements = 3
 
-        val pngFolder = output.newFolder("png")
-        val jpgFolder = output.newFolder("jpg")
-        val ninePatchFolder = output.newFolder("9png")
-        val gifFolder = output.newFolder("gif")
-        val webpFolder = output.newFolder("webp")
-        val xmlFolder = output.newFolder("xml")
+        val pngFolder = testFolder.newFolder("png")
+        val jpgFolder = testFolder.newFolder("jpg")
+        val ninePatchFolder = testFolder.newFolder("9png")
+        val gifFolder = testFolder.newFolder("gif")
+        val webpFolder = testFolder.newFolder("webp")
+        val xmlFolder = testFolder.newFolder("xml")
 
         val expectedChosenImages = mapOf(
                 "image_aaa.png" to
@@ -50,56 +50,56 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationUnitTest() {
                 number = 2,
                 outputFolder = pngFolder,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".png"
+                resourceExtension = "png"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = jpgFolder,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".jpg"
+                resourceExtension = "jpg"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = ninePatchFolder,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".9.png"
+                resourceExtension = "9.png"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = gifFolder,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".gif"
+                resourceExtension = "gif"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = webpFolder,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".webp"
+                resourceExtension = "webp"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = pngFolder,
                 resourceQualifiers = listOf("xxxhdpi"),
-                resourceExtension = ".png"
+                resourceExtension = "png"
         )
 
         generator.generateResource(
                 number = 2,
                 outputFolder = xmlFolder,
                 resourceQualifiers = listOf(),
-                resourceExtension = ".xml"
+                resourceExtension = "xml"
         )
 
         generator.generateResource(
                 number = 1,
                 outputFolder = xmlFolder,
                 resourceQualifiers = listOf("hidpi-v24"),
-                resourceExtension = ".xml"
+                resourceExtension = "xml"
         )
 
         Truth.assertThat(pngFolder.listFiles()!!.asList().map{it.name}).containsExactly(
