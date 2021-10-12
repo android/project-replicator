@@ -43,8 +43,8 @@ interface ProjectGenerator {
     companion object {
         fun createGenerator(
             params: BuildGenerator.Params,
-            libraryFilter: Map<String, String>,
-            libraryAdditions: Map<String, List<DependenciesInfo>>
+            libraryFilter: Map<Regex, String>,
+            libraryAdditions: Map<Regex, List<DependenciesInfo>>
         ): ProjectGenerator {
             val resGenerator = ManifestGenerator()
 

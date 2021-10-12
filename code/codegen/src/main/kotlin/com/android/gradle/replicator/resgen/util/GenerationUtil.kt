@@ -54,9 +54,12 @@ fun genString(maxWordCount: Int, separator: String, random: Random): String {
     return stringValue.joinToString(separator)
 }
 
-// TODO: Make name based on count rather than random
 fun genName(random: Random): String {
     return genString(3, "_", random)
+}
+
+fun genUniqueName(random: Random, category: String): String {
+    return "${genName(random)}_${UniqueIdGenerator.genIdByCategory(category)}"
 }
 
 fun genHex(numberOfDigits: Int, random: Random): String {
@@ -68,12 +71,21 @@ fun genHex(numberOfDigits: Int, random: Random): String {
             .substring(0, numberOfDigits) // Trim if odd number of hex requested
 }
 
-fun genFileNameCharacters(count: Int, minFileNameCharacters: Int = 3): String {
+fun genIdCharacters(count: Int, minFileNameCharacters: Int = 3): String {
     var current = count
     var characters = ""
     while (current > 0 || characters.length < minFileNameCharacters) {
         characters = 'a' + (current % 26) + characters
         current /= 26
     }
-    return "_$characters"
+    return characters
+}
+
+object UniqueIdGenerator {
+    private val idCountByType = mutableMapOf<String, Int>()
+    fun genIdByCategory(category: String): String {
+        idCountByType.putIfAbsent(category, 0)
+        idCountByType[category] = idCountByType[category]!! + 1
+        return genIdCharacters(idCountByType[category]!! - 1, NUMBER_OF_ID_CHARACTERS)
+    }
 }

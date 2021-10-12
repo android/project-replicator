@@ -18,9 +18,9 @@ package com.android.gradle.replicator.resgen
 
 import com.android.gradle.replicator.resgen.util.FileTypes
 import com.android.gradle.replicator.resgen.util.ResgenConstants
+import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
 import com.android.gradle.replicator.resgen.util.VectorDrawableGenerator
 import com.android.gradle.replicator.resgen.util.copyResourceFile
-import com.android.gradle.replicator.resgen.util.genFileNameCharacters
 import com.android.gradle.replicator.resgen.util.getFileType
 import com.android.gradle.replicator.resgen.util.getRandomResource
 import com.google.common.annotations.VisibleForTesting
@@ -40,9 +40,6 @@ class DrawableResourceGenerator (val random: Random, val constants: ResgenConsta
             FileTypes.WEBP
     )
 
-    var imageFiles = 0
-    var xmlFiles = 0
-
     override fun generateResource(
             number: Int,
             outputFolder: File,
@@ -51,17 +48,15 @@ class DrawableResourceGenerator (val random: Random, val constants: ResgenConsta
     ) {
         repeat(number) {
             when (resourceExtension) {
-                ".xml" ->  {
-                    val outputFile = File(outputFolder, "xml${genFileNameCharacters(xmlFiles)}${resourceExtension}")
+                "xml" ->  {
+                    val outputFile = File(outputFolder, "vector_drawable_${UniqueIdGenerator.genIdByCategory("drawable.fileName.vectorDrawable")}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateVectorDrawableResource(outputFile, resourceQualifiers)
-                    xmlFiles++
                 }
                 else -> {
-                    val outputFile = File(outputFolder, "image${genFileNameCharacters(imageFiles)}${resourceExtension}")
+                    val outputFile = File(outputFolder, "image_${UniqueIdGenerator.genIdByCategory("drawable.fileName.image")}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateImageResource(outputFile, resourceQualifiers, resourceExtension)
-                    imageFiles++
                 }
             }
         }
