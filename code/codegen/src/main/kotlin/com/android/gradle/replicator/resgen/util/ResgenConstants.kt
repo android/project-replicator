@@ -3,9 +3,6 @@ package com.android.gradle.replicator.resgen.util
 import com.android.gradle.replicator.parsing.ArgsParser
 import java.io.File
 
-// Immutable constants
-const val NUMBER_OF_ID_CHARACTERS = 4 //Number of base characters to use on unique identifiers
-
 class ResgenConstants (propertyFile: File? = null) {
     data class VectorImageConstants (
         val MAX_VECTOR_IMAGE_SIZE_SMALL: Int,

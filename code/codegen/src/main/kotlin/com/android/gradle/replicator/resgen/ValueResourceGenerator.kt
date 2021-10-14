@@ -17,10 +17,10 @@
 package com.android.gradle.replicator.resgen
 
 import com.android.gradle.replicator.resgen.util.ResgenConstants
-import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
+import com.android.gradle.replicator.resgen.util.genFileNameCharacters
 import com.android.gradle.replicator.resgen.util.genHex
+import com.android.gradle.replicator.resgen.util.genName
 import com.android.gradle.replicator.resgen.util.genString
-import com.android.gradle.replicator.resgen.util.genUniqueName
 import com.google.common.annotations.VisibleForTesting
 import java.io.File
 import kotlin.random.Random
@@ -36,19 +36,24 @@ class ValueResourceGenerator (val random: Random, val constants: ResgenConstants
             resourceQualifiers: List<String>,
             resourceExtension: String
     ) {
+        var themesFiles = 0
+        var valuesFiles = 0
+
         repeat(number) {
-            // TODO: Identify which kind of resource to generate
+            // TODO: Randomize this
             val type = ResourceType.VALUES
             when (type) {
                 ResourceType.THEME ->  {
-                    val outputFile = File(outputFolder, "themes_${UniqueIdGenerator.genIdByCategory("values.fileName.theme")}.${resourceExtension}")
+                    val outputFile = File(outputFolder, "themes${genFileNameCharacters(themesFiles)}${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateThemeResource(outputFile, resourceQualifiers)
+                    themesFiles++
                 }
                 ResourceType.VALUES -> {
-                    val outputFile = File(outputFolder, "value_${UniqueIdGenerator.genIdByCategory("values.fileName.values")}.${resourceExtension}")
+                    val outputFile = File(outputFolder, "values${genFileNameCharacters(valuesFiles)}${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateXmlValueResource(outputFile)
+                    valuesFiles++
                 }
             }
         }
@@ -99,7 +104,7 @@ class ValueResourceGenerator (val random: Random, val constants: ResgenConstants
     }
 
     private fun stringBlock (): String {
-        val name = genUniqueName(random, "values.resName.string")
+        val name = genName(random)
         val value = genString(
             constants.values.MAX_STRING_WORD_COUNT,
             separator = " ",
@@ -108,19 +113,19 @@ class ValueResourceGenerator (val random: Random, val constants: ResgenConstants
     }
 
     private fun intBlock (): String {
-        val name = genUniqueName(random, "values.resName.int")
+        val name = genName(random)
         val value = random.nextInt()
         return "    <integer name=\"$name\">$value</integer>"
     }
 
     private fun boolBlock (): String {
-        val name = genUniqueName(random, "values.resName.bool")
+        val name = genName(random)
         val value = random.nextBoolean()
         return "    <bool name=\"$name\">$value</bool>"
     }
 
     private fun colorBlock (): String {
-        val name = genUniqueName(random, "values.resName.color")
+        val name = genName(random)
         /* Digits can be:
          * #RGB
          * #ARGB
@@ -135,19 +140,19 @@ class ValueResourceGenerator (val random: Random, val constants: ResgenConstants
     }
 
     private fun dimenBlock (): String {
-        val name = genUniqueName(random, "values.resName.dimen")
+        val name = genName(random)
         val value = "${random.nextInt(constants.values.MAX_DIMENSION)}${constants.values.DIMENSION_UNITS.random(random)}"
 
         return "    <dimen name=\"$name\">$value</dimen>"
     }
 
     private fun idBlock (): String {
-        val name = genUniqueName(random, "values.resName.id")
+        val name = genName(random)
         return "    <item type=\"id\" name=\"$name\"/>"
     }
 
     private fun intArrayBlock (): List<String> {
-        val name = genUniqueName(random, "values.resName.intArray")
+        val name = genName(random)
         val size = random.nextInt(constants.values.MAX_ARRAY_ELEMENTS)
         val result = mutableListOf("    <integer-array name=\"$name\">")
 

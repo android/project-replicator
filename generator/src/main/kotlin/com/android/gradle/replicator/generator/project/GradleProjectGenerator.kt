@@ -28,19 +28,21 @@ import com.android.gradle.replicator.model.ModuleInfo
 import com.android.gradle.replicator.model.PluginType
 import com.android.gradle.replicator.model.ProjectInfo
 import com.android.gradle.replicator.model.internal.AndroidResourcesAdapter
+import com.android.gradle.replicator.model.internal.DefaultFilesWithSizeMetadataInfo
+import com.android.gradle.replicator.model.internal.DefaultSourceFilesInfo
 import com.android.gradle.replicator.model.internal.FilesWithSizeMetadataAdapter
+import com.android.gradle.replicator.model.internal.SourceFilesAdapter
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonWriter
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
-import java.util.LinkedList
 
 class GradleProjectGenerator(
     private val destinationFolder: File,
-    private val libraryFilter: Map<Regex, String>,
-    private val libraryAdditions: Map<Regex, List<DependenciesInfo>>,
+    private val libraryFilter: Map<String, String>,
+    private val libraryAdditions: Map<String, List<DependenciesInfo>>,
     private val dslWriter: DslWriter,
     private val resGenerator: ManifestGenerator
 ): ProjectGenerator {
@@ -167,65 +169,10 @@ class GradleProjectGenerator(
                 }
             }
         }
-        val leafModules = getLeafModules(project.subModules)
-        leafModules.forEach {
+
+        project.subModules.map { it.path }.sorted().forEach {
             dslWriter.call("include", dslWriter.asString(it))
         }
-    }
-
-    private fun getLeafModules(modules: List<ModuleInfo>): List<String> {
-
-        val ret = mutableListOf<String>()
-
-        // Convert projects into a graph so we can trim all the non-leaf nodes since those are included automatically
-        class Node(val path: String) {
-            val children = mutableMapOf<String, Node>()
-        }
-
-        val root = Node(":")
-
-        // Go through the graph and grab the corresponding node (and create it if it doesn't exist)
-        // :module1:module2 becomes root -> module1 -> module2
-        val createModuleNode = { module: String ->
-            var currNode = root
-            val coordinates = LinkedList<String>(module.split(":"))
-            // The first coordinate is the root (":a:b" -> ["", "a", "b"]). Discard it.
-            coordinates.pop()
-            var currFullPath = ""
-            // Go through the list of coordinates and traverse the graph, creating nodes as needed
-            while (coordinates.isNotEmpty()) {
-                val nextCoordinate = coordinates.pop()
-                currFullPath += ":$nextCoordinate"
-                if (!currNode.children.containsKey(nextCoordinate)) {
-                    currNode.children[nextCoordinate] = Node(currFullPath)
-                } else if (coordinates.isEmpty()) { // Node already exists. Module is duplicated
-                    throw java.lang.RuntimeException("duplicated module $currFullPath")
-                }
-                currNode = currNode.children[nextCoordinate]!!
-            }
-        }
-
-        // create the graph with all the modules
-        modules.map { it.path }.sorted().forEach {
-            createModuleNode(it)
-        }
-
-        // BFS
-        val visit = { node: Node ->
-            // If leaf node add it to includes
-            if (node.children.isEmpty()) {
-                ret.add(node.path)
-            }
-        }
-        val frontier = LinkedList<Node>(listOf(root))
-        while (frontier.isNotEmpty()) {
-            val currNode = frontier.pop()
-            visit(currNode)
-            currNode.children.forEach {
-                frontier.add(it.value)
-            }
-        }
-        return ret
     }
 
     override fun close() {
@@ -306,33 +253,13 @@ class GradleProjectGenerator(
         loader.getResourceAsStream("project/resourceGeneratorConstants.properties")!!.copyTo(FileOutputStream(generationPropertyFile))
     }
 
-    private fun matchLibraryFilter(lib: String): String? {
-        for (i in libraryFilter) {
-            if (i.key.matches(lib)) {
-                return i.value
-            }
-        }
-        return null
-    }
-
-    // Library additions need to match ALL patterns, not just the first
-    private fun matchLibraryAdditions(module: String): List<DependenciesInfo>? {
-        val result = mutableListOf<DependenciesInfo>()
-        for (i in libraryAdditions) {
-            if (i.key.matches(module)) {
-                result.addAll(i.value)
-            }
-        }
-        return if (result.isEmpty()) null else result
-    }
-
     private fun ModuleInfo.generateDependencies() {
         val moduleInfo = this
         dslWriter.block("dependencies") {
             var dependencyList = dependencies
 
             // check if we need to add dependencies to this module
-            matchLibraryAdditions(moduleInfo.path)?.let { list ->
+            libraryAdditions[moduleInfo.path]?.let { list ->
                 println("\tAdding dependencies to $path")
                 list.forEach {
                     println("\t\t- ${it.dependency}(${it.scope})")
@@ -347,7 +274,7 @@ class GradleProjectGenerator(
             for (scope in scopes) {
                 for (dep in dependencyList.filter { it.scope == scope }) {
                     // search for replacement. If none, use the original value
-                    val replacement = matchLibraryFilter(dep.dependency) ?: dep.dependency
+                    val replacement = libraryFilter[dep.dependency] ?: dep.dependency
                     // empty string means ignored dependency
                     if (replacement.isEmpty()) {
                         println("\tIgnoring ${dep.dependency}")

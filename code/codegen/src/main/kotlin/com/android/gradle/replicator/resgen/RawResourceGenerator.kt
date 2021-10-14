@@ -1,7 +1,7 @@
 package com.android.gradle.replicator.resgen
 
-import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
 import com.android.gradle.replicator.resgen.util.copyResourceFile
+import com.android.gradle.replicator.resgen.util.genFileNameCharacters
 import com.android.gradle.replicator.resgen.util.getFileType
 import com.android.gradle.replicator.resgen.util.getRandomResource
 import java.io.File
@@ -21,7 +21,7 @@ class RawResourceGenerator (val random: Random): ResourceGenerator {
             return
         }
         repeat(number) {
-            val outputFile = File(outputFolder, "raw_${UniqueIdGenerator.genIdByCategory("raw.fileName")}.${resourceExtension}")
+            val outputFile = File(outputFolder, "raw${genFileNameCharacters(files)}${resourceExtension}")
             println("Generating ${outputFile.absolutePath}")
             generateRawResource(outputFile, resourceQualifiers, resourceExtension)
             files++

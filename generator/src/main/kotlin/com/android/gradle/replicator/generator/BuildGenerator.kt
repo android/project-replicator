@@ -37,8 +37,8 @@ class BuildGenerator(private val params: Params) {
         val kts: Boolean
     }
 
-    private val libraryFilter: Map<Regex, String> = generateLibraryFilter()
-    private val libraryAdditions: Map<Regex, List<DependenciesInfo>> = generateLibraryAdditions()
+    private val libraryFilter: Map<String, String> = generateLibraryFilter()
+    private val libraryAdditions: Map<String, List<DependenciesInfo>> = generateLibraryAdditions()
 
     fun generate() {
         val project = Serializer.instance().deserializeProject(params.jsonFile)
@@ -67,44 +67,20 @@ class BuildGenerator(private val params: Params) {
         println("Done.")
     }
 
-    // Separate wildcard tokens and create a regex string. Does not support !, ^ and []
-    private fun convertToRegex(wildcardString: String): Regex {
-        var ret = "\\Q"
-        for (c in wildcardString) {
-            when(c) {
-                '*' -> {
-                    ret += "\\E.*\\Q"
-                }
-                '?' -> {
-                    ret += "\\E.\\Q"
-                }
-                '#' -> {
-                    ret += "\\E[0-9]\\Q"
-                }
-                else -> {
-                    ret += c
-                }
-            }
-        }
-        ret += "\\E"
-        // Remove empty regex blocks which are bad Ex: "[0-9]\Q\E[0-9]"
-        return ret.replace("\\Q\\E", "").toRegex()
-    }
-
-    private fun generateLibraryFilter(): Map<Regex, String> {
+    private fun generateLibraryFilter(): Map<String, String> {
         return params.libraryFilter?.let { file: File ->
             file.readLines().filter { it.isNotEmpty() }.map {
                 val split = it.split(" -> ")
                 if (split.size == 1) {
-                    convertToRegex(split[0]) to ""
+                    split[0] to ""
                 } else {
-                    convertToRegex(split[0]) to split[1]
+                    split[0] to split[1]
                 }
             }.toMap()
         } ?: mapOf()
     }
 
-    private fun generateLibraryAdditions(): Map<Regex, List<DependenciesInfo>> {
+    private fun generateLibraryAdditions(): Map<String, List<DependenciesInfo>> {
         return params.libraryAdditions?.let { file: File ->
             val entries = file.readLines().filter { it.isNotEmpty() }.map {
                 val split = it.split(" ")
@@ -119,19 +95,13 @@ class BuildGenerator(private val params: Params) {
                 )
             }
 
-            val stringMap = mutableMapOf<String, List<DependenciesInfo>>()
+            val result = mutableMapOf<String, List<DependenciesInfo>>()
 
-            // Make the map as a string map first because Regexes don't compare well
             entries.forEach {
-                val list = stringMap.computeIfAbsent(it.first) { mutableListOf() } as MutableList<DependenciesInfo>
+                val list = result.computeIfAbsent(it.first) { mutableListOf() } as MutableList<DependenciesInfo>
                 list.add(it.second)
             }
 
-            val result = mutableMapOf<Regex, List<DependenciesInfo>>()
-
-            stringMap.forEach {
-                result[convertToRegex(it.key)] = it.value
-            }
             result
         } ?: mapOf()
     }
