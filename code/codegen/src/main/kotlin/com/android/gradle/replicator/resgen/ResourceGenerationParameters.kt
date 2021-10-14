@@ -16,43 +16,53 @@
  */
 package com.android.gradle.replicator.resgen
 
-import com.android.gradle.replicator.model.internal.resources.AndroidResourceMap
+import com.android.gradle.replicator.model.internal.filedata.AndroidResourceMap
+import com.android.gradle.replicator.model.internal.filedata.FilesWithSizeMap
 
 /**
  * Parameters for the generation for a module.
  */
 data class ResourceGenerationParameters(
-        /**
+    /**
          * Seed value for the randomizer
          */
         val seed: Int,
 
-        /**
-         * Number of Android resource files that should be generated in this module, separated by type
+    /**
+         * Number of Android resource files that should be generated in this module, separated by type, with metadata
          */
         val androidResourcesMap: AndroidResourceMap,
 
-        /**
-         * Number of Java resource files that should be generated in this module
+    /**
+         * Number of Java resource files that should be generated in this module, separated by type, with metadata
          */
-        val numberOfJavaResources: Int
+        val javaResourcesMap: FilesWithSizeMap,
+
+    /**
+         * Number of Java resource files that should be generated in this module, separated by type, with metadata
+         */
+        val assetsMap: FilesWithSizeMap
 ) {
     class Builder {
         private var seed = 1
-        private var nbOfAndroidResources: AndroidResourceMap = mutableMapOf()
-        private var nbOfJavaResources = 0
+        private var androidResourcesMap: AndroidResourceMap = mutableMapOf()
+        private var javaResourcesMap: FilesWithSizeMap = mapOf()
+        private var assetsMap: FilesWithSizeMap = mapOf()
 
         fun setSeed(seed: Int) { this.seed = seed }
 
-        fun setNumberOfAndroidResources(numberOfAndroidResources: AndroidResourceMap) { this.nbOfAndroidResources = numberOfAndroidResources }
+        fun setAndroidResourcesMap(androidResourcesMap: AndroidResourceMap) { this.androidResourcesMap = androidResourcesMap }
 
-        fun setNumberOfJavaResources(numberOfJavaResources: Int) { this.nbOfJavaResources = numberOfJavaResources }
+        fun setJavaResourcesMap(javaResourcesMap: FilesWithSizeMap) { this.javaResourcesMap = javaResourcesMap }
+
+        fun setAssetsMap(assetsMap: FilesWithSizeMap) { this.assetsMap = assetsMap }
 
         fun build(): ResourceGenerationParameters =
                 ResourceGenerationParameters(
-                        seed = seed,
-                        androidResourcesMap = nbOfAndroidResources,
-                        numberOfJavaResources = nbOfJavaResources
+                    seed = seed,
+                    androidResourcesMap = androidResourcesMap,
+                    javaResourcesMap = javaResourcesMap,
+                    assetsMap = assetsMap
                 )
     }
 }

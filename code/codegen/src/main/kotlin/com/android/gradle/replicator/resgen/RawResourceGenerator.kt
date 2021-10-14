@@ -21,7 +21,7 @@ class RawResourceGenerator (val random: Random): ResourceGenerator {
             return
         }
         repeat(number) {
-            val outputFile = File(outputFolder, "raw${genFileNameCharacters(files)}${resourceExtension}")
+            val outputFile = File(outputFolder, "raw${genFileNameCharacters(files)}.${resourceExtension}")
             println("Generating ${outputFile.absolutePath}")
             generateRawResource(outputFile, resourceQualifiers, resourceExtension)
             files++

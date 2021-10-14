@@ -59,7 +59,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
             "qualifiers": "",
             "extension": ".xml",
             "quantity": 1,
-            "fileSizes": [
+            "fileData": [
               64
             ]
           },
@@ -67,7 +67,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
             "qualifiers": "v24",
             "extension": ".xml",
             "quantity": 1,
-            "fileSizes": [
+            "fileData": [
               128
             ]
           }
@@ -77,14 +77,23 @@ class BasicAndroidWithResourcesTest: BaseTest() {
           {
             "qualifiers": "",
             "extension": ".xml",
-            "quantity": 4
+            "quantity": 4,
+            "fileData": [
+              4321,
+              5432,
+              6532,
+              7654
+            ]
           }
         ],
         "menu": [
           {
             "qualifiers": "",
             "extension": ".xml",
-            "quantity": 1
+            "quantity": 1,
+            "fileData": [
+              1234
+            ]
           }
         ],
         "mipmap": [
@@ -92,7 +101,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
             "qualifiers": "anydpi-v26",
             "extension": ".xml",
             "quantity": 2,
-            "fileSizes": [
+            "fileData": [
               256,
               512
             ]
@@ -101,7 +110,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
             "qualifiers": "hdpi",
             "extension": ".webp",
             "quantity": 2,
-            "fileSizes": [
+            "fileData": [
               1024,
               2048
             ]
@@ -110,7 +119,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
             "qualifiers": "mdpi",
             "extension": ".webp",
             "quantity": 2,
-            "fileSizes": [
+            "fileData": [
               4096,
               8192
             ]
@@ -119,7 +128,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
             "qualifiers": "xhdpi",
             "extension": ".webp",
             "quantity": 2,
-            "fileSizes": [
+            "fileData": [
               16384,
               32768
             ]
@@ -128,7 +137,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
             "qualifiers": "xxhdpi",
             "extension": ".webp",
             "quantity": 2,
-            "fileSizes": [
+            "fileData": [
               65536,
               131072
             ]
@@ -137,7 +146,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
             "qualifiers": "xxxhdpi",
             "extension": ".webp",
             "quantity": 2,
-            "fileSizes": [
+            "fileData": [
               262144,
               524288
             ]
@@ -299,7 +308,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                         "qualifiers": "",
                                         "extension": ".xml",
                                         "quantity": 1,
-                                        "fileSizes": [
+                                        "fileData": [
                                           64
                                         ]
                                       },
@@ -307,7 +316,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                         "qualifiers": "v24",
                                         "extension": ".xml",
                                         "quantity": 1,
-                                        "fileSizes": [
+                                        "fileData": [
                                           128
                                         ]
                                       }
@@ -317,14 +326,23 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                       {
                                         "qualifiers": "",
                                         "extension": ".xml",
-                                        "quantity": 4
+                                        "quantity": 4,
+                                        "fileData": [
+                                          4321,
+                                          5432,
+                                          6532,
+                                          7654
+                                        ]
                                       }
                                     ],
                                     "menu": [
                                       {
                                         "qualifiers": "",
                                         "extension": ".xml",
-                                        "quantity": 1
+                                        "quantity": 1,
+                                        "fileData": [
+                                          1234
+                                        ]
                                       }
                                     ],
                                     "mipmap": [
@@ -332,7 +350,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                         "qualifiers": "anydpi-v26",
                                         "extension": ".xml",
                                         "quantity": 2,
-                                        "fileSizes": [
+                                        "fileData": [
                                           256,
                                           512
                                         ]
@@ -341,7 +359,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                         "qualifiers": "hdpi",
                                         "extension": ".webp",
                                         "quantity": 2,
-                                        "fileSizes": [
+                                        "fileData": [
                                           1024,
                                           2048
                                         ]
@@ -350,7 +368,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                         "qualifiers": "mdpi",
                                         "extension": ".webp",
                                         "quantity": 2,
-                                        "fileSizes": [
+                                        "fileData": [
                                           4096,
                                           8192
                                         ]
@@ -359,7 +377,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                         "qualifiers": "xhdpi",
                                         "extension": ".webp",
                                         "quantity": 2,
-                                        "fileSizes": [
+                                        "fileData": [
                                           16384,
                                           32768
                                         ]
@@ -368,7 +386,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                         "qualifiers": "xxhdpi",
                                         "extension": ".webp",
                                         "quantity": 2,
-                                        "fileSizes": [
+                                        "fileData": [
                                           65536,
                                           131072
                                         ]
@@ -377,7 +395,7 @@ class BasicAndroidWithResourcesTest: BaseTest() {
                                         "qualifiers": "xxxhdpi",
                                         "extension": ".webp",
                                         "quantity": 2,
-                                        "fileSizes": [
+                                        "fileData": [
                                           262144,
                                           524288
                                         ]

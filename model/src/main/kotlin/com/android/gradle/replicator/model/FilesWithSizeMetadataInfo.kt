@@ -16,9 +16,11 @@
 
 package com.android.gradle.replicator.model
 
+import com.android.gradle.replicator.model.internal.filedata.FilesWithSizeMap
+
 /**
  * Information about amount, size and extension of files in a [ModuleInfo]
  */
 interface FilesWithSizeMetadataInfo {
-    val fileData: Map<String, List<Long>>
+    val fileData: FilesWithSizeMap
 }
