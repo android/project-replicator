@@ -22,6 +22,7 @@ import com.android.gradle.replicator.generator.containsKotlin
 import com.android.gradle.replicator.generator.generate
 import com.android.gradle.replicator.generator.join
 import com.android.gradle.replicator.generator.manifest.ManifestGenerator
+import com.android.gradle.replicator.generator.util.WildcardString
 import com.android.gradle.replicator.generator.writer.DslWriter
 import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.ModuleInfo
@@ -39,8 +40,8 @@ import java.util.LinkedList
 
 class GradleProjectGenerator(
     private val destinationFolder: File,
-    private val libraryFilter: Map<Regex, String>,
-    private val libraryAdditions: Map<Regex, List<DependenciesInfo>>,
+    private val libraryFilter: Map<WildcardString, String>,
+    private val libraryAdditions: Map<WildcardString, List<DependenciesInfo>>,
     private val dslWriter: DslWriter,
     private val resGenerator: ManifestGenerator
 ): ProjectGenerator {
@@ -318,10 +319,11 @@ class GradleProjectGenerator(
     }
 
     // Library additions need to match ALL patterns, not just the first
-    private fun matchLibraryAdditions(module: String): List<DependenciesInfo>? {
+    private fun matchLibraryAdditions(module: String, wildcardMatch: Boolean): List<DependenciesInfo>? {
         val result = mutableListOf<DependenciesInfo>()
         for (i in libraryAdditions) {
-            if (i.key.matches(module)) {
+            // Only match if wildcard match is on or key is not a wildcard (I.E. is a directly targeted module)
+            if ((wildcardMatch || !i.key.isWildcard) && i.key.matches(module)) {
                 result.addAll(i.value)
             }
         }
@@ -333,8 +335,10 @@ class GradleProjectGenerator(
         dslWriter.block("dependencies") {
             var dependencyList = dependencies
 
-            // check if we need to add dependencies to this module
-            matchLibraryAdditions(moduleInfo.path)?.let { list ->
+            // Check if we need to add dependencies to this module
+            // Only allow wildcard matching for modules that have some dependency to avoid adding dependencies
+            // to intermediate modules
+            matchLibraryAdditions(moduleInfo.path, dependencies.isNotEmpty())?.let { list ->
                 println("\tAdding dependencies to $path")
                 list.forEach {
                     println("\t\t- ${it.dependency}(${it.scope})")
