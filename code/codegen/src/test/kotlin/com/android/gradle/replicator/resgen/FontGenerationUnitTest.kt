@@ -10,17 +10,17 @@ class FontGenerationUnitTest: AbstractResourceGenerationTest() {
         val generator = FontResourceGenerator(random)
 
         val expectedChosenImages = mapOf(
-                "font_aaa.ttf" to
+                "font_aaaa.ttf" to
                         Pair(testFolder.root, getResourceFont("ttf", "AndroidClock.ttf")),
-                "font_aab.ttf" to
+                "font_aaab.ttf" to
                         Pair(testFolder.root, getResourceFont("ttf", "NanumGothic.ttf")),
-                "font_aac.otf" to
+                "font_aaac.otf" to
                         Pair(testFolder.root, getResourceFont("otf", "NotoSansBassaVah-Regular.otf")),
-                "font_aad.otf" to
+                "font_aaad.otf" to
                         Pair(testFolder.root, getResourceFont("otf", "NotoSansBhaiksuki-Regular.otf")),
-                "font_aae.ttc" to
+                "font_aaae.ttc" to
                         Pair(testFolder.root, getResourceFont("ttc", "NotoSansCJK-Regular.ttc")),
-                "font_aaf.ttc" to
+                "font_aaaf.ttc" to
                         Pair(testFolder.root, getResourceFont("ttc", "NotoSerifCJK-Regular.ttc"))
         )
 
@@ -46,7 +46,7 @@ class FontGenerationUnitTest: AbstractResourceGenerationTest() {
         )
 
         Truth.assertThat(testFolder.root.listFiles()!!.asList().map { it.name }).containsExactly(
-                "font_aaa.ttf", "font_aab.ttf", "font_aac.otf", "font_aad.otf", "font_aae.ttc", "font_aaf.ttc")
+                "font_aaaa.ttf", "font_aaab.ttf", "font_aaac.otf", "font_aaad.otf", "font_aaae.ttc", "font_aaaf.ttc")
         expectedChosenImages.forEach {
             Truth.assertThat(File(it.value.first, it.key).readBytes()).isEqualTo(it.value.second.readBytes())
         }

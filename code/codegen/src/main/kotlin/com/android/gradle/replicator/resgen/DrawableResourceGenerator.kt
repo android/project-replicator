@@ -47,6 +47,7 @@ class DrawableResourceGenerator (val random: Random, val constants: ResgenConsta
             resourceExtension: String
     ) {
         repeat(number) {
+            // TODO: generate unique IDs only by qualifiers or folder name so the same resource appears on hdpi and mdpi
             when (resourceExtension) {
                 "xml" ->  {
                     val outputFile = File(outputFolder, "vector_drawable_${UniqueIdGenerator.genIdByCategory("drawable.fileName.vectorDrawable")}.${resourceExtension}")

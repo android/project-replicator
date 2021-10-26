@@ -46,7 +46,7 @@ class ValueResourceGenerator (val random: Random, val constants: ResgenConstants
                     generateThemeResource(outputFile, resourceQualifiers)
                 }
                 ResourceType.VALUES -> {
-                    val outputFile = File(outputFolder, "value_${UniqueIdGenerator.genIdByCategory("values.fileName.values")}.${resourceExtension}")
+                    val outputFile = File(outputFolder, "values_${UniqueIdGenerator.genIdByCategory("values.fileName.values")}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateXmlValueResource(outputFile)
                 }

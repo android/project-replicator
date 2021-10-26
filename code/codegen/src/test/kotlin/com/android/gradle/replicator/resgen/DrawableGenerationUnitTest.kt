@@ -20,29 +20,29 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationTest() {
         val xmlFolder = testFolder.newFolder("xml")
 
         val expectedChosenImages = mapOf(
-                "image_aaa.png" to
+                "image_aaaa.png" to
                         Pair(pngFolder, getResourceImage("png", "anydpi_bootleg_android.png")),
-                "image_aab.png" to
+                "image_aaab.png" to
                         Pair(pngFolder, getResourceImage("png", "anydpi_pizza.png")),
-                "image_aac.jpg" to
+                "image_aaac.jpg" to
                         Pair(jpgFolder, getResourceImage("jpeg", "hdpi_bootleg_android.jpg")),
-                "image_aad.jpg" to
+                "image_aaad.jpg" to
                         Pair(jpgFolder, getResourceImage("jpeg", "hdpi_pizza.jpg")),
-                "image_aae.9.png" to
+                "image_aaae.9.png" to
                         Pair(ninePatchFolder, getResourceImage("9png", "ldpi_bootleg_android.9.png")),
-                "image_aaf.9.png" to
+                "image_aaaf.9.png" to
                         Pair(ninePatchFolder, getResourceImage("9png", "ldpi_pizza.9.png")),
-                "image_aag.gif" to
+                "image_aaag.gif" to
                         Pair(gifFolder, getResourceImage("gif", "mdpi_bootleg_android.gif")),
-                "image_aah.gif" to
+                "image_aaah.gif" to
                         Pair(gifFolder, getResourceImage("gif", "mdpi_pizza.gif")),
-                "image_aai.webp" to
+                "image_aaai.webp" to
                         Pair(webpFolder, getResourceImage("webp", "nodpi_bootleg_android.webp")),
-                "image_aaj.webp" to
+                "image_aaaj.webp" to
                         Pair(webpFolder, getResourceImage("webp", "nodpi_pizza.webp")),
-                "image_aak.png" to
+                "image_aaak.png" to
                         Pair(pngFolder, getResourceImage("png", "xxxhdpi_bootleg_android.png")),
-                "image_aal.png" to
+                "image_aaal.png" to
                         Pair(pngFolder, getResourceImage("png", "xxxhdpi_pizza.png"))
         )
 
@@ -103,19 +103,19 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationTest() {
         )
 
         Truth.assertThat(pngFolder.listFiles()!!.asList().map{it.name}).containsExactly(
-                "image_aaa.png", "image_aab.png", "image_aak.png", "image_aal.png")
-        Truth.assertThat(jpgFolder.listFiles()!!.asList().map{it.name}).containsExactly("image_aac.jpg", "image_aad.jpg")
-        Truth.assertThat(ninePatchFolder.listFiles()!!.asList().map{it.name}).containsExactly("image_aae.9.png", "image_aaf.9.png")
-        Truth.assertThat(gifFolder.listFiles()!!.asList().map{it.name}).containsExactly("image_aag.gif", "image_aah.gif")
-        Truth.assertThat(webpFolder.listFiles()!!.asList().map{it.name}).containsExactly("image_aai.webp", "image_aaj.webp")
-        Truth.assertThat(xmlFolder.listFiles()!!.asList().map{it.name}).containsExactly("xml_aaa.xml", "xml_aab.xml", "xml_aac.xml")
+                "image_aaaa.png", "image_aaab.png", "image_aaak.png", "image_aaal.png")
+        Truth.assertThat(jpgFolder.listFiles()!!.asList().map{it.name}).containsExactly("image_aaac.jpg", "image_aaad.jpg")
+        Truth.assertThat(ninePatchFolder.listFiles()!!.asList().map{it.name}).containsExactly("image_aaae.9.png", "image_aaaf.9.png")
+        Truth.assertThat(gifFolder.listFiles()!!.asList().map{it.name}).containsExactly("image_aaag.gif", "image_aaah.gif")
+        Truth.assertThat(webpFolder.listFiles()!!.asList().map{it.name}).containsExactly("image_aaai.webp", "image_aaaj.webp")
+        Truth.assertThat(xmlFolder.listFiles()!!.asList().map{it.name}).containsExactly("vector_drawable_aaaa.xml", "vector_drawable_aaab.xml", "vector_drawable_aaac.xml")
 
         expectedChosenImages.forEach {
             Truth.assertThat(File(it.value.first, it.key).readBytes()).isEqualTo(it.value.second.readBytes())
         }
 
         @Language("xml")
-        val expectedXmlAAA = """
+        val expectedXmlAAAA = """
             <?xml version="1.0" encoding="utf-8"?>
             <vector xmlns:android="http://schemas.android.com/apk/res/android"
                 android:width="13dp"
@@ -147,7 +147,7 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationTest() {
         """.trimIndent()
 
         @Language("xml")
-        val expectedXmlAAB = """
+        val expectedXmlAAAB = """
             <?xml version="1.0" encoding="utf-8"?>
             <vector xmlns:android="http://schemas.android.com/apk/res/android"
                 android:width="35dp"
@@ -176,7 +176,7 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationTest() {
         """.trimIndent()
 
         @Language("xml")
-        val expectedXmlAAC = """
+        val expectedXmlAAAC = """
             <?xml version="1.0" encoding="utf-8"?>
             <vector xmlns:android="http://schemas.android.com/apk/res/android"
                 android:width="57dp"
@@ -207,8 +207,8 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationTest() {
             </vector>
         """.trimIndent()
 
-        Truth.assertThat(File(xmlFolder, "xml_aaa.xml").readText()).isEqualTo(expectedXmlAAA)
-        Truth.assertThat(File(xmlFolder, "xml_aab.xml").readText()).isEqualTo(expectedXmlAAB)
-        Truth.assertThat(File(xmlFolder, "xml_aac.xml").readText()).isEqualTo(expectedXmlAAC)
+        Truth.assertThat(File(xmlFolder, "vector_drawable_aaaa.xml").readText()).isEqualTo(expectedXmlAAAA)
+        Truth.assertThat(File(xmlFolder, "vector_drawable_aaab.xml").readText()).isEqualTo(expectedXmlAAAB)
+        Truth.assertThat(File(xmlFolder, "vector_drawable_aaac.xml").readText()).isEqualTo(expectedXmlAAAC)
     }
 }
