@@ -86,6 +86,8 @@ object UniqueIdGenerator {
     fun genIdByCategory(category: String): String {
         idCountByType.putIfAbsent(category, 0)
         idCountByType[category] = idCountByType[category]!! + 1
-        return genIdCharacters(idCountByType[category]!! - 1, NUMBER_OF_ID_CHARACTERS)
+        val ret = genIdCharacters(idCountByType[category]!! - 1, NUMBER_OF_ID_CHARACTERS)
+        println("generating id for $category: $ret count = ${idCountByType[category]}")
+        return ret
     }
 }
