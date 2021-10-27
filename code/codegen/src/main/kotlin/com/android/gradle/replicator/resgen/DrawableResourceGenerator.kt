@@ -27,7 +27,10 @@ import com.google.common.annotations.VisibleForTesting
 import java.io.File
 import kotlin.random.Random
 
-class DrawableResourceGenerator (val random: Random, val constants: ResgenConstants): ResourceGenerator {
+class DrawableResourceGenerator (
+    private val random: Random,
+    private val constants: ResgenConstants,
+    private val uniqueIdGenerator: UniqueIdGenerator): ResourceGenerator {
 
     @set:VisibleForTesting
     var numberOfResourceElements: Int?= null
@@ -50,12 +53,12 @@ class DrawableResourceGenerator (val random: Random, val constants: ResgenConsta
             // TODO: generate unique IDs only by qualifiers or folder name so the same resource appears on hdpi and mdpi
             when (resourceExtension) {
                 "xml" ->  {
-                    val outputFile = File(outputFolder, "vector_drawable_${UniqueIdGenerator.genIdByCategory("drawable.fileName.vectorDrawable")}.${resourceExtension}")
+                    val outputFile = File(outputFolder, "vector_drawable_${uniqueIdGenerator.genIdByCategory("drawable.fileName.vectorDrawable")}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateVectorDrawableResource(outputFile, resourceQualifiers)
                 }
                 else -> {
-                    val outputFile = File(outputFolder, "image_${UniqueIdGenerator.genIdByCategory("drawable.fileName.image")}.${resourceExtension}")
+                    val outputFile = File(outputFolder, "image_${uniqueIdGenerator.genIdByCategory("drawable.fileName.image")}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateImageResource(outputFile, resourceQualifiers, resourceExtension)
                 }

@@ -25,7 +25,10 @@ import com.google.common.annotations.VisibleForTesting
 import java.io.File
 import kotlin.random.Random
 
-class ValueResourceGenerator (val random: Random, val constants: ResgenConstants): ResourceGenerator {
+class ValueResourceGenerator (
+    private val random: Random,
+    private val constants: ResgenConstants,
+    private val uniqueIdGenerator: UniqueIdGenerator): ResourceGenerator {
 
     @set:VisibleForTesting
     var numberOfResourceElements: Int?= null
@@ -41,12 +44,12 @@ class ValueResourceGenerator (val random: Random, val constants: ResgenConstants
             val type = ResourceType.VALUES
             when (type) {
                 ResourceType.THEME ->  {
-                    val outputFile = File(outputFolder, "themes_${UniqueIdGenerator.genIdByCategory("values.fileName.theme")}.${resourceExtension}")
+                    val outputFile = File(outputFolder, "themes_${uniqueIdGenerator.genIdByCategory("values.fileName.theme")}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateThemeResource(outputFile, resourceQualifiers)
                 }
                 ResourceType.VALUES -> {
-                    val outputFile = File(outputFolder, "values_${UniqueIdGenerator.genIdByCategory("values.fileName.values")}.${resourceExtension}")
+                    val outputFile = File(outputFolder, "values_${uniqueIdGenerator.genIdByCategory("values.fileName.values")}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateXmlValueResource(outputFile)
                 }
@@ -99,7 +102,7 @@ class ValueResourceGenerator (val random: Random, val constants: ResgenConstants
     }
 
     private fun stringBlock (): String {
-        val name = genUniqueName(random, "values.resName.string")
+        val name = genUniqueName(random, "values.resName.string", uniqueIdGenerator)
         val value = genString(
             constants.values.MAX_STRING_WORD_COUNT,
             separator = " ",
@@ -108,19 +111,19 @@ class ValueResourceGenerator (val random: Random, val constants: ResgenConstants
     }
 
     private fun intBlock (): String {
-        val name = genUniqueName(random, "values.resName.int")
+        val name = genUniqueName(random, "values.resName.int", uniqueIdGenerator)
         val value = random.nextInt()
         return "    <integer name=\"$name\">$value</integer>"
     }
 
     private fun boolBlock (): String {
-        val name = genUniqueName(random, "values.resName.bool")
+        val name = genUniqueName(random, "values.resName.bool", uniqueIdGenerator)
         val value = random.nextBoolean()
         return "    <bool name=\"$name\">$value</bool>"
     }
 
     private fun colorBlock (): String {
-        val name = genUniqueName(random, "values.resName.color")
+        val name = genUniqueName(random, "values.resName.color", uniqueIdGenerator)
         /* Digits can be:
          * #RGB
          * #ARGB
@@ -135,19 +138,19 @@ class ValueResourceGenerator (val random: Random, val constants: ResgenConstants
     }
 
     private fun dimenBlock (): String {
-        val name = genUniqueName(random, "values.resName.dimen")
+        val name = genUniqueName(random, "values.resName.dimen", uniqueIdGenerator)
         val value = "${random.nextInt(constants.values.MAX_DIMENSION)}${constants.values.DIMENSION_UNITS.random(random)}"
 
         return "    <dimen name=\"$name\">$value</dimen>"
     }
 
     private fun idBlock (): String {
-        val name = genUniqueName(random, "values.resName.id")
+        val name = genUniqueName(random, "values.resName.id", uniqueIdGenerator)
         return "    <item type=\"id\" name=\"$name\"/>"
     }
 
     private fun intArrayBlock (): List<String> {
-        val name = genUniqueName(random, "values.resName.intArray")
+        val name = genUniqueName(random, "values.resName.intArray", uniqueIdGenerator)
         val size = random.nextInt(constants.values.MAX_ARRAY_ELEMENTS)
         val result = mutableListOf("    <integer-array name=\"$name\">")
 

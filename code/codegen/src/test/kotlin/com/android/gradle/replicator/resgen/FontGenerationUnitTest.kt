@@ -7,7 +7,7 @@ import java.io.File
 class FontGenerationUnitTest: AbstractResourceGenerationTest() {
     @Test
     fun testFontGeneration() {
-        val generator = FontResourceGenerator(random)
+        val generator = FontResourceGenerator(random, uniqueIdGenerator)
 
         val expectedChosenImages = mapOf(
                 "font_aaaa.ttf" to
