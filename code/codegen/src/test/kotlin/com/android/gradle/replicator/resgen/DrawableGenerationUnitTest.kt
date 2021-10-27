@@ -9,7 +9,7 @@ import java.io.File
 class DrawableGenerationUnitTest: AbstractResourceGenerationTest() {
     @Test
     fun testDrawableGeneration() {
-        val generator = DrawableResourceGenerator(random, ResgenConstants())
+        val generator = DrawableResourceGenerator(random, ResgenConstants(), uniqueIdGenerator)
         generator.numberOfResourceElements = 3
 
         val pngFolder = testFolder.newFolder("png")

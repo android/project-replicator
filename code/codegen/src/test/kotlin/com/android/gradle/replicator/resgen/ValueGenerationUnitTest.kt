@@ -9,7 +9,7 @@ import java.io.File
 class ValueGenerationUnitTest: AbstractResourceGenerationTest() {
     @Test
     fun testValueGeneration() {
-        val generator = ValueResourceGenerator(random, ResgenConstants())
+        val generator = ValueResourceGenerator(random, ResgenConstants(), uniqueIdGenerator)
 
         generator.numberOfResourceElements = 5
 

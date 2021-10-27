@@ -7,7 +7,9 @@ import com.android.gradle.replicator.resgen.util.getRandomResource
 import java.io.File
 import kotlin.random.Random
 
-class FontResourceGenerator(val random: Random): ResourceGenerator {
+class FontResourceGenerator(
+    private val random: Random,
+    private val uniqueIdGenerator: UniqueIdGenerator): ResourceGenerator {
 
     override fun generateResource(
             number: Int,
@@ -20,7 +22,7 @@ class FontResourceGenerator(val random: Random): ResourceGenerator {
             return
         }
         repeat(number) {
-            val outputFile = File(outputFolder, "font_${UniqueIdGenerator.genIdByCategory("font.fileName")}.${resourceExtension}")
+            val outputFile = File(outputFolder, "font_${uniqueIdGenerator.genIdByCategory("font.fileName")}.${resourceExtension}")
             when (resourceExtension) {
                 "xml" ->  {
                     println("Generating ${outputFile.absolutePath}")

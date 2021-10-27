@@ -23,6 +23,7 @@ import com.android.gradle.replicator.model.internal.filedata.AndroidResourceMap
 import com.android.gradle.replicator.model.internal.filedata.FilesWithSizeMap
 import com.android.gradle.replicator.parsing.ArgsParser
 import com.android.gradle.replicator.resgen.util.ResgenConstants
+import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
 import com.google.gson.stream.JsonReader
 import java.io.File
 import java.io.FileNotFoundException
@@ -125,7 +126,8 @@ class Main {
             resgenConstants: ResgenConstants) {
         resMap.keys.sorted().forEach { resourceType ->
             val random = Random(parameters.seed)
-            val generator = GeneratorDriver(random)
+            val uniqueIdGenerator = UniqueIdGenerator()
+            val generator = GeneratorDriver(random, uniqueIdGenerator)
             resMap[resourceType]!!.sortedBy { it.qualifiers }.forEach { resourceProperties ->
                 generator.generateResources(outputFolder, resourceType, resourceProperties, resgenConstants)
             }

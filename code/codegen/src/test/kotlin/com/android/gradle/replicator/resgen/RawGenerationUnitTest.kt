@@ -7,7 +7,7 @@ import java.io.File
 class RawGenerationUnitTest: AbstractResourceGenerationTest() {
     @Test
     fun testRawGeneration() {
-        val generator = RawResourceGenerator(random)
+        val generator = RawResourceGenerator(random, uniqueIdGenerator)
 
         val expectedChosenImages = mapOf(
                 "raw_aaaa.txt" to

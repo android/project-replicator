@@ -58,8 +58,8 @@ fun genName(random: Random): String {
     return genString(3, "_", random)
 }
 
-fun genUniqueName(random: Random, category: String): String {
-    return "${genName(random)}_${UniqueIdGenerator.genIdByCategory(category)}"
+fun genUniqueName(random: Random, category: String, uniqueIdGenerator: UniqueIdGenerator): String {
+    return "${genName(random)}_${uniqueIdGenerator.genIdByCategory(category)}"
 }
 
 fun genHex(numberOfDigits: Int, random: Random): String {
@@ -81,13 +81,11 @@ fun genIdCharacters(count: Int, minFileNameCharacters: Int = 3): String {
     return characters
 }
 
-object UniqueIdGenerator {
+class UniqueIdGenerator {
     private val idCountByType = mutableMapOf<String, Int>()
     fun genIdByCategory(category: String): String {
         idCountByType.putIfAbsent(category, 0)
         idCountByType[category] = idCountByType[category]!! + 1
-        val ret = genIdCharacters(idCountByType[category]!! - 1, NUMBER_OF_ID_CHARACTERS)
-        println("generating id for $category: $ret count = ${idCountByType[category]}")
-        return ret
+        return genIdCharacters(idCountByType[category]!! - 1, NUMBER_OF_ID_CHARACTERS)
     }
 }
