@@ -123,11 +123,11 @@ class Main {
             parameters: ResourceGenerationParameters,
             outputFolder: File,
             resgenConstants: ResgenConstants) {
-        resMap.forEach { resourceType ->
+        resMap.keys.sorted().forEach { resourceType ->
             val random = Random(parameters.seed)
             val generator = GeneratorDriver(random)
-            resourceType.value.forEach { resourceProperties ->
-                generator.generateResources(outputFolder, resourceType.key, resourceProperties, resgenConstants)
+            resMap[resourceType]!!.sortedBy { it.qualifiers }.forEach { resourceProperties ->
+                generator.generateResources(outputFolder, resourceType, resourceProperties, resgenConstants)
             }
         }
     }
