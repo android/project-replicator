@@ -25,14 +25,20 @@ import com.android.gradle.replicator.generator.manifest.ManifestGenerator
 import com.android.gradle.replicator.generator.util.WildcardString
 import com.android.gradle.replicator.generator.writer.DslWriter
 import com.android.gradle.replicator.model.DependenciesInfo
+import com.android.gradle.replicator.model.DependencyType
 import com.android.gradle.replicator.model.ModuleInfo
 import com.android.gradle.replicator.model.PluginType
 import com.android.gradle.replicator.model.ProjectInfo
 import com.android.gradle.replicator.model.internal.AndroidResourcesAdapter
+import com.android.gradle.replicator.model.internal.DefaultDependenciesInfo
 import com.android.gradle.replicator.model.internal.FilesWithSizeMetadataAdapter
+import com.squareup.tools.maven.resolution.ArtifactResolver
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonWriter
+import com.squareup.tools.maven.resolution.Repositories
+import org.apache.maven.model.Repository
+import org.apache.maven.model.RepositoryPolicy
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
@@ -45,6 +51,8 @@ class GradleProjectGenerator(
     private val dslWriter: DslWriter,
     private val resGenerator: ManifestGenerator
 ): ProjectGenerator {
+
+    var processedDependencies: MutableMap<ModuleInfo, List<DependenciesInfo>>? = null
 
     override fun generateRootModule(project: ProjectInfo) {
         dslWriter.newBuildFile(destinationFolder)
@@ -229,6 +237,69 @@ class GradleProjectGenerator(
         return ret
     }
 
+    override fun validateProjectDependencies(project: ProjectInfo) {
+        println("Validating dependencies")
+        val repos = listOf(
+            Repositories.MAVEN_CENTRAL,
+            Repositories.GOOGLE_ANDROID,
+            Repository().apply {
+                id = "jitpack"
+                releases = RepositoryPolicy().apply {
+                    enabled = "true"
+                }
+                url = "https://jitpack.io"
+            }
+        )
+
+        val invalidDependencies = mutableSetOf<String>()
+
+        for (moduleDependencies in processedDependencies!!) {
+            invalidDependencies.addAll(checkDependenciesExist(moduleDependencies.value
+                .filter { it.type == DependencyType.EXTERNAL_LIBRARY } // module deps should not be checked against maven
+                .map { it.dependency }, repos))
+        }
+
+        if (invalidDependencies.isNotEmpty()) {
+            generateInvalidDependenciesFile(invalidDependencies, repos)
+        }
+    }
+
+    // Returns invalid dependencies
+    private fun checkDependenciesExist(moduleDependencies: List<String>, repos: List<Repository>): Set<String> {
+        val ret = mutableSetOf<String>()
+        val resolver = ArtifactResolver(repositories = repos)
+        for (dependency in moduleDependencies) {
+            val artifact = resolver.artifactFor(dependency) // returns Artifact
+            val resolvedArtifact = resolver.resolveArtifact(artifact) // returns ResolvedArtifact
+            if (resolvedArtifact == null) {
+                ret.add(dependency)
+            }
+        }
+        return ret
+    }
+
+    private fun generateInvalidDependenciesFile(dependencies: Set<String>, repos: List<Repository>) {
+        println("Generate invalid-dependencies.txt")
+        val outFile = File(destinationFolder, "invalid-dependencies.txt")
+        val buffer = mutableListOf<String>()
+        var stringBuffer = ""
+
+        stringBuffer += "These dependencies were not found in the repositories ["
+        if (repos.isNotEmpty()) {
+            stringBuffer += repos[0].id
+        }
+
+        for (i in 1 until repos.size) {
+            stringBuffer += ", ${repos[i].id}"
+        }
+        stringBuffer += "]"
+        buffer.add(stringBuffer)
+
+        buffer.addAll(dependencies)
+
+        outFile.writeText(buffer.joinToString("\n"))
+    }
+
     override fun close() {
         dslWriter.flush()
     }
@@ -247,6 +318,13 @@ class GradleProjectGenerator(
         folder: File,
         module: ModuleInfo
     ) {
+        if (processedDependencies == null) {
+            processedDependencies = mutableMapOf()
+        }
+
+        // Filter and add module dependencies
+        processModuleDependencies(module)
+
         module.android?.generate(
             folder = folder,
             dslWriter = dslWriter,
@@ -330,21 +408,42 @@ class GradleProjectGenerator(
         return if (result.isEmpty()) null else result
     }
 
+    private fun processModuleDependencies(module: ModuleInfo) {
+        val dependencyList = mutableListOf<DependenciesInfo>()
+        for (dep in module.dependencies) {
+            // search for replacement. If none, use the original value
+            val replacement: DependenciesInfo = matchLibraryFilter(dep.dependency)?.let {
+                DefaultDependenciesInfo(
+                    type = dep.type,
+                    dependency = it,
+                    scope = dep.scope) } ?: dep
+            // empty string means ignored dependency
+            if (replacement.dependency.isEmpty()) {
+                println("\tIgnoring ${dep.dependency}")
+            } else {
+                dependencyList.add(replacement)
+            }
+        }
+
+        // Check if we need to add dependencies to this module
+        // This is done after filtering to avoid added libraries being filtered out
+        // Only allow wildcard matching for modules that have some dependency to avoid adding dependencies
+        // to intermediate modules
+        matchLibraryAdditions(module.path, module.dependencies.isNotEmpty())?.let { list ->
+            println("\tAdding dependencies to ${module.path}")
+            list.forEach {
+                println("\t\t- ${it.dependency}(${it.scope})")
+            }
+            dependencyList.addAll(list)
+        }
+
+        processedDependencies!![module] = dependencyList
+    }
+
     private fun ModuleInfo.generateDependencies() {
         val moduleInfo = this
         dslWriter.block("dependencies") {
-            var dependencyList = dependencies
-
-            // Check if we need to add dependencies to this module
-            // Only allow wildcard matching for modules that have some dependency to avoid adding dependencies
-            // to intermediate modules
-            matchLibraryAdditions(moduleInfo.path, dependencies.isNotEmpty())?.let { list ->
-                println("\tAdding dependencies to $path")
-                list.forEach {
-                    println("\t\t- ${it.dependency}(${it.scope})")
-                }
-                dependencyList = dependencyList + list
-            }
+            val dependencyList = processedDependencies!![moduleInfo]!!
 
             // first gather the scope in order to sort by them
             val scopes = dependencyList.asSequence().map { it.scope }.toSortedSet()
@@ -352,15 +451,7 @@ class GradleProjectGenerator(
             // this is not very efficient, but good enough here.
             for (scope in scopes) {
                 for (dep in dependencyList.filter { it.scope == scope }) {
-                    // search for replacement. If none, use the original value
-                    val replacement = matchLibraryFilter(dep.dependency) ?: dep.dependency
-                    // empty string means ignored dependency
-                    if (replacement.isEmpty()) {
-                        println("\tIgnoring ${dep.dependency}")
-                        continue
-                    }
-
-                    call(rewriteDependencyScope(dep.scope), dep.type.getString(replacement, dslWriter::asString))
+                    call(rewriteDependencyScope(dep.scope), dep.type.getString(dep.dependency, dslWriter::asString))
                 }
             }
         }

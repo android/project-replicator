@@ -39,6 +39,8 @@ interface ProjectGenerator {
 
     fun generateSettingsFile(project: ProjectInfo)
 
+    fun validateProjectDependencies(project: ProjectInfo)
+
     fun close()
 
     companion object {
