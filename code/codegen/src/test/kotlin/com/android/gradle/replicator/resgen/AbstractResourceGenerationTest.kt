@@ -17,7 +17,6 @@
 
 package com.android.gradle.replicator.resgen
 
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -41,11 +40,6 @@ abstract class AbstractResourceGenerationTest {
     fun setup() {
         MockitoAnnotations.openMocks(this)
         mockRandom(random)
-    }
-
-    @After
-    fun cleanup() {
-        testFolder.delete()
     }
 
     private var nextIntValue = 0
