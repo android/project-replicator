@@ -44,8 +44,6 @@ class Main {
             main.process(args)
         }
     }
-    var random: Random = Random(10)
-
     fun process(args: Array<String>) {
 
         val parser = ArgsParser()
@@ -118,15 +116,14 @@ class Main {
             )
         }
     }
-
     private fun generateAndroidResources(
             resMap: AndroidResourceMap,
             parameters: ResourceGenerationParameters,
             outputFolder: File,
             resgenConstants: ResgenConstants) {
+        val random = Random(parameters.seed)
+        val uniqueIdGenerator = UniqueIdGenerator()
         resMap.keys.sorted().forEach { resourceType ->
-            val random = Random(parameters.seed)
-            val uniqueIdGenerator = UniqueIdGenerator()
             val generator = GeneratorDriver(random, uniqueIdGenerator)
             resMap[resourceType]!!.sortedBy { it.qualifiers }.forEach { resourceProperties ->
                 generator.generateResources(outputFolder, resourceType, resourceProperties, resgenConstants)
