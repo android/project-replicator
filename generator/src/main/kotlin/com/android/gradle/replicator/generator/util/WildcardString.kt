@@ -1,8 +1,19 @@
 package com.android.gradle.replicator.generator.util
 
+
+/**
+ * This class wraps around regex and allows you to match strings with wildcards as you would regex
+ * Ex: WildcardString("ab*d").match(...) would match "abcd", "abd", "abced", etc.
+ * It also overrides match and hashcode so you can compare it: WildcardString("abc") == WildcardString("abc")
+ * and use it as a map key: wildcardMap = mapOf(WildcardString("abc") to 1), wildcardMap[WildcardString("abc")]
+ */
 class WildcardString(private val baseString: String) {
     private val regex: Regex by lazy { convertToRegex(baseString) }
 
+    /**
+     * Tells you whether the base string is a wildcard pattern
+     * @return true if wildcard pattern, false if plain string
+     */
     val isWildcard: Boolean by lazy { isWildcardString(baseString) }
 
     private fun isWildcardString(str: String): Boolean {
@@ -50,12 +61,17 @@ class WildcardString(private val baseString: String) {
         return this.baseString.hashCode()
     }
 
-    fun matches(str: String): Boolean {
+    /**
+     * Indicates whether the wildcard pattern matches the entire input
+     * @param input the string to match the pattern against
+     * @return true if pattern matches input, false otherwise
+     */
+    fun matches(input: String): Boolean {
         // Small optimization
         return if (this.isWildcard) {
-            regex.matches(str)
+            regex.matches(input)
         } else {
-            this.baseString == str
+            this.baseString == input
         }
     }
 }
