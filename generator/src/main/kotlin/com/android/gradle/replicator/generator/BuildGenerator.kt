@@ -18,6 +18,7 @@
 package com.android.gradle.replicator.generator
 
 import com.android.gradle.replicator.generator.project.ProjectGenerator
+import com.android.gradle.replicator.generator.util.WildcardString
 import com.android.gradle.replicator.model.DependenciesInfo
 import com.android.gradle.replicator.model.DependencyType
 import com.android.gradle.replicator.model.ProjectInfo
@@ -37,8 +38,8 @@ class BuildGenerator(private val params: Params) {
         val kts: Boolean
     }
 
-    private val libraryFilter: Map<String, String> = generateLibraryFilter()
-    private val libraryAdditions: Map<String, List<DependenciesInfo>> = generateLibraryAdditions()
+    private val libraryFilter: Map<WildcardString, String> = generateLibraryFilter()
+    private val libraryAdditions: Map<WildcardString, List<DependenciesInfo>> = generateLibraryAdditions()
 
     fun generate() {
         val project = Serializer.instance().deserializeProject(params.jsonFile)
@@ -67,20 +68,20 @@ class BuildGenerator(private val params: Params) {
         println("Done.")
     }
 
-    private fun generateLibraryFilter(): Map<String, String> {
+    private fun generateLibraryFilter(): Map<WildcardString, String> {
         return params.libraryFilter?.let { file: File ->
             file.readLines().filter { it.isNotEmpty() }.map {
                 val split = it.split(" -> ")
                 if (split.size == 1) {
-                    split[0] to ""
+                    WildcardString(split[0]) to ""
                 } else {
-                    split[0] to split[1]
+                    WildcardString(split[0]) to split[1]
                 }
             }.toMap()
         } ?: mapOf()
     }
 
-    private fun generateLibraryAdditions(): Map<String, List<DependenciesInfo>> {
+    private fun generateLibraryAdditions(): Map<WildcardString, List<DependenciesInfo>> {
         return params.libraryAdditions?.let { file: File ->
             val entries = file.readLines().filter { it.isNotEmpty() }.map {
                 val split = it.split(" ")
@@ -95,10 +96,10 @@ class BuildGenerator(private val params: Params) {
                 )
             }
 
-            val result = mutableMapOf<String, List<DependenciesInfo>>()
+            val result = mutableMapOf<WildcardString, List<DependenciesInfo>>()
 
             entries.forEach {
-                val list = result.computeIfAbsent(it.first) { mutableListOf() } as MutableList<DependenciesInfo>
+                val list = result.computeIfAbsent(WildcardString(it.first)) { mutableListOf() } as MutableList<DependenciesInfo>
                 list.add(it.second)
             }
 

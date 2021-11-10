@@ -68,8 +68,8 @@ class Main {
         }
         buildParameters(
                 parametersBuilder,
-                implClasspathElementOption.orNull?.argv,
                 apiOption.orNull?.argv,
+                implClasspathElementOption.orNull?.argv,
                 codeGenModuleApiClasspathOption.orNull?.argv,
                 codeGenModuleImplClasspathOption.orNull?.argv,
                 runtimeClasspathOption.orNull?.argv,

@@ -1,14 +1,15 @@
 package com.android.gradle.replicator.resgen
 
+import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
 import com.android.gradle.replicator.resgen.util.copyResourceFile
-import com.android.gradle.replicator.resgen.util.genFileNameCharacters
 import com.android.gradle.replicator.resgen.util.getFileType
 import com.android.gradle.replicator.resgen.util.getRandomResource
 import java.io.File
 import kotlin.random.Random
 
-class FontResourceGenerator(val random: Random): ResourceGenerator {
-    var files = 0
+class FontResourceGenerator(
+    private val random: Random,
+    private val uniqueIdGenerator: UniqueIdGenerator): ResourceGenerator {
 
     override fun generateResource(
             number: Int,
@@ -21,18 +22,15 @@ class FontResourceGenerator(val random: Random): ResourceGenerator {
             return
         }
         repeat(number) {
+            val outputFile = File(outputFolder, "font_${uniqueIdGenerator.genIdByCategory("font.fileName")}.${resourceExtension}")
             when (resourceExtension) {
                 "xml" ->  {
-                    val outputFile = File(outputFolder, "font${genFileNameCharacters(files)}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateFontReferenceResource(outputFile, resourceQualifiers)
-                    files++
                 }
                 else -> {
-                    val outputFile = File(outputFolder, "font${genFileNameCharacters(files)}.${resourceExtension}")
                     println("Generating ${outputFile.absolutePath}")
                     generateFontResource(outputFile, resourceQualifiers, resourceExtension)
-                    files++
                 }
             }
         }

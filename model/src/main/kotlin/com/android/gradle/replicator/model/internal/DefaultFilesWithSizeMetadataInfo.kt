@@ -19,9 +19,9 @@ data class DefaultFilesWithSizeMetadataInfo(
 class FilesWithSizeMetadataAdapter: TypeAdapter<FilesWithSizeMetadataInfo>() {
     override fun write(output: JsonWriter, value: FilesWithSizeMetadataInfo) {
         output.beginObject()
-        for (extension in value.fileData) {
-            output.name(extension.key).beginArray()
-            for (size in extension.value) {
+        for (extensionKey in value.fileData.keys.sorted()) {
+            output.name(extensionKey).beginArray()
+            for (size in value.fileData[extensionKey]!!) {
                 output.value(size)
             }
             output.endArray()
