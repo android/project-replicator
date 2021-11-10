@@ -2,24 +2,25 @@ package com.android.gradle.replicator.resgen
 
 import com.android.gradle.replicator.model.internal.filedata.AbstractAndroidResourceProperties
 import com.android.gradle.replicator.resgen.util.ResgenConstants
+import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
 import java.io.File
 import kotlin.random.Random
 
-class GeneratorDriver (val random: Random) {
+class GeneratorDriver (val random: Random, private val uniqueIdGenerator: UniqueIdGenerator) {
     // TODO: implement other generators
     private fun getGenerator(random: Random, resourceType: String, constants: ResgenConstants): ResourceGenerator? {
         return when(resourceType) {
             //"animator" ->
             //"anim" ->
             //"color" ->
-            "drawable" -> DrawableResourceGenerator(random, constants)
-            "font" -> FontResourceGenerator(random)
+            "drawable" -> DrawableResourceGenerator(random, constants, uniqueIdGenerator)
+            "font" -> FontResourceGenerator(random, uniqueIdGenerator)
             //"layout" ->
             //"menu" ->
-            "mipmap" -> DrawableResourceGenerator(random, constants)
-            "raw" -> RawResourceGenerator(random)
+            "mipmap" -> DrawableResourceGenerator(random, constants, uniqueIdGenerator)
+            "raw" -> RawResourceGenerator(random, uniqueIdGenerator)
             //"transition" ->
-            "values" -> ValueResourceGenerator(random, constants)
+            "values" -> ValueResourceGenerator(random, constants, uniqueIdGenerator)
             //"xml" ->
             else -> null
         }

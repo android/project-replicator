@@ -19,6 +19,7 @@ package com.android.gradle.replicator.generator.project
 
 import com.android.gradle.replicator.generator.BuildGenerator
 import com.android.gradle.replicator.generator.manifest.ManifestGenerator
+import com.android.gradle.replicator.generator.util.WildcardString
 import com.android.gradle.replicator.generator.writer.DslWriter
 import com.android.gradle.replicator.generator.writer.GroovyDslWriter
 import com.android.gradle.replicator.generator.writer.KtsWriter
@@ -43,8 +44,8 @@ interface ProjectGenerator {
     companion object {
         fun createGenerator(
             params: BuildGenerator.Params,
-            libraryFilter: Map<String, String>,
-            libraryAdditions: Map<String, List<DependenciesInfo>>
+            libraryFilter: Map<WildcardString, String>,
+            libraryAdditions: Map<WildcardString, List<DependenciesInfo>>
         ): ProjectGenerator {
             val resGenerator = ManifestGenerator()
 

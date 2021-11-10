@@ -17,6 +17,8 @@
 
 package com.android.gradle.replicator.resgen
 
+import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -36,10 +38,18 @@ abstract class AbstractResourceGenerationTest {
     @get:Rule
     val testFolder = TemporaryFolder()
 
+    lateinit var uniqueIdGenerator: UniqueIdGenerator
+
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
         mockRandom(random)
+        uniqueIdGenerator = UniqueIdGenerator()
+    }
+
+    @After
+    fun cleanup() {
+        testFolder.delete()
     }
 
     private var nextIntValue = 0
