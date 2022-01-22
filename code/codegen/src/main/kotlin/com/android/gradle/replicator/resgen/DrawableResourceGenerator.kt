@@ -16,24 +16,22 @@
  */
 package com.android.gradle.replicator.resgen
 
+import com.android.gradle.replicator.model.internal.filedata.AbstractAndroidResourceProperties
+import com.android.gradle.replicator.model.internal.filedata.DefaultAndroidResourceProperties
+import com.android.gradle.replicator.model.internal.filedata.ResourcePropertyType
+import com.android.gradle.replicator.resgen.resourceModel.ResourceData
 import com.android.gradle.replicator.resgen.util.FileTypes
-import com.android.gradle.replicator.resgen.util.ResgenConstants
-import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
 import com.android.gradle.replicator.resgen.util.VectorDrawableGenerator
 import com.android.gradle.replicator.resgen.util.copyResourceFile
 import com.android.gradle.replicator.resgen.util.getFileType
-import com.android.gradle.replicator.resgen.util.getRandomResource
+import com.android.gradle.replicator.resgen.util.getResourceClosestToSize
 import com.google.common.annotations.VisibleForTesting
 import java.io.File
-import kotlin.random.Random
 
-class DrawableResourceGenerator (
-    private val random: Random,
-    private val constants: ResgenConstants,
-    private val uniqueIdGenerator: UniqueIdGenerator): ResourceGenerator {
+class DrawableResourceGenerator (params: ResourceGenerationParams): ResourceGenerator(params) {
 
     @set:VisibleForTesting
-    var numberOfResourceElements: Int?= null
+    var numberOfResourceElements: Long?= null
 
     private val supportedFileTypes = listOf(
             FileTypes.PNG,
@@ -44,23 +42,39 @@ class DrawableResourceGenerator (
     )
 
     override fun generateResource(
-            number: Int,
-            outputFolder: File,
-            resourceQualifiers: List<String>,
-            resourceExtension: String
+            properties: AbstractAndroidResourceProperties,
+            outputFolder: File
     ) {
-        repeat(number) {
+        // Sanity check
+        if (properties.propertyType != ResourcePropertyType.DEFAULT) {
+            throw RuntimeException ("Unexpected property type. Got ${properties.propertyType} instead of ${ResourcePropertyType.DEFAULT}")
+        }
+        (properties as DefaultAndroidResourceProperties).fileData.forEach { fileData ->
             // TODO: generate unique IDs only by qualifiers or folder name so the same resource appears on hdpi and mdpi
-            when (resourceExtension) {
+            when (properties.extension) {
                 "xml" ->  {
-                    val outputFile = File(outputFolder, "vector_drawable_${uniqueIdGenerator.genIdByCategory("drawable.fileName.vectorDrawable")}.${resourceExtension}")
+                    val fileName = "vector_drawable_${params.uniqueIdGenerator.genIdByCategory("drawable.fileName.vectorDrawable.${properties.qualifiers}")}"
+                    val outputFile = File(outputFolder, "$fileName.${properties.extension}")
                     println("Generating ${outputFile.absolutePath}")
-                    generateVectorDrawableResource(outputFile, resourceQualifiers)
+                    generateVectorDrawableResource(outputFile, properties.splitQualifiers, fileData)
+                    params.resourceModel.resourceList.add(ResourceData(
+                        pkg = "",
+                        name = fileName,
+                        type = "drawable",
+                        extension = properties.extension,
+                        qualifiers = properties.splitQualifiers))
                 }
                 else -> {
-                    val outputFile = File(outputFolder, "image_${uniqueIdGenerator.genIdByCategory("drawable.fileName.image")}.${resourceExtension}")
+                    val fileName = "image_${params.uniqueIdGenerator.genIdByCategory("drawable.fileName.image.${properties.qualifiers}")}"
+                    val outputFile = File(outputFolder, "$fileName.${properties.extension}")
                     println("Generating ${outputFile.absolutePath}")
-                    generateImageResource(outputFile, resourceQualifiers, resourceExtension)
+                    generateImageResource(outputFile, properties.extension, fileData)
+                    params.resourceModel.resourceList.add(ResourceData(
+                        pkg = "",
+                        name = fileName,
+                        type = "drawable",
+                        extension = properties.extension,
+                        qualifiers = properties.splitQualifiers))
                 }
             }
         }
@@ -68,8 +82,8 @@ class DrawableResourceGenerator (
 
     private fun generateImageResource (
             outputFile: File,
-            resourceQualifiers: List<String>,
-            resourceExtension: String
+            resourceExtension: String,
+            fileSize: Long
     ) {
         val fileType = getFileType(resourceExtension)
 
@@ -78,55 +92,38 @@ class DrawableResourceGenerator (
             return
         }
 
-        val resourcePath = getRandomResource(random, fileType, resourceQualifiers) ?: return
+        val resourcePath = getResourceClosestToSize(fileType, fileSize) ?: return
 
         copyResourceFile(resourcePath, outputFile)
-    }
-
-    private fun selectNumberOfResourceElements(qualifiers: List<String>): Int {
-        if (numberOfResourceElements != null) return numberOfResourceElements!!
-
-        qualifiers.forEach {
-            when (it) {
-                "ldpi" -> return constants.vectorImage.MAX_VECTOR_IMAGE_LINES_SMALL
-                "nodpi",
-                "anydpi",
-                "tvdpi",
-                "mdpi"-> return constants.vectorImage.MAX_VECTOR_IMAGE_LINES_MEDIUM
-                "hdpi",
-                "xhdpi",
-                "xxhdpi",
-                "xxxhdpi" -> return constants.vectorImage.MAX_VECTOR_IMAGE_LINES_LARGE
-                else -> {}
-            }
-        }
-        return constants.vectorImage.MAX_VECTOR_IMAGE_SIZE_MEDIUM // NNNDPI also ends up here
     }
 
     private fun selectMaxImageSize(qualifiers: List<String>): Int {
         qualifiers.forEach {
             when (it) {
-                "ldpi" -> return constants.vectorImage.MAX_VECTOR_IMAGE_SIZE_SMALL
+                "ldpi" -> return params.constants.vectorImage.MAX_VECTOR_IMAGE_SIZE_SMALL
                 "nodpi",
                 "anydpi",
                 "tvdpi",
-                "mdpi"-> return constants.vectorImage.MAX_VECTOR_IMAGE_SIZE_MEDIUM
+                "mdpi"-> return params.constants.vectorImage.MAX_VECTOR_IMAGE_SIZE_MEDIUM
                 "hdpi",
                 "xhdpi",
                 "xxhdpi",
-                "xxxhdpi" -> return constants.vectorImage.MAX_VECTOR_IMAGE_SIZE_LARGE
+                "xxxhdpi" -> return params.constants.vectorImage.MAX_VECTOR_IMAGE_SIZE_LARGE
                 else -> {}
             }
         }
-        return constants.vectorImage.MAX_VECTOR_IMAGE_SIZE_MEDIUM // NNNDPI also ends up here
+        return params.constants.vectorImage.MAX_VECTOR_IMAGE_SIZE_MEDIUM // NNNDPI also ends up here
     }
 
     private fun generateVectorDrawableResource(
             outputFile: File,
-            resourceQualifiers: List<String>
+            resourceQualifiers: List<String>,
+            fileLines: Long
     ) {
-        val generator = VectorDrawableGenerator(random)
-        val xmlLines = generator.generateImage(selectNumberOfResourceElements(resourceQualifiers), selectMaxImageSize(resourceQualifiers))
+        val generator = VectorDrawableGenerator(params.random)
+        val xmlLines = generator.generateImage(
+            generator.getPathVectorsFromLines(fileLines),
+            selectMaxImageSize(resourceQualifiers))
         outputFile.writeText(xmlLines.joinToString(System.lineSeparator()))
     }
 }

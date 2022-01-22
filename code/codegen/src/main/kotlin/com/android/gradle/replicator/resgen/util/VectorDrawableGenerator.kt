@@ -3,7 +3,7 @@ package com.android.gradle.replicator.resgen.util
 import kotlin.random.Random
 
 class VectorDrawableGenerator (val random: Random) {
-    fun generateImage(numberOfPathVectors: Int, maxVectorImageSize: Int): List<String> {
+    fun generateImage(numberOfPathVectors: Long, maxVectorImageSize: Int): List<String> {
         val lines = mutableListOf<String>()
         val width = random.nextInt(1, maxVectorImageSize)
         val height = random.nextInt(1, maxVectorImageSize)
@@ -21,7 +21,7 @@ class VectorDrawableGenerator (val random: Random) {
             ))
         }
         // Add random lines
-        repeat(numberOfPathVectors) {
+        for (i in 0..numberOfPathVectors) {
             lines.addAll(path(
                     fillColor = genHex(numberOfDigits = 8, random = random),
                     pathData = genStraightLinePathData(width, height),
@@ -32,6 +32,10 @@ class VectorDrawableGenerator (val random: Random) {
         }
         lines.add(endImage())
         return lines
+    }
+
+    fun getPathVectorsFromLines(lines: Long): Long {
+        return (lines - 7) / 6 // Header + footer is 7 lines and path vectors are 6 lines
     }
 
     private fun startImage(width: Int, height: Int, viewportWidth: Int, viewportHeight: Int): List<String> {
