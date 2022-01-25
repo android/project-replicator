@@ -31,6 +31,7 @@ class Main {
             }
 
             BuildGenerator(params).generate()
+            exitProcess(0)
         }
 
         internal fun parseArgs(args: Array<String>): ExecutionParams? {
@@ -63,6 +64,9 @@ class Main {
                     }
                     "--kts" -> {
                         params.kts = true
+                    }
+                    "--validate-dependencies" -> {
+                        params.validateDeps = true
                     }
                     else -> throw RuntimeException("Unknown option: $option")
                 }
@@ -119,6 +123,7 @@ class ExecutionParams: BuildGenerator.Params {
     override var libraryFilter: File? = null
     override var libraryAdditions: File? = null
     override var kts: Boolean = false
+    override var validateDeps: Boolean = false
 
     fun isValid(): Boolean {
         if (!::jsonFile.isInitialized) throw RuntimeException("structure file location has not been provider")
