@@ -182,11 +182,12 @@ class GradleProjectGenerator(
         }
     }
 
+    // Gradle has a limit of how many modules can be added to a project.
+    // Trimming non-leaf modules (which are automatically included) lets us avoid this limit
     private fun getLeafModules(modules: List<ModuleInfo>): List<String> {
-
         val ret = mutableListOf<String>()
 
-        // Convert projects into a graph so we can trim all the non-leaf nodes since those are included automatically
+        // Convert projects into a graph
         class Node(val path: String) {
             val children = mutableMapOf<String, Node>()
         }
@@ -388,9 +389,9 @@ class GradleProjectGenerator(
     }
 
     private fun matchLibraryFilter(lib: String): String? {
-        for (i in libraryFilter) {
-            if (i.key.matches(lib)) {
-                return i.value
+        for (originalToReplacement in libraryFilter) {
+            if (originalToReplacement.key.matches(lib)) {
+                return originalToReplacement.value
             }
         }
         return null
@@ -399,10 +400,10 @@ class GradleProjectGenerator(
     // Library additions need to match ALL patterns, not just the first
     private fun matchLibraryAdditions(module: String, wildcardMatch: Boolean): List<DependenciesInfo>? {
         val result = mutableListOf<DependenciesInfo>()
-        for (i in libraryAdditions) {
+        for (moduleToAdditions in libraryAdditions) {
             // Only match if wildcard match is on or key is not a wildcard (I.E. is a directly targeted module)
-            if ((wildcardMatch || !i.key.isWildcard) && i.key.matches(module)) {
-                result.addAll(i.value)
+            if ((wildcardMatch || !moduleToAdditions.key.isWildcard) && moduleToAdditions.key.matches(module)) {
+                result.addAll(moduleToAdditions.value)
             }
         }
         return if (result.isEmpty()) null else result
