@@ -48,6 +48,7 @@ dependencies {
 
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("com.squareup.tools.build:maven-archeologist:0.0.3.1")
 
     implementation("com.google.code.gson:gson:2.8.5")
 

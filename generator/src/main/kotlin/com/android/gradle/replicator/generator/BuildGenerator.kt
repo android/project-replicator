@@ -36,6 +36,7 @@ class BuildGenerator(private val params: Params) {
         val libraryFilter: File?
         val libraryAdditions: File?
         val kts: Boolean
+        val validateDeps: Boolean
     }
 
     private val libraryFilter: Map<WildcardString, String> = generateLibraryFilter()
@@ -60,6 +61,9 @@ class BuildGenerator(private val params: Params) {
             index++
         }
 
+        if (params.validateDeps) {
+            projectGenerator.validateProjectDependencies(project)
+        }
         projectGenerator.generateSettingsFile(project)
         generateGradleProperties(project.gradleProperties)
         generateCodeGeneratorInitGradleFile(project)
