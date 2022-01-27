@@ -45,7 +45,7 @@ class DrawableResourceGenerator (params: ResourceGenerationParams): ResourceGene
             properties: AbstractAndroidResourceProperties,
             outputFolder: File
     ) {
-        // Sanity check
+        // Sanity check. This should not happen unless there is a bug in the metadata reader.
         if (properties.propertyType != ResourcePropertyType.DEFAULT) {
             throw RuntimeException ("Unexpected property type. Got ${properties.propertyType} instead of ${ResourcePropertyType.DEFAULT}")
         }

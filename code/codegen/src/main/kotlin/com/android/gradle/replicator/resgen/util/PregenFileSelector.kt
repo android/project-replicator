@@ -84,12 +84,7 @@ fun getResourceClosestToSize(type: FileTypes, size: Long): String? {
         println("e: no pre-generated $type file found")
         return null
     }
-    var closest = cachedFiles[0]
-    fileSizeCache[type]!!.forEach {
-        if (abs(it.size - size) < abs(closest.size - size)) {
-            closest = it
-        }
-    }
+    val closest = cachedFiles.minBy { abs(it.size - size) }!!
     println("closest file to $size is ${closest.name} ${closest.size}")
     return closest.name
 }
