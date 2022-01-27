@@ -1,5 +1,6 @@
 package com.android.gradle.replicator.resgen
 
+import com.android.gradle.replicator.model.internal.filedata.DefaultAndroidResourceProperties
 import com.google.common.truth.Truth
 import org.junit.Test
 import java.io.File
@@ -7,7 +8,7 @@ import java.io.File
 class FontGenerationUnitTest: AbstractResourceGenerationTest() {
     @Test
     fun testFontGeneration() {
-        val generator = FontResourceGenerator(random, uniqueIdGenerator)
+        val generator = FontResourceGenerator(resourceGenerationParams)
 
         val expectedChosenImages = mapOf(
                 "font_aaaa.ttf" to
@@ -25,24 +26,33 @@ class FontGenerationUnitTest: AbstractResourceGenerationTest() {
         )
 
         generator.generateResource(
-                number = 2,
-                outputFolder = testFolder.root,
-                resourceQualifiers = listOf(),
-                resourceExtension = "ttf"
+            properties = DefaultAndroidResourceProperties(
+                qualifiers = "",
+                extension = "ttf",
+                quantity = 2,
+                fileData = listOf(5000, 1300000)
+            ),
+            outputFolder = testFolder.root
         )
 
         generator.generateResource(
-                number = 2,
-                outputFolder = testFolder.root,
-                resourceQualifiers = listOf(),
-                resourceExtension = "otf"
+            properties = DefaultAndroidResourceProperties(
+                qualifiers = "",
+                extension = "otf",
+                quantity = 2,
+                fileData = listOf(6332, 100000)
+            ),
+            outputFolder = testFolder.root
         )
 
         generator.generateResource(
-                number = 2,
-                outputFolder = testFolder.root,
-                resourceQualifiers = listOf(),
-                resourceExtension = "ttc"
+            properties = DefaultAndroidResourceProperties(
+                qualifiers = "",
+                extension = "ttc",
+                quantity = 2,
+                fileData = listOf(19000000, 24000000)
+            ),
+            outputFolder = testFolder.root
         )
 
         Truth.assertThat(testFolder.root.listFiles()!!.asList().map { it.name }).containsExactly(

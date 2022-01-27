@@ -16,76 +16,85 @@
  */
 package com.android.gradle.replicator.resgen
 
-import com.android.gradle.replicator.resgen.util.ResgenConstants
-import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
+import com.android.gradle.replicator.model.internal.filedata.AbstractAndroidResourceProperties
+import com.android.gradle.replicator.model.internal.filedata.ResourcePropertyType
+import com.android.gradle.replicator.model.internal.filedata.ValuesAndroidResourceProperties
+import com.android.gradle.replicator.model.internal.filedata.ValuesMap
+import com.android.gradle.replicator.resgen.resourceModel.ResourceData
 import com.android.gradle.replicator.resgen.util.genHex
 import com.android.gradle.replicator.resgen.util.genString
 import com.android.gradle.replicator.resgen.util.genUniqueName
 import com.google.common.annotations.VisibleForTesting
 import java.io.File
-import kotlin.random.Random
 
-class ValueResourceGenerator (
-    private val random: Random,
-    private val constants: ResgenConstants,
-    private val uniqueIdGenerator: UniqueIdGenerator): ResourceGenerator {
+class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerator(params) {
 
     @set:VisibleForTesting
     var numberOfResourceElements: Int?= null
 
     override fun generateResource(
-            number: Int,
-            outputFolder: File,
-            resourceQualifiers: List<String>,
-            resourceExtension: String
+        properties: AbstractAndroidResourceProperties,
+        outputFolder: File
     ) {
-        repeat(number) {
-            // TODO: Identify which kind of resource to generate
-            val type = ResourceType.VALUES
-            when (type) {
-                ResourceType.THEME ->  {
-                    val outputFile = File(outputFolder, "themes_${uniqueIdGenerator.genIdByCategory("values.fileName.theme")}.${resourceExtension}")
-                    println("Generating ${outputFile.absolutePath}")
-                    generateThemeResource(outputFile, resourceQualifiers)
-                }
-                ResourceType.VALUES -> {
-                    val outputFile = File(outputFolder, "values_${uniqueIdGenerator.genIdByCategory("values.fileName.values")}.${resourceExtension}")
-                    println("Generating ${outputFile.absolutePath}")
-                    generateXmlValueResource(outputFile)
-                }
+        // Sanity check. This should not happen unless there is a bug in the metadata reader.
+        if (properties.propertyType != ResourcePropertyType.VALUES) {
+            throw RuntimeException ("Unexpected property type. Got ${properties.propertyType} instead of ${ResourcePropertyType.VALUES}")
+        }
+        (properties as ValuesAndroidResourceProperties).valuesMapPerFile.forEach {
+            // TODO: Sanity check style count vs other types
+            if (it.styleCount.size > 0)  { // Theme resource
+                val outputFile = File(outputFolder, "themes_${params.uniqueIdGenerator.genIdByCategory("values.fileName.theme")}.${properties.extension}")
+                println("Generating ${outputFile.absolutePath}")
+                generateThemeResource(outputFile, properties.splitQualifiers, it)
+            } else { // XML values resource
+                val outputFile = File(outputFolder, "values_${params.uniqueIdGenerator.genIdByCategory("values.fileName.values")}.${properties.extension}")
+                println("Generating ${outputFile.absolutePath}")
+                generateXmlValueResource(outputFile, properties.splitQualifiers, it)
             }
         }
     }
 
-    private enum class ValueType {
-        STRING, INT, BOOL, COLOR, DIMEN, ID, INT_ARRAY, TYPED_ARRAY
-    }
-
-    private enum class ResourceType {
-        VALUES, THEME
-    }
-
     private fun generateXmlValueResource (
-            outputFile: File
+            outputFile: File,
+            resourceQualifiers: List<String>,
+            valuesMap: ValuesMap
     ) {
-        val numberOfValues = numberOfResourceElements ?: random.nextInt(1, constants.values.MAX_VALUES)
-        val allValueTypes = ValueType.values()
+        // TODO: Randomize order of elements
 
         val xmlLines = mutableListOf<String>()
 
         xmlLines.add("<resources>")
 
-        repeat(numberOfValues) {
-            when(allValueTypes.random(random)) {
-                ValueType.STRING -> xmlLines.add(stringBlock())
-                ValueType.INT -> xmlLines.add(intBlock())
-                ValueType.BOOL -> xmlLines.add(boolBlock())
-                ValueType.COLOR -> xmlLines.add(colorBlock())
-                ValueType.DIMEN -> xmlLines.add(dimenBlock())
-                ValueType.ID -> xmlLines.add(idBlock())
-                ValueType.INT_ARRAY -> xmlLines.addAll(intArrayBlock())
-                ValueType.TYPED_ARRAY -> xmlLines.addAll(typedArrayBlock())
-            }
+        repeat(valuesMap.stringCount) {
+            xmlLines.add(stringBlock(resourceQualifiers))
+        }
+
+        repeat(valuesMap.intCount) {
+            xmlLines.add(intBlock(resourceQualifiers))
+        }
+
+        repeat(valuesMap.boolCount) {
+            xmlLines.add(boolBlock(resourceQualifiers))
+        }
+
+        repeat(valuesMap.colorCount) {
+            xmlLines.add(colorBlock(resourceQualifiers))
+        }
+
+        repeat(valuesMap.dimenCount) {
+            xmlLines.add(dimenBlock(resourceQualifiers))
+        }
+
+        repeat(valuesMap.idCount) {
+            xmlLines.add(idBlock(resourceQualifiers))
+        }
+
+        valuesMap.integerArrayCount.forEach {
+            xmlLines.addAll(intArrayBlock(resourceQualifiers))
+        }
+
+        valuesMap.arrayCount.forEach {
+            xmlLines.addAll(typedArrayBlock(resourceQualifiers))
         }
 
         xmlLines.add("</resources>")
@@ -95,74 +104,138 @@ class ValueResourceGenerator (
 
     private fun generateThemeResource (
             outputFile: File,
-            resourceQualifiers: List<String>
+            resourceQualifiers: List<String>,
+            valuesMap: ValuesMap
     ) {
         // To be implemented
         return
     }
 
-    private fun stringBlock (): String {
-        val name = genUniqueName(random, "values.resName.string", uniqueIdGenerator)
+    private fun stringBlock (resourceQualifiers: List<String>): String {
+        val name = genUniqueName(params.random, "values.resName.string.${resourceQualifiers}", params.uniqueIdGenerator)
         val value = genString(
-            constants.values.MAX_STRING_WORD_COUNT,
+            params.constants.values.MAX_STRING_WORD_COUNT,
             separator = " ",
-            random = random)
+            random = params.random)
+
+        params.resourceModel.resourceList.add(
+            ResourceData(
+                pkg = "",
+                name = name,
+                type = "values_string",
+                extension = "xml",
+                qualifiers = resourceQualifiers)
+        )
+
         return "    <string name=\"$name\">$value</string>"
     }
 
-    private fun intBlock (): String {
-        val name = genUniqueName(random, "values.resName.int", uniqueIdGenerator)
-        val value = random.nextInt()
+    private fun intBlock (resourceQualifiers: List<String>): String {
+        val name = genUniqueName(params.random, "values.resName.int.${resourceQualifiers}", params.uniqueIdGenerator)
+        val value = params.random.nextInt()
+
+        params.resourceModel.resourceList.add(
+            ResourceData(
+                pkg = "",
+                name = name,
+                type = "values_int",
+                extension = "xml",
+                qualifiers = resourceQualifiers)
+        )
+
         return "    <integer name=\"$name\">$value</integer>"
     }
 
-    private fun boolBlock (): String {
-        val name = genUniqueName(random, "values.resName.bool", uniqueIdGenerator)
-        val value = random.nextBoolean()
+    private fun boolBlock (resourceQualifiers: List<String>): String {
+        val name = genUniqueName(params.random, "values.resName.bool.${resourceQualifiers}", params.uniqueIdGenerator)
+        val value = params.random.nextBoolean()
+
+        params.resourceModel.resourceList.add(
+            ResourceData(
+                pkg = "",
+                name = name,
+                type = "values_bool",
+                extension = "xml",
+                qualifiers = resourceQualifiers)
+        )
+
         return "    <bool name=\"$name\">$value</bool>"
     }
 
-    private fun colorBlock (): String {
-        val name = genUniqueName(random, "values.resName.color", uniqueIdGenerator)
+    private fun colorBlock (resourceQualifiers: List<String>): String {
+        val name = genUniqueName(params.random, "values.resName.color.${resourceQualifiers}", params.uniqueIdGenerator)
         /* Digits can be:
          * #RGB
          * #ARGB
          * #RRGGBB
          * #AARRGGBB
          */
-        val numberOfDigits = constants.values.POSSIBLE_COLOR_DIGITS.random(random)
+        val numberOfDigits = params.constants.values.POSSIBLE_COLOR_DIGITS.random(params.random)
 
-        val value = genHex(numberOfDigits, random)
+        val value = genHex(numberOfDigits, params.random)
+
+        params.resourceModel.resourceList.add(
+            ResourceData(
+                pkg = "",
+                name = name,
+                type = "values_color",
+                extension = "xml",
+                qualifiers = resourceQualifiers)
+        )
 
         return "    <color name=\"$name\">#$value</color>"
     }
 
-    private fun dimenBlock (): String {
-        val name = genUniqueName(random, "values.resName.dimen", uniqueIdGenerator)
-        val value = "${random.nextInt(constants.values.MAX_DIMENSION)}${constants.values.DIMENSION_UNITS.random(random)}"
+    private fun dimenBlock (resourceQualifiers: List<String>): String {
+        val name = genUniqueName(params.random, "values.resName.dimen.${resourceQualifiers}", params.uniqueIdGenerator)
+        val value = "${params.random.nextInt(params.constants.values.MAX_DIMENSION)}${params.constants.values.DIMENSION_UNITS.random(params.random)}"
+        params.resourceModel.resourceList.add(
+            ResourceData(
+                pkg = "",
+                name = name,
+                type = "values_dimen",
+                extension = "xml",
+                qualifiers = resourceQualifiers)
+        )
 
         return "    <dimen name=\"$name\">$value</dimen>"
     }
 
-    private fun idBlock (): String {
-        val name = genUniqueName(random, "values.resName.id", uniqueIdGenerator)
+    private fun idBlock (resourceQualifiers: List<String>): String {
+        val name = genUniqueName(params.random, "values.resName.id.${resourceQualifiers}", params.uniqueIdGenerator)
+        params.resourceModel.resourceList.add(
+            ResourceData(
+                pkg = "",
+                name = name,
+                type = "values_id",
+                extension = "xml",
+                qualifiers = resourceQualifiers)
+        )
         return "    <item type=\"id\" name=\"$name\"/>"
     }
 
-    private fun intArrayBlock (): List<String> {
-        val name = genUniqueName(random, "values.resName.intArray", uniqueIdGenerator)
-        val size = random.nextInt(constants.values.MAX_ARRAY_ELEMENTS)
+    private fun intArrayBlock (resourceQualifiers: List<String>): List<String> {
+        val name = genUniqueName(params.random, "values.resName.intArray.${resourceQualifiers}", params.uniqueIdGenerator)
+        val size = params.random.nextInt(params.constants.values.MAX_ARRAY_ELEMENTS)
         val result = mutableListOf("    <integer-array name=\"$name\">")
 
         repeat(size) {
-            val value = random.nextInt()
+            val value = params.random.nextInt()
             result.add("        <item>$value</item>")
         }
         result.add("    </integer-array>")
+        params.resourceModel.resourceList.add(
+            ResourceData(
+                pkg = "",
+                name = name,
+                type = "values_int_array",
+                extension = "xml",
+                qualifiers = resourceQualifiers)
+        )
         return result
     }
 
-    private fun typedArrayBlock (): List<String> {
+    private fun typedArrayBlock (resourceQualifiers: List<String>): List<String> {
         // to be implemented
         return listOf()
     }

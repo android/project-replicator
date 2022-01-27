@@ -10,10 +10,7 @@ class ResgenConstants (propertyFile: File? = null) {
     data class VectorImageConstants (
         val MAX_VECTOR_IMAGE_SIZE_SMALL: Int,
         val MAX_VECTOR_IMAGE_SIZE_MEDIUM: Int,
-        val MAX_VECTOR_IMAGE_SIZE_LARGE: Int,
-        val MAX_VECTOR_IMAGE_LINES_SMALL: Int,
-        val MAX_VECTOR_IMAGE_LINES_MEDIUM: Int,
-        val MAX_VECTOR_IMAGE_LINES_LARGE: Int)
+        val MAX_VECTOR_IMAGE_SIZE_LARGE: Int)
 
     data class ValuesConstants (
         val MAX_VALUES: Int,
@@ -34,9 +31,6 @@ class ResgenConstants (propertyFile: File? = null) {
         val maxVectorImageSizeSmall =  parser.option(propertyName = "maxVectorImageSizeSmall", argc = 1)
         val maxVectorImageSizeMedium =  parser.option(propertyName = "maxVectorImageSizeMedium", argc = 1)
         val maxVectorImageSizeLarge =  parser.option(propertyName = "maxVectorImageSizeLarge", argc = 1)
-        val maxVectorImageLinesSmall =  parser.option(propertyName = "maxVectorImageLinesSmall", argc = 1)
-        val maxVectorImageLinesMedium =  parser.option(propertyName = "maxVectorImageLinesMedium", argc = 1)
-        val maxVectorImageLinesLarge =  parser.option(propertyName = "maxVectorImageLinesLarge", argc = 1)
 
         // Values
         val maxValues =  parser.option(propertyName = "maxValues", argc = 1)
@@ -53,10 +47,7 @@ class ResgenConstants (propertyFile: File? = null) {
         vectorImage = VectorImageConstants(
             MAX_VECTOR_IMAGE_SIZE_SMALL = (maxVectorImageSizeSmall.orNull?.first?.toInt() ?: 100) + 1,
             MAX_VECTOR_IMAGE_SIZE_MEDIUM = (maxVectorImageSizeMedium.orNull?.first?.toInt() ?: 150) + 1,
-            MAX_VECTOR_IMAGE_SIZE_LARGE = (maxVectorImageSizeLarge.orNull?.first?.toInt() ?: 200) + 1,
-            MAX_VECTOR_IMAGE_LINES_SMALL = (maxVectorImageLinesSmall.orNull?.first?.toInt() ?: 50) + 1,
-            MAX_VECTOR_IMAGE_LINES_MEDIUM = (maxVectorImageLinesMedium.orNull?.first?.toInt() ?: 75) + 1,
-            MAX_VECTOR_IMAGE_LINES_LARGE = (maxVectorImageLinesLarge.orNull?.first?.toInt() ?: 100) + 1
+            MAX_VECTOR_IMAGE_SIZE_LARGE = (maxVectorImageSizeLarge.orNull?.first?.toInt() ?: 200) + 1
         )
 
         // same as above

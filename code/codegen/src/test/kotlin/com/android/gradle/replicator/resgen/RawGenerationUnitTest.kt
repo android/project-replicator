@@ -1,5 +1,6 @@
 package com.android.gradle.replicator.resgen
 
+import com.android.gradle.replicator.model.internal.filedata.DefaultAndroidResourceProperties
 import com.google.common.truth.Truth
 import org.junit.Test
 import java.io.File
@@ -7,7 +8,7 @@ import java.io.File
 class RawGenerationUnitTest: AbstractResourceGenerationTest() {
     @Test
     fun testRawGeneration() {
-        val generator = RawResourceGenerator(random, uniqueIdGenerator)
+        val generator = RawResourceGenerator(resourceGenerationParams)
 
         val expectedChosenImages = mapOf(
                 "raw_aaaa.txt" to
@@ -21,31 +22,43 @@ class RawGenerationUnitTest: AbstractResourceGenerationTest() {
         )
 
         generator.generateResource(
-                number = 1,
-                outputFolder = testFolder.root,
-                resourceQualifiers = listOf(),
-                resourceExtension = "txt"
+            properties = DefaultAndroidResourceProperties(
+                qualifiers = "",
+                extension = "txt",
+                quantity = 1,
+                fileData = listOf(1535)
+            ),
+            outputFolder = testFolder.root
         )
 
         generator.generateResource(
-                number = 1,
-                outputFolder = testFolder.root,
-                resourceQualifiers = listOf(),
-                resourceExtension = "json"
+            properties = DefaultAndroidResourceProperties(
+                qualifiers = "",
+                extension = "json",
+                quantity = 1,
+                fileData = listOf(600)
+            ),
+            outputFolder = testFolder.root
         )
 
         generator.generateResource(
-                number = 1,
-                outputFolder = testFolder.root,
-                resourceQualifiers = listOf(),
-                resourceExtension = "png"
+            properties = DefaultAndroidResourceProperties(
+                qualifiers = "",
+                extension = "png",
+                quantity = 1,
+                fileData = listOf(318000)
+            ),
+            outputFolder = testFolder.root
         )
 
         generator.generateResource(
-                number = 1,
-                outputFolder = testFolder.root,
-                resourceQualifiers = listOf(),
-                resourceExtension = "jpg"
+            properties = DefaultAndroidResourceProperties(
+                qualifiers = "",
+                extension = "jpg",
+                quantity = 1,
+                fileData = listOf(2300000)
+            ),
+            outputFolder = testFolder.root
         )
 
         Truth.assertThat(testFolder.root.listFiles()!!.asList().map { it.name }).containsExactly(

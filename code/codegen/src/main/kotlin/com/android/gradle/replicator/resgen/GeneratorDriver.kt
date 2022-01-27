@@ -1,6 +1,7 @@
 package com.android.gradle.replicator.resgen
 
 import com.android.gradle.replicator.model.internal.filedata.AbstractAndroidResourceProperties
+import com.android.gradle.replicator.resgen.resourceModel.ResourceModel
 import com.android.gradle.replicator.resgen.util.ResgenConstants
 import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
 import java.io.File
@@ -8,19 +9,20 @@ import kotlin.random.Random
 
 class GeneratorDriver (val random: Random, private val uniqueIdGenerator: UniqueIdGenerator) {
     // TODO: implement other generators
-    private fun getGenerator(random: Random, resourceType: String, constants: ResgenConstants): ResourceGenerator? {
+    private fun getGenerator(random: Random, resourceType: String, constants: ResgenConstants, resourceModel: ResourceModel): ResourceGenerator? {
+        val params = ResourceGenerationParams(random, constants, uniqueIdGenerator, resourceModel)
         return when(resourceType) {
             //"animator" ->
             //"anim" ->
             //"color" ->
-            "drawable" -> DrawableResourceGenerator(random, constants, uniqueIdGenerator)
-            "font" -> FontResourceGenerator(random, uniqueIdGenerator)
+            "drawable" -> DrawableResourceGenerator(params)
+            "font" -> FontResourceGenerator(params)
             //"layout" ->
             //"menu" ->
-            "mipmap" -> DrawableResourceGenerator(random, constants, uniqueIdGenerator)
-            "raw" -> RawResourceGenerator(random, uniqueIdGenerator)
+            "mipmap" -> DrawableResourceGenerator(params)
+            "raw" -> RawResourceGenerator(params)
             //"transition" ->
-            "values" -> ValueResourceGenerator(random, constants, uniqueIdGenerator)
+            "values" -> ValueResourceGenerator(params)
             //"xml" ->
             else -> null
         }
@@ -30,10 +32,11 @@ class GeneratorDriver (val random: Random, private val uniqueIdGenerator: Unique
         outputFolder: File,
         resourceType: String,
         resourceProperties: AbstractAndroidResourceProperties,
-        resgenConstants: ResgenConstants) {
+        resgenConstants: ResgenConstants,
+        resourceModel: ResourceModel) {
 
         // TODO: Generate resources based on property type (size matters, values, etc.)
-        val generator = getGenerator(random, resourceType, resgenConstants)
+        val generator = getGenerator(random, resourceType, resgenConstants, resourceModel)
 
         // empty qualifiers means the folder is unqualified, as in "mipmap" instead of "mipmap-hidpi"
         val qualifiedFolder =
@@ -45,12 +48,8 @@ class GeneratorDriver (val random: Random, private val uniqueIdGenerator: Unique
         qualifiedFolder.mkdirs()
 
         generator?.generateResource(
-                number = resourceProperties.quantity,
-                outputFolder = qualifiedFolder,
-                // resources can have more than one qualifier
-                resourceQualifiers =
-                if (resourceProperties.qualifiers.isEmpty()) listOf() else resourceProperties.qualifiers.split("-"),
-                resourceExtension = resourceProperties.extension
+                properties = resourceProperties,
+                outputFolder = qualifiedFolder
         ) ?: println("w: unsupported resource type $resourceType. Skipping.")
     }
 }
