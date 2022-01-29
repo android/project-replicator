@@ -85,7 +85,7 @@ fun parseValuesFile(valuesFile: File): ValuesMap {
                     "bool" -> { valuesMap.boolCount++  }
                     "color" -> { valuesMap.colorCount++  }
                     "dimen" -> { valuesMap.dimenCount++  }
-                    "item" -> { if (attributes.getValue("name") == "id") { valuesMap.idCount++ } }
+                    "item" -> { if (attributes.getValue("type") == "id") { valuesMap.idCount++ } }
                     "integer-array" -> {} // Only add on close
                     "array" -> {} // Only add on close
                     "style" -> {} // Only add on close

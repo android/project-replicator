@@ -4,11 +4,22 @@ import org.reflections.Reflections
 import org.reflections.scanners.ResourcesScanner
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.math.abs
 import kotlin.random.Random
 
 enum class FileTypes {
     PNG, NINE_PATCH, WEBP, JPEG, GIF, TEXT, JSON, TTF, OTF, TTC
 }
+
+/* Singleton cache of file sizes, so we don't recalculate them every time. Example:
+ * {
+ *   PNG: [("somefile.png", 523), ("anotherfile.png", 346), ("yetanotherfile.png", 456)],
+ *
+ *   WEBP: [("somefile.webp", 1237), ("anotherfile.webp", 2342), ("yetanotherfile.webp", 123)]
+ * }
+ */
+private data class FileData(val name: String, val size: Long)
+private val fileSizeCache = mutableMapOf<FileTypes, MutableList<FileData>>()
 
 private fun listResourceFiles(folder: String): List<String> {
     val reflections = Reflections("resgen", ResourcesScanner())
@@ -31,10 +42,13 @@ private fun getFolderFromType(type: FileTypes): String {
     return "resgen/$typeFolderName"
 }
 
-fun getRandomResource(random: Random, type: FileTypes, resourceQualifiers: List<String>): String? {
+fun getRandomResourceFromQualifiers(random: Random, type: FileTypes, resourceQualifiers: List<String>): String? {
     val qualifierPrefixes = resourceQualifiers.filter(String::isNotEmpty)
 
-    val allFiles = listResourceFiles(getFolderFromType(type))
+    // Cache is faster if it exists
+    val allFiles =
+        if (fileSizeCache[type] == null) listResourceFiles(getFolderFromType(type))
+        else fileSizeCache[type]!!.map { it.name }
 
     if (allFiles.isEmpty()) {
         println("e: no pre-generated $type file found")
@@ -49,6 +63,30 @@ fun getRandomResource(random: Random, type: FileTypes, resourceQualifiers: List<
 
     // If specific file does not exist, get generic one
     return if (filteredFiles.isEmpty()) allFiles.sorted().random(random) else filteredFiles.sorted().random(random)
+}
+
+fun getResourceClosestToSize(type: FileTypes, size: Long): String? {
+    if (fileSizeCache[type] == null) {
+        // Calculate cache
+        val allFiles = listResourceFiles(getFolderFromType(type))
+
+        fileSizeCache[type] = mutableListOf()
+
+        val loader = Thread.currentThread().contextClassLoader
+        allFiles.forEach { fileName ->
+            // getContentLengthLong gets the uncompressed file size
+            fileSizeCache[type]!!.add(
+                FileData(fileName, loader.getResource(fileName)!!.openConnection().contentLengthLong))
+        }
+    }
+    val cachedFiles = fileSizeCache[type]!!
+    if (cachedFiles.isEmpty()) {
+        println("e: no pre-generated $type file found")
+        return null
+    }
+    val closest = cachedFiles.minBy { abs(it.size - size) }!!
+    println("closest file to $size is ${closest.name} ${closest.size}")
+    return closest.name
 }
 
 fun copyResourceFile(resourcePath: String, output: File) {

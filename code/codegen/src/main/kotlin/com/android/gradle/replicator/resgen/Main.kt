@@ -22,6 +22,7 @@ import com.android.gradle.replicator.model.internal.*
 import com.android.gradle.replicator.model.internal.filedata.AndroidResourceMap
 import com.android.gradle.replicator.model.internal.filedata.FilesWithSizeMap
 import com.android.gradle.replicator.parsing.ArgsParser
+import com.android.gradle.replicator.resgen.resourceModel.ResourceModel
 import com.android.gradle.replicator.resgen.util.ResgenConstants
 import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
 import com.google.gson.stream.JsonReader
@@ -123,10 +124,11 @@ class Main {
             resgenConstants: ResgenConstants) {
         val random = Random(parameters.seed)
         val uniqueIdGenerator = UniqueIdGenerator()
+        val resourceModel = ResourceModel()
         resMap.keys.sorted().forEach { resourceType ->
             val generator = GeneratorDriver(random, uniqueIdGenerator)
             resMap[resourceType]!!.sortedBy { it.qualifiers }.forEach { resourceProperties ->
-                generator.generateResources(outputFolder, resourceType, resourceProperties, resgenConstants)
+                generator.generateResources(outputFolder, resourceType, resourceProperties, resgenConstants, resourceModel)
             }
         }
     }

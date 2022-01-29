@@ -25,6 +25,9 @@ val ANDROID_RESOURCE_FOLDER_CONVENTION = mapOf(
  */
 abstract class AbstractAndroidResourceProperties (val qualifiers: String, val extension: String, val quantity: Int) {
         abstract val propertyType: ResourcePropertyType
+
+        val splitQualifiers: List<String>
+            get() = if (qualifiers.isEmpty()) listOf() else qualifiers.split("-")
 }
 
 enum class ResourcePropertyType {

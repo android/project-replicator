@@ -32,10 +32,10 @@ class ResourceGenerationIntegrationTest: AbstractResourceGenerationTest() {
 
         Truth.assertThat(allResourceFiles).containsExactly(
             "mipmap-mdpi",
-            "mipmap-mdpi/image_aaae.webp",
-            "mipmap-mdpi/image_aaad.webp",
+            "mipmap-mdpi/image_aaaa.webp",
+            "mipmap-mdpi/image_aaab.webp",
             "drawable-v24",
-            "drawable-v24/vector_drawable_aaaf.xml",
+            "drawable-v24/vector_drawable_aaaa.xml",
             "mipmap-hdpi",
             "mipmap-hdpi/image_aaaa.webp",
             "mipmap-hdpi/image_aaab.webp",
@@ -46,27 +46,27 @@ class ResourceGenerationIntegrationTest: AbstractResourceGenerationTest() {
             "drawable/vector_drawable_aaad.xml",
             "drawable/vector_drawable_aaae.xml",
             "mipmap-xxxhdpi",
-            "mipmap-xxxhdpi/image_aaaj.webp",
-            "mipmap-xxxhdpi/image_aaak.webp",
+            "mipmap-xxxhdpi/image_aaaa.webp",
+            "mipmap-xxxhdpi/image_aaab.webp",
             "layout",
             "mipmap-xxhdpi",
-            "mipmap-xxhdpi/image_aaah.webp",
-            "mipmap-xxhdpi/image_aaai.webp",
+            "mipmap-xxhdpi/image_aaaa.webp",
+            "mipmap-xxhdpi/image_aaab.webp",
             "values-night",
-            "values-night/values_aaaf.xml",
+            "values-night/values_aaae.xml",
             "values",
             "values/values_aaaa.xml",
             "values/values_aaab.xml",
             "values/values_aaac.xml",
             "values/values_aaad.xml",
-            "values/values_aaae.xml",
+            //"values/values_aaae.xml", themes still not supported
             "menu",
             "mipmap-xhdpi",
-            "mipmap-xhdpi/image_aaaf.webp",
-            "mipmap-xhdpi/image_aaag.webp",
+            "mipmap-xhdpi/image_aaaa.webp",
+            "mipmap-xhdpi/image_aaab.webp",
             "mipmap-anydpi-v26",
-            "mipmap-anydpi-v26/vector_drawable_aaah.xml",
-            "mipmap-anydpi-v26/vector_drawable_aaag.xml"
+            "mipmap-anydpi-v26/vector_drawable_aaaa.xml",
+            "mipmap-anydpi-v26/vector_drawable_aaab.xml"
         )
     }
 }
@@ -274,6 +274,17 @@ private const val MODEL_FILE = """
             "styleCount": [
               7
             ]
+          },
+          {
+            "stringCount": 0,
+            "intCount": 0,
+            "boolCount": 2,
+            "colorCount": 0,
+            "dimenCount": 0,
+            "idCount": 0,
+            "integerArrayCount": [],
+            "arrayCount": [],
+            "styleCount": []
           }
         ]
       }

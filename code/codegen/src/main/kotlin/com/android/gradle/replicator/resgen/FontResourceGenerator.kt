@@ -1,56 +1,68 @@
 package com.android.gradle.replicator.resgen
 
-import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
+import com.android.gradle.replicator.model.internal.filedata.AbstractAndroidResourceProperties
+import com.android.gradle.replicator.model.internal.filedata.DefaultAndroidResourceProperties
+import com.android.gradle.replicator.model.internal.filedata.ResourcePropertyType
+import com.android.gradle.replicator.resgen.resourceModel.ResourceData
 import com.android.gradle.replicator.resgen.util.copyResourceFile
 import com.android.gradle.replicator.resgen.util.getFileType
-import com.android.gradle.replicator.resgen.util.getRandomResource
+import com.android.gradle.replicator.resgen.util.getResourceClosestToSize
 import java.io.File
-import kotlin.random.Random
 
-class FontResourceGenerator(
-    private val random: Random,
-    private val uniqueIdGenerator: UniqueIdGenerator): ResourceGenerator {
+class FontResourceGenerator(params: ResourceGenerationParams): ResourceGenerator(params) {
 
     override fun generateResource(
-            number: Int,
-            outputFolder: File,
-            resourceQualifiers: List<String>,
-            resourceExtension: String
+        properties: AbstractAndroidResourceProperties,
+        outputFolder: File
     ) {
-        if (getFileType(resourceExtension) == null) {
-            println("Unsupported file type $resourceExtension")
+        // Sanity check. This should not happen unless there is a bug in the metadata reader.
+        if (properties.propertyType != ResourcePropertyType.DEFAULT) {
+            throw RuntimeException ("Unexpected property type. Got ${properties.propertyType} instead of ${ResourcePropertyType.DEFAULT}")
+        }
+        if (getFileType(properties.extension) == null) {
+            println("Unsupported file type $properties.extension")
             return
         }
-        repeat(number) {
-            val outputFile = File(outputFolder, "font_${uniqueIdGenerator.genIdByCategory("font.fileName")}.${resourceExtension}")
-            when (resourceExtension) {
+        (properties as DefaultAndroidResourceProperties).fileData.forEach { fileSize ->
+            val fileName = "font_${params.uniqueIdGenerator.genIdByCategory("font.fileName.${properties.qualifiers}")}"
+            val outputFile = File(outputFolder, "$fileName.${properties.extension}")
+            when (properties.extension) {
                 "xml" ->  {
                     println("Generating ${outputFile.absolutePath}")
-                    generateFontReferenceResource(outputFile, resourceQualifiers)
+                    generateFontReferenceResource(outputFile, properties.splitQualifiers, fileSize)
                 }
                 else -> {
                     println("Generating ${outputFile.absolutePath}")
-                    generateFontResource(outputFile, resourceQualifiers, resourceExtension)
+                    generateFontResource(outputFile, properties.extension, fileSize)
                 }
             }
+            params.resourceModel.resourceList.add(
+                ResourceData(
+                pkg = "",
+                name = fileName,
+                type = "font",
+                extension = properties.extension,
+                qualifiers = properties.splitQualifiers)
+            )
         }
     }
 
     private fun generateFontResource (
             outputFile: File,
-            resourceQualifiers: List<String>,
-            resourceExtension: String
+            resourceExtension: String,
+            fileSize: Long
     ) {
         val fileType = getFileType(resourceExtension)!!
 
-        val resourcePath = getRandomResource(random, fileType, resourceQualifiers) ?: return
+        val resourcePath = getResourceClosestToSize(fileType, fileSize) ?: return
 
         copyResourceFile(resourcePath, outputFile)
     }
 
     private fun generateFontReferenceResource (
             outputFile: File,
-            resourceQualifiers: List<String>
+            resourceQualifiers: List<String>,
+            fileSize: Long
     ) {
         // TODO: Implement this (needs resource context)
     }

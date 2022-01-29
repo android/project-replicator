@@ -17,6 +17,8 @@
 
 package com.android.gradle.replicator.resgen
 
+import com.android.gradle.replicator.resgen.resourceModel.ResourceModel
+import com.android.gradle.replicator.resgen.util.ResgenConstants
 import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
 import org.junit.After
 import org.junit.Before
@@ -39,6 +41,9 @@ abstract class AbstractResourceGenerationTest {
     val testFolder = TemporaryFolder()
 
     lateinit var uniqueIdGenerator: UniqueIdGenerator
+
+    protected val resourceGenerationParams
+        get() = ResourceGenerationParams(random, ResgenConstants(), uniqueIdGenerator, ResourceModel())
 
     @Before
     fun setup() {
