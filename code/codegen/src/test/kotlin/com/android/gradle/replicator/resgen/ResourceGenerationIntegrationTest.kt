@@ -6,20 +6,22 @@ import org.junit.Test
 class ResourceGenerationIntegrationTest: AbstractResourceGenerationTest() {
     @Test
     fun testFullResourceGeneration() {
-        val modelFile = testFolder.newFile("resource-metadata.json")
+        val metadataFile = testFolder.newFile("resource-metadata.json")
+        val resModelFile = testFolder.newFile("resource-model.json")
         val propertiesFile = testFolder.newFile("generation.properties")
         val androidOutputFolder = testFolder.newFolder("res")
         val javaOutputFolder = testFolder.newFolder("resources")
         val assetOutputFolder = testFolder.newFolder("assets")
 
-        modelFile.writeText(MODEL_FILE)
+        metadataFile.writeText(MODEL_FILE)
         propertiesFile.writeText(PROPERTIES_FILE)
 
         Main().process(arrayOf(
-            "--resJson", modelFile.absolutePath,
+            "--resJson", metadataFile.absolutePath,
             "--androidOutput", androidOutputFolder.absolutePath,
             "--javaOutput", javaOutputFolder.absolutePath,
             "--assetOutput", assetOutputFolder.absolutePath,
+            "--resModel", resModelFile.absolutePath,
             "--generationProperties", propertiesFile.absolutePath
             // Use default seed
         ))
@@ -53,13 +55,14 @@ class ResourceGenerationIntegrationTest: AbstractResourceGenerationTest() {
             "mipmap-xxhdpi/image_aaaa.webp",
             "mipmap-xxhdpi/image_aaab.webp",
             "values-night",
-            "values-night/values_aaae.xml",
+            "values-night/values_aaag.xml",
+            "values-night/values_aaaf.xml",
             "values",
             "values/values_aaaa.xml",
             "values/values_aaab.xml",
             "values/values_aaac.xml",
             "values/values_aaad.xml",
-            //"values/values_aaae.xml", themes still not supported
+            "values/values_aaae.xml",
             "menu",
             "mipmap-xhdpi",
             "mipmap-xhdpi/image_aaaa.webp",

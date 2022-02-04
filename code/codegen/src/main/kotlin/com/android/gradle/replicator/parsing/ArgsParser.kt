@@ -18,6 +18,8 @@ class ArgsParser {
             get() = argv[0]
         val orNull
             get() = if (isPresent) this else null
+        val asFile
+            get() = File(argv[0])
     }
 
     private val longNameOpts = mutableMapOf<String, Option>()

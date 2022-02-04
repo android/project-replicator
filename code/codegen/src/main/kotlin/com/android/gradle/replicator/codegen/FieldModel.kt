@@ -16,8 +16,6 @@
  */
 package com.android.gradle.replicator.codegen
 
-import kotlin.reflect.KClass
-
 data class FieldModel(
         val name: String,
         override val classModel: ClassModel<*>,

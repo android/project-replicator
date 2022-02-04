@@ -17,6 +17,7 @@
 package com.android.gradle.replicator.codegen
 
 import com.android.gradle.replicator.codegen.kotlin.KotlinClassGenerator
+import com.android.gradle.replicator.resourceModel.ResourceModel
 import com.google.common.truth.Truth
 import org.junit.Before
 import org.junit.Test
@@ -78,10 +79,12 @@ class CodeGenerationListenerTest {
         SingleClassGenerator(
                 generator = KotlinClassGenerator(PrettyPrintStream(PrintStream(outputStream)), listOf(listener)),
                 params = params,
+                moduleName = "foo",
                 packageName = "foo.package",
                 className = "FooClass",
                 apiClassPicker = importClassPicker,
                 implClassPicker = importClassPicker,
+                resourceModel = ResourceModel(),
                 random = random).generate()
 
         Mockito.`when`(random.nextInt(1)).thenReturn(0) // use first import in list.

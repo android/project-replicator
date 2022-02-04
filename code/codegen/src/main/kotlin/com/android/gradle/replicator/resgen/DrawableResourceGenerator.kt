@@ -19,12 +19,13 @@ package com.android.gradle.replicator.resgen
 import com.android.gradle.replicator.model.internal.filedata.AbstractAndroidResourceProperties
 import com.android.gradle.replicator.model.internal.filedata.DefaultAndroidResourceProperties
 import com.android.gradle.replicator.model.internal.filedata.ResourcePropertyType
-import com.android.gradle.replicator.resgen.resourceModel.ResourceData
+import com.android.gradle.replicator.resourceModel.ResourceData
 import com.android.gradle.replicator.resgen.util.FileTypes
 import com.android.gradle.replicator.resgen.util.VectorDrawableGenerator
 import com.android.gradle.replicator.resgen.util.copyResourceFile
 import com.android.gradle.replicator.resgen.util.getFileType
 import com.android.gradle.replicator.resgen.util.getResourceClosestToSize
+import com.android.gradle.replicator.resourceModel.ResourceTypes
 import com.google.common.annotations.VisibleForTesting
 import java.io.File
 
@@ -60,7 +61,7 @@ class DrawableResourceGenerator (params: ResourceGenerationParams): ResourceGene
                     params.resourceModel.resourceList.add(ResourceData(
                         pkg = "",
                         name = fileName,
-                        type = "drawable",
+                        type = ResourceTypes.DRAWABLE,
                         extension = properties.extension,
                         qualifiers = properties.splitQualifiers))
                 }
@@ -72,7 +73,7 @@ class DrawableResourceGenerator (params: ResourceGenerationParams): ResourceGene
                     params.resourceModel.resourceList.add(ResourceData(
                         pkg = "",
                         name = fileName,
-                        type = "drawable",
+                        type = ResourceTypes.DRAWABLE,
                         extension = properties.extension,
                         qualifiers = properties.splitQualifiers))
                 }

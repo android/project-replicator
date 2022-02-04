@@ -20,10 +20,15 @@ import com.android.gradle.replicator.model.internal.filedata.AbstractAndroidReso
 import com.android.gradle.replicator.model.internal.filedata.ResourcePropertyType
 import com.android.gradle.replicator.model.internal.filedata.ValuesAndroidResourceProperties
 import com.android.gradle.replicator.model.internal.filedata.ValuesMap
-import com.android.gradle.replicator.resgen.resourceModel.ResourceData
+import com.android.gradle.replicator.resgen.util.StyleItemGenerator
+import com.android.gradle.replicator.resgen.util.genColor
+import com.android.gradle.replicator.resgen.util.genDimen
+import com.android.gradle.replicator.resourceModel.ResourceData
 import com.android.gradle.replicator.resgen.util.genHex
+import com.android.gradle.replicator.resgen.util.genName
 import com.android.gradle.replicator.resgen.util.genString
 import com.android.gradle.replicator.resgen.util.genUniqueName
+import com.android.gradle.replicator.resourceModel.ResourceTypes
 import com.google.common.annotations.VisibleForTesting
 import java.io.File
 
@@ -41,20 +46,13 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
             throw RuntimeException ("Unexpected property type. Got ${properties.propertyType} instead of ${ResourcePropertyType.VALUES}")
         }
         (properties as ValuesAndroidResourceProperties).valuesMapPerFile.forEach {
-            // TODO: Sanity check style count vs other types
-            if (it.styleCount.size > 0)  { // Theme resource
-                val outputFile = File(outputFolder, "themes_${params.uniqueIdGenerator.genIdByCategory("values.fileName.theme")}.${properties.extension}")
-                println("Generating ${outputFile.absolutePath}")
-                generateThemeResource(outputFile, properties.splitQualifiers, it)
-            } else { // XML values resource
-                val outputFile = File(outputFolder, "values_${params.uniqueIdGenerator.genIdByCategory("values.fileName.values")}.${properties.extension}")
-                println("Generating ${outputFile.absolutePath}")
-                generateXmlValueResource(outputFile, properties.splitQualifiers, it)
-            }
+            val outputFile = File(outputFolder, "values_${params.uniqueIdGenerator.genIdByCategory("values.fileName")}.${properties.extension}")
+            println("Generating ${outputFile.absolutePath}")
+            generateValuesResource(outputFile, properties.splitQualifiers, it)
         }
     }
 
-    private fun generateXmlValueResource (
+    private fun generateValuesResource (
             outputFile: File,
             resourceQualifiers: List<String>,
             valuesMap: ValuesMap
@@ -90,11 +88,15 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
         }
 
         valuesMap.integerArrayCount.forEach {
-            xmlLines.addAll(intArrayBlock(resourceQualifiers))
+            xmlLines.addAll(intArrayBlock(resourceQualifiers, it))
         }
 
         valuesMap.arrayCount.forEach {
-            xmlLines.addAll(typedArrayBlock(resourceQualifiers))
+            xmlLines.addAll(typedArrayBlock(resourceQualifiers, it))
+        }
+
+        valuesMap.styleCount.forEach {
+            xmlLines.addAll(styleBlock(resourceQualifiers, it))
         }
 
         xmlLines.add("</resources>")
@@ -102,13 +104,34 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
         outputFile.writeText(xmlLines.joinToString(System.lineSeparator()))
     }
 
-    private fun generateThemeResource (
-            outputFile: File,
-            resourceQualifiers: List<String>,
-            valuesMap: ValuesMap
-    ) {
-        // To be implemented
-        return
+    // TODO: Add style parents and special styles
+    private fun styleBlock (resourceQualifiers: List<String>, size: Int? = null): List<String> {
+        val actualSize = size ?: params.random.nextInt(params.constants.values.MAX_ARRAY_ELEMENTS)
+        val name = genUniqueName(params.random, "values.resName.style", params.uniqueIdGenerator)
+        val xmlLines = mutableListOf(
+            "    <style name=\"$name\">")
+        val itemGenerator = StyleItemGenerator(params.resourceModel, params.constants)
+
+        repeat(actualSize) {
+            val item = itemGenerator.generateStyleItem(params.random)
+            item?.let { // skip invalid items
+                xmlLines.add(
+                    "        <item name=\"${it.name}\">${it.value}</item>"
+                )
+            }
+        }
+        xmlLines.add("    </style>")
+
+        params.resourceModel.resourceList.add(
+            ResourceData(
+                pkg = "",
+                name = name,
+                type = ResourceTypes.VALUES_STYLE,
+                extension = "xml",
+                qualifiers = resourceQualifiers)
+        )
+
+        return xmlLines
     }
 
     private fun stringBlock (resourceQualifiers: List<String>): String {
@@ -122,7 +145,7 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_string",
+                type = ResourceTypes.VALUES_STRING,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
@@ -138,7 +161,7 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_int",
+                type = ResourceTypes.VALUES_INT,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
@@ -154,7 +177,7 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_bool",
+                type = ResourceTypes.VALUES_BOOL,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
@@ -164,36 +187,29 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
 
     private fun colorBlock (resourceQualifiers: List<String>): String {
         val name = genUniqueName(params.random, "values.resName.color.${resourceQualifiers}", params.uniqueIdGenerator)
-        /* Digits can be:
-         * #RGB
-         * #ARGB
-         * #RRGGBB
-         * #AARRGGBB
-         */
-        val numberOfDigits = params.constants.values.POSSIBLE_COLOR_DIGITS.random(params.random)
 
-        val value = genHex(numberOfDigits, params.random)
+        val value = genColor(params.constants, params.random)
 
         params.resourceModel.resourceList.add(
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_color",
+                type = ResourceTypes.VALUES_COLOR,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
 
-        return "    <color name=\"$name\">#$value</color>"
+        return "    <color name=\"$name\">$value</color>"
     }
 
     private fun dimenBlock (resourceQualifiers: List<String>): String {
         val name = genUniqueName(params.random, "values.resName.dimen.${resourceQualifiers}", params.uniqueIdGenerator)
-        val value = "${params.random.nextInt(params.constants.values.MAX_DIMENSION)}${params.constants.values.DIMENSION_UNITS.random(params.random)}"
+        val value = genDimen(params.constants, params.random)
         params.resourceModel.resourceList.add(
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_dimen",
+                type = ResourceTypes.VALUES_DIMEN,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
@@ -207,19 +223,19 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_id",
+                type = ResourceTypes.VALUES_ID,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
         return "    <item type=\"id\" name=\"$name\"/>"
     }
 
-    private fun intArrayBlock (resourceQualifiers: List<String>): List<String> {
+    private fun intArrayBlock (resourceQualifiers: List<String>, size: Int? = null): List<String> {
         val name = genUniqueName(params.random, "values.resName.intArray.${resourceQualifiers}", params.uniqueIdGenerator)
-        val size = params.random.nextInt(params.constants.values.MAX_ARRAY_ELEMENTS)
+        val actualSize = size ?: params.random.nextInt(params.constants.values.MAX_ARRAY_ELEMENTS)
         val result = mutableListOf("    <integer-array name=\"$name\">")
 
-        repeat(size) {
+        repeat(actualSize) {
             val value = params.random.nextInt()
             result.add("        <item>$value</item>")
         }
@@ -228,14 +244,14 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_int_array",
+                type = ResourceTypes.VALUES_INT_ARRAY,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
         return result
     }
 
-    private fun typedArrayBlock (resourceQualifiers: List<String>): List<String> {
+    private fun typedArrayBlock (resourceQualifiers: List<String>, size: Int? = null): List<String> {
         // to be implemented
         return listOf()
     }

@@ -17,7 +17,7 @@
 
 package com.android.gradle.replicator.resgen
 
-import com.android.gradle.replicator.resgen.resourceModel.ResourceModel
+import com.android.gradle.replicator.resourceModel.ResourceModel
 import com.android.gradle.replicator.resgen.util.ResgenConstants
 import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
 import org.junit.After

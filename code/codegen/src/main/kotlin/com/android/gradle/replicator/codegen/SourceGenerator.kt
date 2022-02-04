@@ -16,6 +16,8 @@
  */
 package com.android.gradle.replicator.codegen
 
+import com.android.gradle.replicator.resourceModel.ResourceModel
+
 /**
  * A SourceGenerator is capable of generating various types of source files for a particular language.
  *
@@ -24,15 +26,18 @@ package com.android.gradle.replicator.codegen
 interface SourceGenerator {
     /**
      * Generate a class
+     * @param moduleName the root package for the module (where the R class is located).
      * @param packageName the class package.
      * @param className the class name.
      * @param printStream the stream to write the source code to.
      * @param listeners listeners for code generation events.
      */
     fun generateClass(
+            moduleName: String,
             packageName: String,
             className: String,
             printStream: PrettyPrintStream,
-            listeners: List<CodeGenerationListener> = listOf()
+            listeners: List<CodeGenerationListener> = listOf(),
+            resourceModel: ResourceModel
     )
 }

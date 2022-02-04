@@ -15,3 +15,7 @@ Capture:
 Flags:
 - ways to disable class count and resource count (--no-class-count on task)
 
+Generation
+- Fetch resource artifact from AGP to reference resources from other modules
+- Two-pass resource generation so menu resources can be generated with code references
+- Implement random raw resource generation. Also implement random java resource generation and asset generation.

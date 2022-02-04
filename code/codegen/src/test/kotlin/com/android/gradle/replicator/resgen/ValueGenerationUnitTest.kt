@@ -60,6 +60,7 @@ class ValueGenerationUnitTest: AbstractResourceGenerationTest() {
 
         val generatedValues1 = File(testFolder.root, "values_aaaa.xml").readText()
         val generatedValues2 = File(testFolder.root, "values_aaab.xml").readText()
+        val generatedValues3 = File(testFolder.root, "values_aaac.xml").readText()
 
         @Language("xml")
         val expectedValues1 = """
@@ -92,8 +93,11 @@ class ValueGenerationUnitTest: AbstractResourceGenerationTest() {
                 <item type="id" name="cookie_etc._the_aaaf"/>
                 <item type="id" name="max_aaag"/>
                 <integer-array name="chocolate_vanilla_strawberry_aaaa">
+                    <item>105</item>
+                    <item>106</item>
+                    <item>107</item>
                 </integer-array>
-                <integer-array name="cool_delivery_aaab">
+                <integer-array name="awesome_aaab">
                     <item>110</item>
                     <item>111</item>
                     <item>112</item>
@@ -132,49 +136,49 @@ class ValueGenerationUnitTest: AbstractResourceGenerationTest() {
                 <item type="id" name="android_face_pie_aaah"/>
                 <item type="id" name="etc._aaai"/>
                 <integer-array name="name_max_min_aaac">
+                    <item>291</item>
                     <item>292</item>
                     <item>293</item>
                     <item>294</item>
                     <item>295</item>
-                    <item>296</item>
-                    <item>297</item>
-                    <item>298</item>
-                    <item>299</item>
+                </integer-array>
+                <integer-array name="delivery_awesome_nice_aaad">
                     <item>300</item>
                     <item>301</item>
                     <item>302</item>
                     <item>303</item>
                     <item>304</item>
                     <item>305</item>
-                    <item>306</item>
-                    <item>307</item>
-                    <item>308</item>
-                    <item>309</item>
-                </integer-array>
-                <integer-array name="min_chocolate_aaad">
-                    <item>314</item>
-                    <item>315</item>
-                    <item>316</item>
-                    <item>317</item>
-                    <item>318</item>
-                    <item>319</item>
-                    <item>320</item>
-                    <item>321</item>
-                    <item>322</item>
-                    <item>323</item>
-                    <item>324</item>
-                    <item>325</item>
-                    <item>326</item>
-                    <item>327</item>
-                    <item>328</item>
-                    <item>329</item>
-                    <item>330</item>
-                    <item>331</item>
-                    <item>332</item>
                 </integer-array>
             </resources>""".trimIndent()
 
+        @Language("xml")
+        val expectedValues3 = """
+            <resources>
+                <style name="etc._aaaa">
+                    <item name="android:colorBackground">#171819</item>
+                    <item name="android:secondaryContentAlpha">0.0</item>
+                    <item name="android:textColorSecondary">@color/vanilla_aaaa</item>
+                    <item name="colorPrimarySurface">#1a1b1c</item>
+                </style>
+                <style name="nice_constable_aaab">
+                    <item name="android:disabledAlpha">0.0</item>
+                    <item name="colorControlActivated">#1d1e1f</item>
+                    <item name="colorPrimaryVariant">#2021</item>
+                    <item name="colorPrimary">@color/wire_android_aaai</item>
+                    <item name="dividerHorizontal">@dimen/party_aaac</item>
+                </style>
+                <style name="party_aaac">
+                    <item name="colorControlHighlight">#222</item>
+                    <item name="colorPrimaryVariant">@color/party_aaab</item>
+                    <item name="android:secondaryContentAlpha">0.0</item>
+                    <item name="selectableItemBackground">@dimen/cookie_etc._the_aaag</item>
+                    <item name="android:textColorSecondary">@color/vanilla_aaaa</item>
+                    <item name="android:textColorPrimary">@color/writer_aaad</item>
+                </style>
+            </resources>""".trimIndent()
         Truth.assertThat(generatedValues1).isEqualTo(expectedValues1)
         Truth.assertThat(generatedValues2).isEqualTo(expectedValues2)
+        Truth.assertThat(generatedValues3).isEqualTo(expectedValues3)
     }
 }
