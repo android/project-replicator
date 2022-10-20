@@ -25,6 +25,7 @@ import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.attributes.AttributeContainer
 import org.gradle.api.internal.artifacts.ArtifactAttributes
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import kotlin.random.Random
 
 @Suppress("UnstableApiUsage")
@@ -186,5 +187,6 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
         // generate the code before we start compiling it.
         // hack, use variant API.
         project.tasks.findByName("preBuild")!!.dependsOn(generateCodeTask)
+        project.tasks.withType(KotlinCompile::class.java).configureEach { it.dependsOn(generateCodeTask) }
     }
 }

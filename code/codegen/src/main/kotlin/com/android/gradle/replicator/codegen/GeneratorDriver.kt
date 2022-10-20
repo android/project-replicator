@@ -171,6 +171,7 @@ class GeneratorDriver(
             entryName.endsWith(".class")
                     && !entryName.contains("R.class")
                     && !entryName.contains("module-info")
+                    && !entryName.contains("meta-inf", ignoreCase = true)
                     && !entryName.contains('$')
 
     private fun entryNameToClassName(entryName: String): String =
