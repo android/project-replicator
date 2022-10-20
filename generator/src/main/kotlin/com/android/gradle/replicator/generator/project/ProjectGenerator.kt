@@ -54,7 +54,7 @@ interface ProjectGenerator {
             val dslWriter: DslWriter = if (params.kts) KtsWriter(true) else GroovyDslWriter(true)
 
             return GradleProjectGenerator(
-                params.destination,
+                params,
                 libraryFilter,
                 libraryAdditions,
                 dslWriter,

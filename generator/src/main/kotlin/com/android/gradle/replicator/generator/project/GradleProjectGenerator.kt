@@ -17,6 +17,7 @@
 
 package com.android.gradle.replicator.generator.project
 
+import com.android.gradle.replicator.generator.*
 import com.android.gradle.replicator.generator.containsAndroid
 import com.android.gradle.replicator.generator.containsKotlin
 import com.android.gradle.replicator.generator.generate
@@ -45,14 +46,30 @@ import java.io.FileWriter
 import java.util.LinkedList
 
 class GradleProjectGenerator(
-    private val destinationFolder: File,
+    private val params: BuildGenerator.Params,
     private val libraryFilter: Map<WildcardString, String>,
     private val libraryAdditions: Map<WildcardString, List<DependenciesInfo>>,
     private val dslWriter: DslWriter,
     private val resGenerator: ManifestGenerator
 ): ProjectGenerator {
 
-    var processedDependencies: MutableMap<ModuleInfo, List<DependenciesInfo>>? = null
+    private val destinationFolder = params.destination
+
+    private var processedDependencies: MutableMap<ModuleInfo, List<DependenciesInfo>>? = null
+    private val missingDependencies = mutableSetOf<String>()
+    private val validDependencies = mutableSetOf<String>()
+
+    private val repos = listOf(
+        Repositories.MAVEN_CENTRAL,
+        Repositories.GOOGLE_ANDROID,
+        Repository().apply {
+            id = "jitpack"
+            releases = RepositoryPolicy().apply {
+                enabled = "true"
+            }
+            url = "https://jitpack.io"
+        }
+    )
 
     override fun generateRootModule(project: ProjectInfo) {
         dslWriter.newBuildFile(destinationFolder)
@@ -240,43 +257,31 @@ class GradleProjectGenerator(
 
     override fun validateProjectDependencies(project: ProjectInfo) {
         println("Validating dependencies")
-        val repos = listOf(
-            Repositories.MAVEN_CENTRAL,
-            Repositories.GOOGLE_ANDROID,
-            Repository().apply {
-                id = "jitpack"
-                releases = RepositoryPolicy().apply {
-                    enabled = "true"
-                }
-                url = "https://jitpack.io"
-            }
-        )
-
-        val invalidDependencies = mutableSetOf<String>()
-
-        for (moduleDependencies in processedDependencies!!) {
-            invalidDependencies.addAll(checkDependenciesExist(moduleDependencies.value
-                .filter { it.type == DependencyType.EXTERNAL_LIBRARY } // module deps should not be checked against maven
-                .map { it.dependency }, repos))
-        }
-
-        if (invalidDependencies.isNotEmpty()) {
-            generateInvalidDependenciesFile(invalidDependencies, repos)
+        if (missingDependencies.isNotEmpty()) {
+            generateInvalidDependenciesFile(missingDependencies, repos)
         }
     }
 
-    // Returns invalid dependencies
-    private fun checkDependenciesExist(moduleDependencies: List<String>, repos: List<Repository>): Set<String> {
-        val ret = mutableSetOf<String>()
-        val resolver = ArtifactResolver(repositories = repos)
-        for (dependency in moduleDependencies) {
+    /** Checks if dependency is available in the listed [repos]. All non-external deps are always available. */
+    private fun checkIfDependencyExists(depInfo: DependenciesInfo): Boolean {
+        if (depInfo.type != DependencyType.EXTERNAL_LIBRARY) return true
+
+        val dependency = depInfo.dependency
+        if (dependency in missingDependencies) return false
+        if (dependency in validDependencies) return true
+        val exists = try {
+            val resolver = ArtifactResolver(repositories = repos)
             val artifact = resolver.artifactFor(dependency) // returns Artifact
-            val resolvedArtifact = resolver.resolveArtifact(artifact) // returns ResolvedArtifact
-            if (resolvedArtifact == null) {
-                ret.add(dependency)
-            }
+            resolver.resolveArtifact(artifact) != null // returns ResolvedArtifact
+        } catch (t: Throwable) {
+            System.err.println("Failed to verify existence of $dependency. $t")
+            false
         }
-        return ret
+
+        if (!exists) missingDependencies.add(dependency)
+        else validDependencies.add(dependency)
+
+        return exists
     }
 
     private fun generateInvalidDependenciesFile(dependencies: Set<String>, repos: List<Repository>) {
@@ -438,7 +443,9 @@ class GradleProjectGenerator(
             dependencyList.addAll(list)
         }
 
-        processedDependencies!![module] = dependencyList
+        processedDependencies!![module] = if (params.validateDeps) {
+            dependencyList.filter { checkIfDependencyExists(it) }
+        } else dependencyList
     }
 
     private fun ModuleInfo.generateDependencies() {
