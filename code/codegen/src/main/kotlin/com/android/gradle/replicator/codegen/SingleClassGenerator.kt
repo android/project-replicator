@@ -77,7 +77,7 @@ class SingleClassGenerator(
                     false))
         }
         classGenerator.declareMethod("method", parameters, null, null) {
-            for (blockNumber in params.minNumberOfMethods..random.nextInt(params.maxNumberOfMethodBlocks)) {
+            for (blockNumber in params.minNumberOfMethodBlocks..random.nextInt(params.maxNumberOfMethodBlocks)) {
                 addBlock()
             }
         }

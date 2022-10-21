@@ -21,6 +21,8 @@ import org.gradle.api.artifacts.ArtifactView
 import org.gradle.api.artifacts.component.ComponentIdentifier
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.tasks.compile.JavaCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import kotlin.random.Random
 
 @Suppress("UnstableApiUsage")
@@ -34,8 +36,6 @@ class JavaLibraryCodegenPlugin: AbstractCodeGenPlugin() {
             while (current.parent != null) current = current.parent!!
             current.name
         }
-
-        val hasKotlinSources = project.pluginManager.hasPlugin("org.jetbrains.kotlin.jvm")
 
         val generateTask = project.tasks.register(
                 "generateCodegenParams",
@@ -99,6 +99,11 @@ class JavaLibraryCodegenPlugin: AbstractCodeGenPlugin() {
         }
 
         // generate the code before we start compiling it.
-        project.tasks.findByName(if (hasKotlinSources) "compileKotlin" else "compileJava")!!.dependsOn(generateCodeTask)
+        project.tasks.withType(JavaCompile::class.java).configureEach {
+            it.dependsOn(generateCodeTask)
+        }
+        project.tasks.withType(KotlinCompile::class.java).configureEach {
+            it.dependsOn(generateCodeTask)
+        }
     }
 }

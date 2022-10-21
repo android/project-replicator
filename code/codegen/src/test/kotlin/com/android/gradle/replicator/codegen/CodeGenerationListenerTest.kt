@@ -49,9 +49,11 @@ class CodeGenerationListenerTest {
     @Test
     fun testAnnotationDecorations() {
         val params = ClassGenerationParameters.Builder(
-                maxNumberOfInstanceVars = 1,
-                maxNumberOfMethods = 1,
-                maxNumberOfMethodBlocks = 1
+            maxNumberOfInstanceVars = 1,
+            maxNumberOfMethods = 1,
+            // Having min higher than max means no blocks are generated
+            minNumberOfMethodBlocks = 1,
+            maxNumberOfMethodBlocks = 0
         ).build()
 
         val listener = object : CodeGenerationListener {
