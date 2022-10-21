@@ -143,7 +143,8 @@ open class ImportClassPicker(
                         && isClassHierarchySafe(selectedType.java)
                         && selectedType.visibility == KVisibility.PUBLIC
                         && declaredFunctions.isNotEmpty()
-                        && selectedType.isNotDeprecated()) {
+                        && selectedType.isNotDeprecated()
+                        && selectedType.isNotOptInType()) {
                     val constructor = selectedType.findSuitableConstructor(mutableListOf())
                             ?: return null
                     val suitableMethodsToCall = findSuitableMethodsToCall(declaredFunctions)

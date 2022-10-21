@@ -273,6 +273,7 @@ class SingleClassGenerator(
                         && it.isPublic()
                         && it.allParametersCanBeInstantiated(mutableListOf<Class<*>>())
                         && (it.parameters.any { parameter -> parameter.kind == KParameter.Kind.INSTANCE })
+                        && !it.isSuspend
                 }
         return suitableMethods.randomOrNull(random)
     }

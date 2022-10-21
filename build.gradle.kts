@@ -16,6 +16,6 @@
 
 plugins {
     // set the version of the kotlin plugin
-    kotlin("jvm") version "1.3.72" apply false
+    kotlin("jvm") version "1.7.20" apply false
 }
 
