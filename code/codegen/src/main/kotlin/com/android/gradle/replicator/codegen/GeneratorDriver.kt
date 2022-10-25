@@ -16,6 +16,9 @@
  */
 package com.android.gradle.replicator.codegen
 
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.Type
+import org.objectweb.asm.tree.ClassNode
 import java.io.File
 import java.lang.reflect.Modifier
 import java.net.URLClassLoader
@@ -177,6 +180,41 @@ class GeneratorDriver(
     private fun entryNameToClassName(entryName: String): String =
             entryName.substringBefore(".class").replace('/', '.')
 
+}
+
+/**
+ * Return true if the annotated element requires opt-in [RequiresOptIn]. This is true if the element has an annotation
+ * that is annotated with [RequiresOptIn].
+ */
+fun KClass<*>.isNotOptInType(): Boolean {
+    fun getAllAnnotationDescriptors(internalName: String): Sequence<String> {
+        // This only handles top-level classes, but considering the code generator is random it should
+        // just pick another class if we encounter non-top level one.
+        val bytes = java.classLoader.getResourceAsStream("$internalName.class").use {
+            it!!.readAllBytes()
+        }
+        val node = ClassNode()
+        ClassReader(bytes).accept(node, ClassReader.SKIP_CODE)
+
+        val invisible = node.invisibleAnnotations ?: listOf()
+        val visible = node.visibleAnnotations ?: listOf()
+
+        return (invisible + visible).asSequence()
+            .map { it.desc }
+            .filter { it != "Lkotlin/Metadata;" }
+    }
+
+    return try {
+        val directAnnotations = getAllAnnotationDescriptors(Type.getInternalName(this.java))
+
+        // RequiresOptIn is annotation on annotation
+        directAnnotations
+            .flatMap { getAllAnnotationDescriptors(Type.getType(it).internalName) }
+            .none { it == "Lkotlin/RequiresOptIn;" }
+    } catch (e: Throwable) {
+        // cannot determine, play it safe and return false (this could be an opt-in type)
+        false
+    }
 }
 
 /**

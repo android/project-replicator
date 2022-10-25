@@ -1,6 +1,6 @@
 plugins {
     `java-gradle-plugin`
-    id("org.jetbrains.kotlin.jvm") version "1.3.72"
+    id("org.jetbrains.kotlin.jvm") version "1.7.20"
 }
 
 repositories {
@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-  compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
+  compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
 }
 
 gradlePlugin {

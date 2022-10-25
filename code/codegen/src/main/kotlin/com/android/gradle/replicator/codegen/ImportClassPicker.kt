@@ -143,7 +143,8 @@ open class ImportClassPicker(
                         && isClassHierarchySafe(selectedType.java)
                         && selectedType.visibility == KVisibility.PUBLIC
                         && declaredFunctions.isNotEmpty()
-                        && selectedType.isNotDeprecated()) {
+                        && selectedType.isNotDeprecated()
+                        && selectedType.isNotOptInType()) {
                     val constructor = selectedType.findSuitableConstructor(mutableListOf())
                             ?: return null
                     val suitableMethodsToCall = findSuitableMethodsToCall(declaredFunctions)
@@ -169,15 +170,15 @@ open class ImportClassPicker(
     }
 
     private fun findSuitableMethodsToCall(methods: Collection<KFunction<*>>): List<KFunction<*>> =
-            methods
-                .filter {
-                    it.isNotDeprecated()
-                            && it.isPublic()
-                            && it.allParametersCanBeInstantiated(mutableListOf<Class<*>>())
-                            && it.parameters.all { parameter -> isTypeSafe(parameter.type.jvmErasure.java)}
-                            && isTypeSafe(it.returnType.jvmErasure.java)
-                            && (it.parameters.any { parameter -> parameter.kind == KParameter.Kind.INSTANCE })
-                }
+        methods.filter {
+            (it.isNotDeprecated()
+                    && it.isPublic()
+                    && it.allParametersCanBeInstantiated(mutableListOf())
+                    && it.parameters.all { parameter -> isTypeSafe(parameter.type.jvmErasure.java) }
+                    && isTypeSafe(it.returnType.jvmErasure.java)
+                    && !it.isSuspend
+                    && (it.parameters.any { parameter -> parameter.kind == KParameter.Kind.INSTANCE }))
+        }
 
     private fun isTypeSafe(type: Class<*>): Boolean =
         type.classLoader == classLoader

@@ -44,12 +44,14 @@ publishing {
 
 kotlin {
     sourceSets.all {
-        languageSettings.useExperimentalAnnotation("kotlin.ExperimentalStdlibApi")
+        languageSettings.optIn("kotlin.ExperimentalStdlibApi")
     }
 }
 
 dependencies {
     implementation(project(":model"))
+    implementation("org.ow2.asm:asm:9.4")
+    implementation("org.ow2.asm:asm-tree:9.4")
 
     compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))

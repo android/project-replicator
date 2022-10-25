@@ -150,7 +150,7 @@ class SingleClassGenerator(
     private fun addFunctionParameterMethodCall() {
         classGenerator.getLocalVariables().forEach { paramModel ->
             if (paramModel.classModel.type.simpleName?.contains("String") == false) {
-                findSuitableMethodToCall(paramModel.classModel.type.declaredMemberFunctions)?.let {
+                paramModel.classModel.callableMethods.randomOrNull(random)?.let {
                     classGenerator.indent()
                     addMethodCall(paramModel, it)
                     classGenerator.println()
@@ -264,16 +264,5 @@ class SingleClassGenerator(
                 ?: apiClassPicker.pickClass(random)
 
         return selectedType ?: stringClassModel
-    }
-
-    private fun findSuitableMethodToCall(methods: Collection<KFunction<*>>): KFunction<*>? {
-        val suitableMethods = methods
-            .filter {
-                it.isNotDeprecated()
-                        && it.isPublic()
-                        && it.allParametersCanBeInstantiated(mutableListOf<Class<*>>())
-                        && (it.parameters.any { parameter -> parameter.kind == KParameter.Kind.INSTANCE })
-                }
-        return suitableMethods.randomOrNull(random)
     }
 }
