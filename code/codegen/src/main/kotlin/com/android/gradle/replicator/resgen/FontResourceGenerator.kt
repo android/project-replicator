@@ -3,10 +3,11 @@ package com.android.gradle.replicator.resgen
 import com.android.gradle.replicator.model.internal.filedata.AbstractAndroidResourceProperties
 import com.android.gradle.replicator.model.internal.filedata.DefaultAndroidResourceProperties
 import com.android.gradle.replicator.model.internal.filedata.ResourcePropertyType
-import com.android.gradle.replicator.resgen.resourceModel.ResourceData
+import com.android.gradle.replicator.resourceModel.ResourceData
 import com.android.gradle.replicator.resgen.util.copyResourceFile
 import com.android.gradle.replicator.resgen.util.getFileType
 import com.android.gradle.replicator.resgen.util.getResourceClosestToSize
+import com.android.gradle.replicator.resourceModel.ResourceTypes
 import java.io.File
 
 class FontResourceGenerator(params: ResourceGenerationParams): ResourceGenerator(params) {
@@ -40,7 +41,7 @@ class FontResourceGenerator(params: ResourceGenerationParams): ResourceGenerator
                 ResourceData(
                 pkg = "",
                 name = fileName,
-                type = "font",
+                type = ResourceTypes.FONT,
                 extension = properties.extension,
                 qualifiers = properties.splitQualifiers)
             )

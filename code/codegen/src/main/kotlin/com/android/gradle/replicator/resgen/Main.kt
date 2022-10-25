@@ -22,12 +22,15 @@ import com.android.gradle.replicator.model.internal.*
 import com.android.gradle.replicator.model.internal.filedata.AndroidResourceMap
 import com.android.gradle.replicator.model.internal.filedata.FilesWithSizeMap
 import com.android.gradle.replicator.parsing.ArgsParser
-import com.android.gradle.replicator.resgen.resourceModel.ResourceModel
+import com.android.gradle.replicator.resourceModel.ResourceModel
 import com.android.gradle.replicator.resgen.util.ResgenConstants
 import com.android.gradle.replicator.resgen.util.UniqueIdGenerator
+import com.android.gradle.replicator.resourceModel.ResourceModelAdapter
 import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.FileWriter
 import java.nio.file.Files
 import kotlin.random.Random
 
@@ -50,6 +53,7 @@ class Main {
         val parser = ArgsParser()
 
         val androidOutputFolderOption = parser.option(longName = "androidOutput", shortName = "ao", argc = 1)
+        val resourceModelFileOption = parser.option(longName = "resModel", shortName = "rm", argc = 1)
         val javaOutputFolderOption = parser.option(longName = "javaOutput", shortName = "jo", argc = 1)
         val assetOutputFolderOption = parser.option(longName = "assetOutput", shortName = "so", argc = 1)
         val resJsonOption = parser.option(longName = "resJson", shortName = "rj", argc = 1)
@@ -75,17 +79,21 @@ class Main {
             argumentsBuilder.setSeed(it.toInt())
         }
 
-        val androidOutputFolder = File(checkNotNull(androidOutputFolderOption.orNull?.first))
+        val androidOutputFolder = androidOutputFolderOption.asFile
         androidOutputFolder.deleteRecursively()
         androidOutputFolder.mkdirs()
         println("Generating android resources in $androidOutputFolder")
 
-        val javaOutputFolder = File(checkNotNull(javaOutputFolderOption.orNull?.first))
+        val resourceModelFile = resourceModelFileOption.asFile
+        androidOutputFolder.parentFile.mkdirs()
+        println("Writing res model to $resourceModelFile")
+
+        val javaOutputFolder = javaOutputFolderOption.asFile
         javaOutputFolder.deleteRecursively()
         javaOutputFolder.mkdirs()
         println("Generating java resources in $javaOutputFolder")
 
-        val assetOutputFolder = File(checkNotNull(assetOutputFolderOption.orNull?.first))
+        val assetOutputFolder = assetOutputFolderOption.asFile
         assetOutputFolder.deleteRecursively()
         assetOutputFolder.mkdirs()
         println("Generating java resources in $assetOutputFolder")
@@ -99,6 +107,7 @@ class Main {
                     arguments.androidResourcesMap,
                     arguments,
                     androidOutputFolder,
+                    resourceModelFile,
                     resgenConstants
             )
         }
@@ -121,6 +130,7 @@ class Main {
             resMap: AndroidResourceMap,
             parameters: ResourceGenerationParameters,
             outputFolder: File,
+            resourceModelFile: File,
             resgenConstants: ResgenConstants) {
         val random = Random(parameters.seed)
         val uniqueIdGenerator = UniqueIdGenerator()
@@ -131,6 +141,7 @@ class Main {
                 generator.generateResources(outputFolder, resourceType, resourceProperties, resgenConstants, resourceModel)
             }
         }
+        writeResourceModelFile(resourceModelFile, resourceModel)
     }
 
     private fun generateJavaResources(
@@ -174,6 +185,14 @@ class Main {
         }
 
         return ResourceMetadata(androidResources.resourceMap, javaResources.fileData, assets.fileData)
+    }
+
+    private fun writeResourceModelFile(resourceModelFile: File, resourceModel: ResourceModel) {
+        with(JsonWriter(FileWriter(resourceModelFile))) {
+            this.setIndent("  ")
+            ResourceModelAdapter().write(this, resourceModel)
+            this.flush()
+        }
     }
 
     private fun countResources(res: AndroidResourceMap): Int {

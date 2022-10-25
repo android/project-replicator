@@ -16,9 +16,19 @@
  */
 package com.android.gradle.replicator.codegen
 
+import com.android.gradle.replicator.model.AndroidResourcesInfo
+import com.android.gradle.replicator.model.FilesWithSizeMetadataInfo
+import com.android.gradle.replicator.model.internal.AndroidResourcesAdapter
+import com.android.gradle.replicator.model.internal.DefaultAndroidResourcesInfo
+import com.android.gradle.replicator.model.internal.DefaultFilesWithSizeMetadataInfo
+import com.android.gradle.replicator.model.internal.FilesWithSizeMetadataAdapter
 import com.android.gradle.replicator.parsing.ArgsParser
+import com.android.gradle.replicator.resourceModel.ResourceModel
+import com.android.gradle.replicator.resourceModel.ResourceModelAdapter
+import com.google.gson.stream.JsonReader
 import java.io.File
 import java.io.PrintStream
+import java.nio.file.Files
 
 fun main(args: Array<String>) {
     val main= Main()
@@ -34,6 +44,7 @@ class Main {
         val parser = ArgsParser()
 
         val pathToArgumentsFileOption = parser.option(longName = "argsFile", shortName = "i", argc = 1)
+        val resourceModelFileOption = parser.option(longName = "resModel", shortName = "rm", argc = 1)
         val outputFolderOption = parser.option(longName = "outputFolder", shortName = "o", argc = 1)
         val moduleOption = parser.option(longName = "module", shortName = "m", argc = 1)
         val implClasspathElementOption = parser.option(
@@ -61,11 +72,19 @@ class Main {
         parser.parseArgs(args)
 
         val parametersBuilder = CodeGenerationParameters.Builder()
-        val pathToArgumentsFile = pathToArgumentsFileOption.orNull?.first
-        if (pathToArgumentsFile!=null
-            && File(pathToArgumentsFile).exists()) {
-            parser.parsePropertyFile(File(pathToArgumentsFile))
+        val pathToArgumentsFile = pathToArgumentsFileOption.orNull?.asFile
+        if (pathToArgumentsFile != null
+            && pathToArgumentsFile.exists()) {
+            parser.parsePropertyFile(pathToArgumentsFile)
         }
+        val resourceModelFile = resourceModelFileOption.orNull?.asFile
+        val resourceModel =
+            if (resourceModelFile != null
+                && resourceModelFile.exists()) {
+                loadResourceModel(resourceModelFile)
+            } else {
+                ResourceModel()
+            }
         buildParameters(
                 parametersBuilder,
                 apiOption.orNull?.argv,
@@ -80,7 +99,7 @@ class Main {
         val kotlinGenerator: GeneratorType = GeneratorType.Kotlin
         val javaGenerator = GeneratorType.Java
 
-        val outputFolder = File(checkNotNull(outputFolderOption.orNull?.first))
+        val outputFolder = outputFolderOption.asFile
         outputFolder.deleteRecursively()
         outputFolder.mkdirs()
         println("Generating in $outputFolder")
@@ -94,6 +113,7 @@ class Main {
                     javaGenerator,
                     arguments,
                     moduleName,
+                    resourceModel,
                     outputFolder
             )
         }
@@ -103,6 +123,7 @@ class Main {
                     kotlinGenerator,
                     arguments,
                     moduleName,
+                    resourceModel,
                     outputFolder
             )
         }
@@ -113,6 +134,7 @@ class Main {
             generatorType: GeneratorType,
             parameters: CodeGenerationParameters,
             moduleName: String,
+            resourceModel: ResourceModel,
             outputFolder: File) {
         val generator = generatorType.initialize(parameters)
         repeat(numberOfSources) { count ->
@@ -124,12 +146,25 @@ class Main {
             println("Generating ${generatorType.name} source ${outputFile.absolutePath}")
             PrintStream(outputFile).use {
                 generator.generateClass(
+                        moduleName = "com.android.example.${moduleName}",
                         packageName = "com.android.example.${moduleName}",
                         className = className,
                         printStream = PrettyPrintStream(it),
-                        listeners = listOf())
+                        listeners = listOf(),
+                        resourceModel = resourceModel)
             }
         }
+    }
+
+    // read generated android resource model
+    private fun loadResourceModel(resourceModelFile: File): ResourceModel {
+        var resourceModel: ResourceModel
+
+        with(JsonReader(Files.newBufferedReader(resourceModelFile.toPath()))) {
+            resourceModel = ResourceModelAdapter().read(this)
+        }
+
+        return resourceModel
     }
 
     private fun buildParameters(

@@ -90,6 +90,16 @@ open class ImportClassPicker(
     }
 
     /**
+     * find a specific class in the class loader by name.
+     *
+     * @param className the name of the class.
+     * @return the class or null if it could not be found.
+     */
+    fun getClassByName(className: String): ClassModel<*>? {
+        return isClassEligible(loadClass(className))
+    }
+
+    /**
      * Loads a class from the classloader.
      *
      * @param name the class name to load.

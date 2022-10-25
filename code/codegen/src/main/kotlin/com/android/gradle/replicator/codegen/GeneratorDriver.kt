@@ -16,6 +16,7 @@
  */
 package com.android.gradle.replicator.codegen
 
+import com.android.gradle.replicator.resourceModel.ResourceModel
 import java.io.File
 import java.lang.reflect.Modifier
 import java.net.URLClassLoader
@@ -39,20 +40,25 @@ class GeneratorDriver(
     /**
      * Generate a single class
      *
+     * @param moduleName the root package for the module (where the R class is located).
      * @param packageName the package name for the class to generate.
      * @param className the class name to generate.
      * @param printStream the [PrettyPrintStream] to use to generate the code.
      * @param listeners optional list of code generation listeners to further customize generated code.
      */
     override fun generateClass(
+            moduleName: String,
             packageName: String,
             className: String,
             printStream: PrettyPrintStream,
-            listeners: List<CodeGenerationListener>) {
+            listeners: List<CodeGenerationListener>,
+            resourceModel: ResourceModel) {
         SingleClassGenerator(
                 generator = generatorAllocator(printStream, listeners),
+                moduleName = moduleName,
                 packageName = packageName,
                 className = className,
+                resourceModel = resourceModel,
                 random = random,
                 apiClassPicker = apiImportClassPicker,
                 implClassPicker = implementationImportClassPicker,

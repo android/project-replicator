@@ -39,6 +39,8 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
             current.name
         }
 
+        val resourceModelFile = project.layout.projectDirectory.file("generated-resource-model.json")
+
         val generateResourcesTask = project.tasks.register(
                 "generateResources",
                 GenerateResources::class.java) { task ->
@@ -48,6 +50,7 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
             task.androidOutputDirectory.set(project.layout.projectDirectory.dir("src/main/res"))
             task.javaOutputDirectory.set(project.layout.projectDirectory.dir("src/main/resources"))
             task.assetOutputDirectory.set(project.layout.projectDirectory.dir("src/main/assets"))
+            task.resourceModelFile.set(resourceModelFile)
             task.generationProperties.set(project.rootProject.layout.projectDirectory.file("generation.properties"))
         }
 
@@ -179,6 +182,7 @@ class CodegenPlugin: AbstractCodeGenPlugin() {
                 GenerateCode::class.java) { task ->
 
             task.parameters.set(generateTask.flatMap(GenerateCodegenParamsTask::paramsFile))
+            task.resourceModelFile.set(resourceModelFile)
             task.outputDirectory.set(
                     project.layout.projectDirectory.dir("src/main/java")
             )

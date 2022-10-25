@@ -28,6 +28,9 @@ abstract class GenerateCode: DefaultTask() {
     @get:InputFile
     abstract val parameters: RegularFileProperty
 
+    @get:InputFile
+    abstract val resourceModelFile: RegularFileProperty
+
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty
 
@@ -37,6 +40,7 @@ abstract class GenerateCode: DefaultTask() {
         Main().process(
                 arrayOf(
                         "--module", path.removeSuffix(":$name").removePrefix(":").replace(':', '_'),
+                        "--resModel", resourceModelFile.get().asFile.absolutePath,
                         "-i", parameters.get().asFile.absolutePath,
                         "-o", outputDirectory.get().asFile.absolutePath
                 )

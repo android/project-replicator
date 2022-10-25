@@ -16,6 +16,7 @@
  */
 package com.android.gradle.replicator.codegen
 
+import com.android.gradle.replicator.resourceModel.ResourceModel
 import java.lang.reflect.Modifier
 import kotlin.random.Random
 import kotlin.reflect.*
@@ -28,16 +29,20 @@ import kotlin.reflect.jvm.kotlinFunction
 class SingleClassGenerator(
         generator: ClassGenerator,
         private val params: ClassGenerationParameters,
+        private val moduleName: String,
         private val packageName: String,
         private val className: String,
         private val apiClassPicker: ImportClassPicker,
         private val implClassPicker: ImportClassPicker,
+        private val resourceModel: ResourceModel,
         private val random: Random
 ) {
 
     private val classGenerator = ModelBuilderClassGenerator(generator)
 
     private var currentBlockDepth: Int = 0;
+
+    private val rClassName = "$moduleName.R"
 
     /**
      * Generate a single class using the provided generation parameters.
@@ -220,6 +225,10 @@ class SingleClassGenerator(
                 }
             }
         }
+    }
+
+    private fun addResourceReferenceAndMethodCall() {
+        // To be implemented
     }
 
     private fun findMethodReturning(desiredReturnType: KType): MethodCall? {

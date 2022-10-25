@@ -16,6 +16,9 @@
  */
 package com.android.gradle.replicator.resgen.util
 
+import com.android.gradle.replicator.resourceModel.ResourceData
+import com.android.gradle.replicator.resourceModel.ResourceModel
+import com.android.gradle.replicator.resourceModel.ResourceTypes
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.random.Random
@@ -71,6 +74,25 @@ fun genHex(numberOfDigits: Int, random: Random): String {
             .substring(0, numberOfDigits) // Trim if odd number of hex requested
 }
 
+fun genColor(constants: ResgenConstants, random: Random): String {
+    /* Digits can be:
+     * #RGB
+     * #ARGB
+     * #RRGGBB
+     * #AARRGGBB
+     */
+    val numberOfDigits = constants.values.POSSIBLE_COLOR_DIGITS.random(random)
+    return "#${genHex(numberOfDigits, random)}"
+}
+
+fun genDimen(constants: ResgenConstants, random: Random): String {
+    return "${random.nextInt(constants.values.MAX_DIMENSION)}${constants.values.DIMENSION_UNITS.random(random)}"
+}
+
+fun genFloat(random: Random): String {
+    return "${random.nextFloat()}"
+}
+
 fun genIdCharacters(count: Int, minFileNameCharacters: Int = 3): String {
     var current = count
     var characters = ""
@@ -79,6 +101,13 @@ fun genIdCharacters(count: Int, minFileNameCharacters: Int = 3): String {
         current /= 26
     }
     return characters
+}
+
+fun genResourceOfType(random: Random, type: ResourceTypes, resourceModel: ResourceModel): ResourceData? {
+    val filtered = resourceModel.resourceList.filter { it.type == type }
+    if (filtered.isEmpty()) return null
+
+    return filtered.random(random)
 }
 
 class UniqueIdGenerator {
