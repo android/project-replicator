@@ -26,7 +26,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
+    implementation("com.google.code.gson:gson:2.10")
     implementation(project(":code:codegen"))
 }
 

@@ -53,7 +53,8 @@ dependencies {
     implementation("org.ow2.asm:asm:9.4")
     implementation("org.ow2.asm:asm-tree:9.4")
 
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
+    implementation("com.google.code.gson:gson:2.10")
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.google.guava:guava:30.0-jre")
