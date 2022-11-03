@@ -25,13 +25,9 @@ import com.android.gradle.replicator.resgen.util.VectorDrawableGenerator
 import com.android.gradle.replicator.resgen.util.copyResourceFile
 import com.android.gradle.replicator.resgen.util.getFileType
 import com.android.gradle.replicator.resgen.util.getResourceClosestToSize
-import com.google.common.annotations.VisibleForTesting
 import java.io.File
 
 class DrawableResourceGenerator (params: ResourceGenerationParams): ResourceGenerator(params) {
-
-    @set:VisibleForTesting
-    var numberOfResourceElements: Long?= null
 
     private val supportedFileTypes = listOf(
             FileTypes.PNG,

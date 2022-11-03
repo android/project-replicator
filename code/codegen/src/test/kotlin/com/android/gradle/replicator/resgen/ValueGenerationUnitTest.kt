@@ -11,9 +11,6 @@ class ValueGenerationUnitTest: AbstractResourceGenerationTest() {
     @Test
     fun testValueGeneration() {
         val generator = ValueResourceGenerator(resourceGenerationParams)
-
-        generator.numberOfResourceElements = 5
-
         generator.generateResource(
             properties = ValuesAndroidResourceProperties(
                 qualifiers = "",
@@ -176,5 +173,44 @@ class ValueGenerationUnitTest: AbstractResourceGenerationTest() {
 
         Truth.assertThat(generatedValues1).isEqualTo(expectedValues1)
         Truth.assertThat(generatedValues2).isEqualTo(expectedValues2)
+    }
+
+    @Test
+    fun testQualifiersReuseNames() {
+        val generator = ValueResourceGenerator(resourceGenerationParams)
+        generator.generateResource(
+            properties = ValuesAndroidResourceProperties(
+                qualifiers = "",
+                extension = "xml",
+                quantity = 1,
+                valuesMapPerFile = listOf(
+                    ValuesMap(
+                        stringCount = 2,
+                        colorCount = 2,
+                    ),
+                )
+            ),
+            outputFolder = testFolder.newFolder("no-qualifiers")
+        )
+        val enUK = "en-UK"
+        generator.generateResource(
+            properties = ValuesAndroidResourceProperties(
+                qualifiers = enUK,
+                extension = "xml",
+                quantity = 1,
+                valuesMapPerFile = listOf(
+                    ValuesMap(
+                        stringCount = 2,
+                        colorCount = 2,
+                    ),
+                )
+            ),
+            outputFolder = testFolder.newFolder("qualifiers")
+        )
+
+        val noQualifiersNames = resourceGenerationParams.resourceModel.resourceList.filter { it.qualifiers.isEmpty() }.map { it.name }
+        val withQualifiersNames = resourceGenerationParams.resourceModel.resourceList.filter { it.qualifiers == listOf(enUK) }.map { it.name }
+
+        Truth.assertThat(noQualifiersNames).containsExactlyElementsIn(withQualifiersNames)
     }
 }

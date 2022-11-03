@@ -11,3 +11,13 @@ data class ResourceData (
 class ResourceModel {
     val resourceList: MutableList<ResourceData> = mutableListOf()
 }
+
+enum class ResourceDataType(val typeName: String) {
+    STRING("values_string"),
+    BOOL("values_bool"),
+    INT("values_int"),
+    COLOR("values_color"),
+    DIMEN("values_dimen"),
+    INT_ARRAY("values_int_array"),
+    ID("values_id"),
+}

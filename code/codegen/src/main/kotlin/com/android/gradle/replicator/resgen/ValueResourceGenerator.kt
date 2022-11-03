@@ -21,16 +21,13 @@ import com.android.gradle.replicator.model.internal.filedata.ResourcePropertyTyp
 import com.android.gradle.replicator.model.internal.filedata.ValuesAndroidResourceProperties
 import com.android.gradle.replicator.model.internal.filedata.ValuesMap
 import com.android.gradle.replicator.resgen.resourceModel.ResourceData
+import com.android.gradle.replicator.resgen.resourceModel.ResourceDataType
 import com.android.gradle.replicator.resgen.util.genHex
 import com.android.gradle.replicator.resgen.util.genString
 import com.android.gradle.replicator.resgen.util.genUniqueName
-import com.google.common.annotations.VisibleForTesting
 import java.io.File
 
 class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerator(params) {
-
-    @set:VisibleForTesting
-    var numberOfResourceElements: Int?= null
 
     override fun generateResource(
         properties: AbstractAndroidResourceProperties,
@@ -112,7 +109,7 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
     }
 
     private fun stringBlock (resourceQualifiers: List<String>): String {
-        val name = genUniqueName(params.random, "values.resName.string.${resourceQualifiers}", params.uniqueIdGenerator)
+        val name = generateName(ResourceDataType.STRING, resourceQualifiers)
         val value = genString(
             params.constants.values.MAX_STRING_WORD_COUNT,
             separator = " ",
@@ -122,7 +119,7 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_string",
+                type = ResourceDataType.STRING.typeName,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
@@ -131,14 +128,14 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
     }
 
     private fun intBlock (resourceQualifiers: List<String>): String {
-        val name = genUniqueName(params.random, "values.resName.int.${resourceQualifiers}", params.uniqueIdGenerator)
+        val name = generateName(ResourceDataType.INT, resourceQualifiers)
         val value = params.random.nextInt()
 
         params.resourceModel.resourceList.add(
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_int",
+                type = ResourceDataType.INT.typeName,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
@@ -147,14 +144,14 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
     }
 
     private fun boolBlock (resourceQualifiers: List<String>): String {
-        val name = genUniqueName(params.random, "values.resName.bool.${resourceQualifiers}", params.uniqueIdGenerator)
+        val name = generateName(ResourceDataType.BOOL, resourceQualifiers)
         val value = params.random.nextBoolean()
 
         params.resourceModel.resourceList.add(
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_bool",
+                type = ResourceDataType.BOOL.typeName,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
@@ -163,7 +160,7 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
     }
 
     private fun colorBlock (resourceQualifiers: List<String>): String {
-        val name = genUniqueName(params.random, "values.resName.color.${resourceQualifiers}", params.uniqueIdGenerator)
+        val name = generateName(ResourceDataType.COLOR, resourceQualifiers)
         /* Digits can be:
          * #RGB
          * #ARGB
@@ -178,7 +175,7 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_color",
+                type = ResourceDataType.COLOR.typeName,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
@@ -187,13 +184,13 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
     }
 
     private fun dimenBlock (resourceQualifiers: List<String>): String {
-        val name = genUniqueName(params.random, "values.resName.dimen.${resourceQualifiers}", params.uniqueIdGenerator)
+        val name = generateName(ResourceDataType.DIMEN, resourceQualifiers)
         val value = "${params.random.nextInt(params.constants.values.MAX_DIMENSION)}${params.constants.values.DIMENSION_UNITS.random(params.random)}"
         params.resourceModel.resourceList.add(
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_dimen",
+                type = ResourceDataType.DIMEN.typeName,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
@@ -202,12 +199,12 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
     }
 
     private fun idBlock (resourceQualifiers: List<String>): String {
-        val name = genUniqueName(params.random, "values.resName.id.${resourceQualifiers}", params.uniqueIdGenerator)
+        val name = generateName(ResourceDataType.ID, resourceQualifiers)
         params.resourceModel.resourceList.add(
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_id",
+                type = ResourceDataType.ID.typeName,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
@@ -215,7 +212,7 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
     }
 
     private fun intArrayBlock (resourceQualifiers: List<String>): List<String> {
-        val name = genUniqueName(params.random, "values.resName.intArray.${resourceQualifiers}", params.uniqueIdGenerator)
+        val name = generateName(ResourceDataType.INT_ARRAY, resourceQualifiers)
         val size = params.random.nextInt(params.constants.values.MAX_ARRAY_ELEMENTS)
         val result = mutableListOf("    <integer-array name=\"$name\">")
 
@@ -228,7 +225,7 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
             ResourceData(
                 pkg = "",
                 name = name,
-                type = "values_int_array",
+                type = ResourceDataType.INT_ARRAY.typeName,
                 extension = "xml",
                 qualifiers = resourceQualifiers)
         )
@@ -238,5 +235,22 @@ class ValueResourceGenerator (params: ResourceGenerationParams): ResourceGenerat
     private fun typedArrayBlock (resourceQualifiers: List<String>): List<String> {
         // to be implemented
         return listOf()
+    }
+
+    private fun generateName(type: ResourceDataType, resourceQualifiers: List<String>): String {
+        val availableNames = params.resourceModel.resourceList
+            .filter { it.type == type.typeName }
+            .partition { it.qualifiers == resourceQualifiers }
+            .let { (thisQualifier, allOtherStrings) ->
+                val takenNames = thisQualifier.mapTo(mutableSetOf()) { it.name }
+
+                allOtherStrings.mapTo(mutableSetOf()) { it.name } - takenNames
+            }
+
+        return availableNames.minOrNull() ?: genUniqueName(
+            params.random,
+            "values.resName.${type.typeName}.${resourceQualifiers}",
+            params.uniqueIdGenerator
+        )
     }
 }

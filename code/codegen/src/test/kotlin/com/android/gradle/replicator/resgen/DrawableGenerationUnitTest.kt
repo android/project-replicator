@@ -10,7 +10,6 @@ class DrawableGenerationUnitTest: AbstractResourceGenerationTest() {
     @Test
     fun testDrawableGeneration() {
         val generator = DrawableResourceGenerator(resourceGenerationParams)
-        generator.numberOfResourceElements = 3
 
         val pngFolder = testFolder.newFolder("png")
         val pngQualifiedFolder = testFolder.newFolder("png-xxxhdpi")
