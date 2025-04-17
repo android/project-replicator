@@ -5,6 +5,7 @@ name: CI
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
+  workflow_dispatch:
   push:
     branches: [ master ]
   pull_request:
@@ -41,4 +42,3 @@ jobs:
         with:
           name: gradle-test-logs
           path: ./**/build/reports/tests
-        
