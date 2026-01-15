@@ -21,7 +21,6 @@ import com.android.build.api.dsl.DynamicFeatureBuildFeatures
 import com.android.build.api.dsl.LibraryBuildFeatures
 import com.android.build.api.dsl.TestBuildFeatures
 import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.internal.plugins.BasePlugin
 import com.android.gradle.replicator.model.internal.DefaultAndroidInfo
 import com.android.gradle.replicator.model.internal.DefaultBuildFeaturesInfo
 import org.gradle.api.Project
@@ -39,14 +38,25 @@ interface AndroidCollector {
     fun collectInfo(project: Project) : AndroidInfoInputs?
 }
 
+// Android plugin IDs to check for
+private val ANDROID_PLUGIN_IDS = listOf(
+    "com.android.application",
+    "com.android.library",
+    "com.android.dynamic-feature",
+    "com.android.test"
+)
+
 /**
  * Basic implementation of collector to start with.
  */
 class DefaultAndroidCollector : AndroidCollector {
     private lateinit var project: Project
     override fun collectInfo(project: Project): AndroidInfoInputs? {
-        // load the BasePlugin by reflection in case it does not exist so that we dont fail with ClassNotFoundException
-        return project.plugins.withType(BasePlugin::class.java).firstOrNull()?.let {
+        // Check for Android plugins by ID instead of using internal BasePlugin class
+        val hasAndroidPlugin = ANDROID_PLUGIN_IDS.any { project.plugins.hasPlugin(it) }
+        if (!hasAndroidPlugin) return null
+
+        return run {
             this.project = project
 
             // if we are here there is indeed an Android plugin applied

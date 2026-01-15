@@ -36,7 +36,7 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileVisitDetails
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.file.ReproducibleFileVisitor
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
@@ -279,9 +279,10 @@ abstract class GatherModuleInfoTask : DefaultTask() {
             task.androidInputs.disallowChanges()
 
             if (appliedPlugins.containsJava()) {
-                val javaConvention = project.convention.findPlugin(JavaPluginConvention::class.java)
-                if (javaConvention != null) {
-                    val mainSrcSet = javaConvention.sourceSets.findByName(SourceSet.MAIN_SOURCE_SET_NAME)
+                // Use the modern JavaPluginExtension instead of deprecated Convention
+                val javaExtension = project.extensions.findByType(JavaPluginExtension::class.java)
+                if (javaExtension != null) {
+                    val mainSrcSet = javaExtension.sourceSets.findByName(SourceSet.MAIN_SOURCE_SET_NAME)
                     // Java source files
                     mainSrcSet?.allSource?.srcDirs?.let {
                         task.javaSourceSets.from(it)
@@ -324,11 +325,28 @@ private fun gatherDependencies(config: Configuration): List<DependenciesInfoInpu
 
     for (dependency in config.dependencies) {
         val dep = when (dependency) {
-            is ProjectDependency -> DependenciesInfoInputs(
-                type = DependencyType.MODULE,
-                dependency = dependency.dependencyProject.path,
-                scope = config.name
-            )
+            is ProjectDependency -> {
+                // Reconstruct the project path from group and name
+                // The group uses dots (e.g., "slack-android-ng.apps") but paths use colons (e.g., ":apps")
+                val group = dependency.group
+                val name = dependency.name
+                val projectPath = if (group != null && group != name) {
+                    // Extract path from group by converting dots to colons and removing root project name
+                    val pathFromGroup = group.substringAfter('.', "").replace('.', ':')
+                    if (pathFromGroup.isNotEmpty()) {
+                        ":$pathFromGroup:$name"
+                    } else {
+                        ":$name"
+                    }
+                } else {
+                    ":$name"
+                }
+                DependenciesInfoInputs(
+                    type = DependencyType.MODULE,
+                    dependency = projectPath,
+                    scope = config.name
+                )
+            }
             is ModuleDependency -> DependenciesInfoInputs(
                 type = DependencyType.EXTERNAL_LIBRARY,
                 dependency = "${dependency.group}:${dependency.name}:${dependency.version}",
