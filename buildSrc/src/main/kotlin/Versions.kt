@@ -23,8 +23,8 @@ class Versions {
 
         internal var _gradleVersion: String? = null
 
-        const val agpVersion = "4.2.0-alpha13"
-        const val kotlinVersion = "1.3.72"
+        const val agpVersion = "8.3.0"
+        const val kotlinVersion = "1.7.20"
         const val pluginVersion = "0.2"
         const val pluginArtifactId = "project-replicator"
     }

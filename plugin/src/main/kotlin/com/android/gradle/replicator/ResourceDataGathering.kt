@@ -1,7 +1,6 @@
 package com.android.gradle.replicator
 
 import com.android.gradle.replicator.model.internal.filedata.*
-import com.android.utils.XmlUtils
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.Locator
@@ -9,6 +8,7 @@ import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
 import java.io.File
 import java.io.StringReader
+import javax.xml.XMLConstants
 import javax.xml.parsers.SAXParserFactory
 
 // Method to create the correct data class. Need to make this so it scans the files appropriately
@@ -114,10 +114,19 @@ fun parseValuesFile(valuesFile: File): ValuesMap {
         }
     }
 
-    val factory = SAXParserFactory.newInstance()
-    // Parse the input
-    XmlUtils.configureSaxFactory(factory, false, false)
-    val saxParser = XmlUtils.createSaxParser(factory)
+    val factory = SAXParserFactory.newInstance().apply {
+        // Configure safely without external entity processing
+        isNamespaceAware = false
+        isValidating = false
+        try {
+            setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+            setFeature("http://xml.org/sax/features/external-general-entities", false)
+            setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+        } catch (e: Exception) {
+            // Ignore if features not supported
+        }
+    }
+    val saxParser = factory.newSAXParser()
     try {
         saxParser.parse(InputSource(StringReader(valuesFile.readText())), handler)
     } catch (e: SAXParseException) {
